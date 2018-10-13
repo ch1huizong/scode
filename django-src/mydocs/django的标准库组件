@@ -1,0 +1,33 @@
+
+一、django.contrib
+
+	sites
+
+	flatpages
+
+	redirects
+
+	session			每一次会话的存储, 特定一次会话数据的存储
+						Session				与数据库有关
+						SessionStore		内部专用存储结构
+
+						数据存在哪里? 四种后端
+
+	contenttypes	通用关系使用，反向关系GenericRelation
+
+	messages		默认Level, 标签， 使用 
+
+	sitemaps		关键是定义Sitemap文件，挂载到url配置中
+
+	syndication		feed的使用
+
+		
+
+
+二、django.core
+
+	paginator
+
+	mail
+
+	signals			发送-接收，定义一个接收函数就可以了

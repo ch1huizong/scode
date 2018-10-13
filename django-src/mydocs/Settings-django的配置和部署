@@ -1,0 +1,24 @@
+一、两种方式：
+
+	都是指定settings的配置文件在哪里
+
+	1. 通过Bash环境的DJANGO_SETTINS_MODULE环境变量指定模块
+
+	2. 使用settings对象的configure方法
+	   from django.conf import settings
+	   settings.configure(default_settings=myapp_defaults, DEBUG=True)
+
+二、使用django东西：
+	通过以上两种方式之一;
+
+	django.setup()
+	from myapp import models
+
+三、部署
+
+	a.配置文件 
+
+	b.服务器设置
+		mod_python
+		mod_wsgi
+		fastcgi + 独立进程、常驻内存、c-s模式

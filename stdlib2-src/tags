@@ -1,0 +1,82 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BaseRequestHandler	SocketServer.py	/^class BaseRequestHandler:  # 一实例化，就开始运行处理$/;"	c
+BaseServer	SocketServer.py	/^class BaseServer:$/;"	c
+DatagramRequestHandler	SocketServer.py	/^class DatagramRequestHandler(BaseRequestHandler):$/;"	c
+ForkingMixIn	SocketServer.py	/^class ForkingMixIn:$/;"	c
+ForkingTCPServer	SocketServer.py	/^class ForkingTCPServer(ForkingMixIn, TCPServer): pass$/;"	c
+ForkingUDPServer	SocketServer.py	/^class ForkingUDPServer(ForkingMixIn, UDPServer): pass$/;"	c
+StreamRequestHandler	SocketServer.py	/^class StreamRequestHandler(BaseRequestHandler):$/;"	c
+TCPServer	SocketServer.py	/^class TCPServer(BaseServer):$/;"	c
+ThreadingMixIn	SocketServer.py	/^class ThreadingMixIn:$/;"	c
+ThreadingTCPServer	SocketServer.py	/^class ThreadingTCPServer(ThreadingMixIn, TCPServer): pass$/;"	c
+ThreadingUDPServer	SocketServer.py	/^class ThreadingUDPServer(ThreadingMixIn, UDPServer): pass$/;"	c
+ThreadingUnixDatagramServer	SocketServer.py	/^    class ThreadingUnixDatagramServer(ThreadingMixIn, UnixDatagramServer): pass$/;"	c	class:ThreadingTCPServer
+ThreadingUnixStreamServer	SocketServer.py	/^    class ThreadingUnixStreamServer(ThreadingMixIn, UnixStreamServer): pass$/;"	c	class:ThreadingTCPServer
+UDPServer	SocketServer.py	/^class UDPServer(TCPServer):$/;"	c
+UnixDatagramServer	SocketServer.py	/^    class UnixDatagramServer(UDPServer):$/;"	c	class:ThreadingTCPServer
+UnixStreamServer	SocketServer.py	/^    class UnixStreamServer(TCPServer):$/;"	c	class:ThreadingTCPServer
+__all__	SocketServer.py	/^__all__ = ["TCPServer","UDPServer","ForkingUDPServer","ForkingTCPServer",$/;"	v
+__init__	SocketServer.py	/^    def __init__(self, request, client_address, server):$/;"	m	class:BaseRequestHandler
+__init__	SocketServer.py	/^    def __init__(self, server_address, RequestHandlerClass):$/;"	m	class:BaseServer
+__init__	SocketServer.py	/^    def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True):$/;"	m	class:TCPServer
+__version__	SocketServer.py	/^__version__ = "0.4"$/;"	v
+_eintr_retry	SocketServer.py	/^def _eintr_retry(func, *args):$/;"	f
+_handle_request_noblock	SocketServer.py	/^    def _handle_request_noblock(self):$/;"	m	class:BaseServer
+active_children	SocketServer.py	/^    active_children = None$/;"	v	class:ForkingMixIn
+address_family	SocketServer.py	/^        address_family = socket.AF_UNIX$/;"	v	class:ThreadingTCPServer.UnixDatagramServer
+address_family	SocketServer.py	/^        address_family = socket.AF_UNIX$/;"	v	class:ThreadingTCPServer.UnixStreamServer
+address_family	SocketServer.py	/^    address_family = socket.AF_INET$/;"	v	class:TCPServer
+allow_reuse_address	SocketServer.py	/^    allow_reuse_address = False$/;"	v	class:TCPServer
+allow_reuse_address	SocketServer.py	/^    allow_reuse_address = False$/;"	v	class:UDPServer
+close_request	SocketServer.py	/^    def close_request(self, request):$/;"	m	class:BaseServer
+close_request	SocketServer.py	/^    def close_request(self, request):$/;"	m	class:TCPServer
+close_request	SocketServer.py	/^    def close_request(self, request):$/;"	m	class:UDPServer
+collect_children	SocketServer.py	/^    def collect_children(self):$/;"	m	class:ForkingMixIn
+daemon_threads	SocketServer.py	/^    daemon_threads = False$/;"	v	class:ThreadingMixIn
+disable_nagle_algorithm	SocketServer.py	/^    disable_nagle_algorithm = False$/;"	v	class:StreamRequestHandler
+fileno	SocketServer.py	/^    def fileno(self):$/;"	m	class:TCPServer
+finish	SocketServer.py	/^    def finish(self):$/;"	m	class:BaseRequestHandler
+finish	SocketServer.py	/^    def finish(self):$/;"	m	class:DatagramRequestHandler
+finish	SocketServer.py	/^    def finish(self):$/;"	m	class:StreamRequestHandler
+finish_request	SocketServer.py	/^    def finish_request(self, request, client_address):$/;"	m	class:BaseServer
+get_request	SocketServer.py	/^    def get_request(self):$/;"	m	class:TCPServer
+get_request	SocketServer.py	/^    def get_request(self):$/;"	m	class:UDPServer
+handle	SocketServer.py	/^    def handle(self):$/;"	m	class:BaseRequestHandler
+handle_error	SocketServer.py	/^    def handle_error(self, request, client_address): $/;"	m	class:BaseServer
+handle_request	SocketServer.py	/^    def handle_request(self):$/;"	m	class:BaseServer
+handle_timeout	SocketServer.py	/^    def handle_timeout(self):$/;"	m	class:BaseServer
+handle_timeout	SocketServer.py	/^    def handle_timeout(self):$/;"	m	class:ForkingMixIn
+max_children	SocketServer.py	/^    max_children = 40$/;"	v	class:ForkingMixIn
+max_packet_size	SocketServer.py	/^    max_packet_size = 8192$/;"	v	class:UDPServer
+process_request	SocketServer.py	/^    def process_request(self, request, client_address):$/;"	m	class:BaseServer
+process_request	SocketServer.py	/^    def process_request(self, request, client_address):$/;"	m	class:ForkingMixIn
+process_request	SocketServer.py	/^    def process_request(self, request, client_address):$/;"	m	class:ThreadingMixIn
+process_request_thread	SocketServer.py	/^    def process_request_thread(self, request, client_address):$/;"	m	class:ThreadingMixIn
+rbufsize	SocketServer.py	/^    rbufsize = -1 #缓存$/;"	v	class:StreamRequestHandler
+request_queue_size	SocketServer.py	/^    request_queue_size = 5$/;"	v	class:TCPServer
+serve_forever	SocketServer.py	/^    def serve_forever(self, poll_interval=0.5):$/;"	m	class:BaseServer
+server_activate	SocketServer.py	/^    def server_activate(self):$/;"	m	class:BaseServer
+server_activate	SocketServer.py	/^    def server_activate(self):$/;"	m	class:TCPServer
+server_activate	SocketServer.py	/^    def server_activate(self):$/;"	m	class:UDPServer
+server_bind	SocketServer.py	/^    def server_bind(self):$/;"	m	class:TCPServer
+server_close	SocketServer.py	/^    def server_close(self):$/;"	m	class:BaseServer
+server_close	SocketServer.py	/^    def server_close(self):$/;"	m	class:TCPServer
+setup	SocketServer.py	/^    def setup(self):$/;"	m	class:BaseRequestHandler
+setup	SocketServer.py	/^    def setup(self):$/;"	m	class:DatagramRequestHandler
+setup	SocketServer.py	/^    def setup(self):$/;"	m	class:StreamRequestHandler
+shutdown	SocketServer.py	/^    def shutdown(self):$/;"	m	class:BaseServer
+shutdown_request	SocketServer.py	/^    def shutdown_request(self, request):$/;"	m	class:BaseServer
+shutdown_request	SocketServer.py	/^    def shutdown_request(self, request):$/;"	m	class:TCPServer
+shutdown_request	SocketServer.py	/^    def shutdown_request(self, request):$/;"	m	class:UDPServer
+socket_type	SocketServer.py	/^    socket_type = socket.SOCK_DGRAM$/;"	v	class:UDPServer
+socket_type	SocketServer.py	/^    socket_type = socket.SOCK_STREAM$/;"	v	class:TCPServer
+timeout	SocketServer.py	/^    timeout = 300$/;"	v	class:ForkingMixIn
+timeout	SocketServer.py	/^    timeout = None$/;"	v	class:BaseServer
+timeout	SocketServer.py	/^    timeout = None$/;"	v	class:StreamRequestHandler
+verify_request	SocketServer.py	/^    def verify_request(self, request, client_address):$/;"	m	class:BaseServer
+wbufsize	SocketServer.py	/^    wbufsize = 0  #不缓存$/;"	v	class:StreamRequestHandler

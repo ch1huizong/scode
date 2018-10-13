@@ -1,0 +1,55 @@
+
+一、Django处理form中的三个部分：
+	1. 展示html,form产生
+	2. 数据处理
+
+	form实例化的来源: 来自前一次提交, 从其他来源, model的已存在instance
+
+	form构造函数:
+		data, initial, auto_id, label_suffix, field_order, error_class, 
+
+		还有一些类属性
+	
+	BoundField:(Form实例字段)
+
+	使用hidden字段的情形，主要是为表单添加一些默认字段值。	
+
+	文件上传...
+
+
+三、form验证：
+		form验证进入点： is_valid, errors, full_clean
+
+		1.Field.clean(to_python, validate, run_validators): 清洗数据，插入到cleaned_data
+		
+		2.clean_<fieldname> : 与字段类型无关，form级别的唯一性验证，返回字段data，更新cleaned_data
+		
+		3.Form.clean: 例如多字段依赖关于验证，self.cleaned_data可以使用了
+
+
+四、formset:
+
+	formset_factory产生函数 
+		extra, initial, max_num, validate_max,  validate_min,can_order, can_delete
+	
+	重新定制BaseFromset
+
+
+四、ModelForm( modelform_factory)
+	1.验证表单
+	2.验证Model实例
+
+	保存： save(commit=False) 返回实例，不保存到数据库，可以进一步修改实例
+	若为commit=false的话，需要f.save后，再f.save_m2m()
+
+	modelform_factory		生成modelform的便捷函数
+
+	***底线,保持model中数据的完整性.
+
+
+
+	
+表单集合：
+formset_factory
+modelformset_factory
+inlineformset_factory

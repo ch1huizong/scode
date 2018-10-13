@@ -1,0 +1,31 @@
+一. 组件
+	
+	User				用户(核心)
+
+	Permission			权限
+
+	Group				组
+
+
+
+二. 流程(user相关的)
+
+	authenticate, login, logout
+
+	login_required/LoginRequired 
+	user_passes_test/UserPassesTest, 
+	permission_required/PermissionRequired
+
+
+
+三. 模块
+
+	访问控制		mixins
+	用户视图		views
+	用户form		forms
+	后端			backends
+
+
+四. 扩展User模型
+	1. 不替换： 使用proxy（只是行为上不同); 使用One-To-One字段
+	2. 替换

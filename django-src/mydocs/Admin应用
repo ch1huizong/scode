@@ -1,0 +1,26 @@
+一.ModelAdmin:
+	
+	1.选项
+
+	list_display: 模型字段、admin中的可调用对象、ModelAdmin的类属性、Model的类属性
+				  后三者主要是指方法, 方法排序admin_order_filed属性，
+
+	list_display_links: 指定在list_display中的字段可以link
+
+
+二、TabularInline、StackedInline(不错啊)
+	外键、多对多关系、多对多的中间表、通用关系做成inline方式
+
+三、覆盖admin模板
+
+四、AdminSite类: 
+
+
+五、自定义actions:
+	...
+	actions迁移到ModelAdmin里;
+	重定向;
+	admin.site.add_action;    #全局
+	admin.site.disable_action;
+	actions = None;  # 使ModelAdmin里的所有action失效
+	get_actions   # 条件失效或有效，重写,每一个request

@@ -1,0 +1,1 @@
+../../../../share/pyshared/hamster/edit_activity.py

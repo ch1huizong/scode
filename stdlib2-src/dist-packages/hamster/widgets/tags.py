@@ -1,0 +1,1 @@
+../../../../../share/pyshared/hamster/widgets/tags.py

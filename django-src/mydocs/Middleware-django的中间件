@@ -1,0 +1,9 @@
+一、
+	洋葱图
+
+	内部：
+		cache, common, gzip, local, security(未读，深研), locale, csrf
+
+		出现顺序，用时再深研。
+
+二、1.10中间件的升级，理解不彻底

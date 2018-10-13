@@ -1,0 +1,40 @@
+
+一、Django模型的继承：
+
+	1. 抽象基类(共同信息)：
+		若基类中FK或M2M有related_name选项，
+		则必须包含%(class)s和%(app_label)s构造部分，
+		使子类动态生成子类查询部分
+
+	2. 继承(信息分表保存)：
+		子类要是有FK或M2M，需要指定related_name部分
+
+	3. 代理(父类的代理，包裹一些自定义表行为)
+
+	共同：子类不能覆盖父类的Field字段。
+
+
+二、数据操作(CURD)
+	Copy		复制操作注意对M2M、O2O、继承分别对待;
+	Update		批量更新QSet.update只能更新“主表”中的字段;
+
+	查询		基于M2M或FK中的多方进行过滤 f1.f2...与f1(con1, con2...)表达的含义不同
+				后者是con1 & con2 ,f1.exclude(con1,con2..)例外
+
+				F 其他字段引用表达式
+
+				完全计算才会产生缓存
+
+				Q 表达式(组合&, |, ~)
+
+
+	反向引用	表反向/实例反向
+
+三、自定义Manager
+	1. 增加表格级别的"额外方法"
+	2. 初始化返回的Qset集合 get_queryset
+
+	default_manager		第一个定义的
+	base_manager		相关对象的访问?  使用情景？
+
+	*manager继承

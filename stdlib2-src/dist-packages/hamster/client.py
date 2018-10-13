@@ -1,0 +1,1 @@
+../../../../share/pyshared/hamster/client.py

@@ -1,0 +1,28 @@
+一、字段选项：
+
+
+二、字段类型：
+
+
+三、关系字段：
+
+	1. ForeignKey选项：
+
+		on_delete					CASCADE, PROTECT, SET_NULL, SET_DEFAULT, SET(), DO_NOTHING
+		limit_choices_to			字典，Q对象，返回字典或Q的可调用对象
+		related_name/related_query_name	后者是反向过滤器的名字
+		to_field					被引用模型的字段	
+		swappable					没看懂
+
+	2. ManyToManyField选项：
+		symmetrical					对称，只用于循环引用
+		through						自定义中间表（连接两者,默认背后会创建）
+									用于在两者的关系上增加一些新的字段
+		through_fileds = ('field1', 'field2') : 
+									field1 源，filed2目标，用于中间表中有多于两个外键
+									指向同一参加关系的模型,比如指向源模型有两个外键
+		db_table: 中间表名称
+
+	3. OneToOneField扩展
+		parent_link
+

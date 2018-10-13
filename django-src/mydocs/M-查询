@@ -1,0 +1,40 @@
+
+一、引起计算：
+	迭代、 step切片、Pickle/Cache 、repr 、len 、 list 、 bool或if
+
+	Qset -> 计算，内存 -> pickle -> 缓存
+
+
+二、
+	1.返回QuerySet的方法：
+	
+	order_by		任何与order_by连用的字段，都会附加到SELECT选择列上,但不显示
+
+	distinct		与order_by(other_model__field)连用，select (,..,other_field),会造成唯一性,不去重
+					与order_by(field)连用，values(..,field)会不区重
+
+					可以指定去重参数,只postsql支持，order_by(f1,f2...).distinct(f1,f2..),注意顺序
+
+	select_related	性能优化，减少查询次数，外键/ONT2ONE字段,附加上了实例上的相关的物体
+
+	prefetch_related多对多字段，ManytoTOne字段，多方, 内存VS缓存 ***
+
+	extra, select_for_update XXXXXX
+
+	2.不返回QSset：
+
+
+
+三、聚合
+	
+	两种方式：
+		1. aggregate	产生一个终极结果值
+		2. annotate		为集合中的每一个对象产生一个聚合附加值，结果还是集合
+
+		annotate(f1,f2) 会产生的问题;
+
+		数据表的正向和反向查询;
+	
+		filter和annotate连用的顺序问题，幂不等;
+		values和annotate顺序问题，若values提前，annotate会应用到values唯一组;
+		values提前可以模拟分组，但是模型中若有ordering则问题变复杂了;

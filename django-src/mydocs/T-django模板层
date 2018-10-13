@@ -1,0 +1,35 @@
+
+
+一、组件：后端引擎、加载器(Loaders)、上下文处理器(产生字典)、模板、上下文
+
+
+二、使用：
+
+	加载：get_template, select_template
+
+	异常：TemplateDoesNotExist, TemplateSyntaxError
+	   
+	渲染：render, render_to_string
+	
+
+三、其他:
+	语法：变量、标签、过滤器、注释
+
+
+四、自定义
+
+		过滤器： @register.filter
+
+		标签：
+			simple_tag, 返回字符串
+			inclusion_tag, 返回字典，用来渲染制定模板片段
+
+		从头开始写标签: 
+			1. 编写编译函数,返回node节点
+			2. 编写Node节点，并定义render方法
+			3. 注册
+
+
+启发：
+	编写一些上下文处理器?
+	创建自定的的模板加载器？
