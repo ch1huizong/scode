@@ -1,3 +1,4 @@
+# -*- coding:UTF-8 -*-
 """Generic socket server classes.
 
 This module tries to capture the various aspects of defining a server:
@@ -136,9 +137,9 @@ __all__ = ["BaseServer", "TCPServer", "UDPServer",
            "BaseRequestHandler", "StreamRequestHandler",
            "DatagramRequestHandler", "ThreadingMixIn"]
 if hasattr(os, "fork"):
-    __all__.extend(["ForkingUDPServer","ForkingTCPServer", "ForkingMixIn"])
+    __all__.extend(["ForkingUDPServer", "ForkingTCPServer", "ForkingMixIn"])
 if hasattr(socket, "AF_UNIX"):
-    __all__.extend(["UnixStreamServer","UnixDatagramServer",
+    __all__.extend(["UnixStreamServer", "UnixDatagramServer",
                     "ThreadingUnixStreamServer",
                     "ThreadingUnixDatagramServer"])
 
@@ -372,7 +373,7 @@ class BaseServer:
         """
         print('-'*40, file=sys.stderr)
         print('Exception happened during processing of request from',
-            client_address, file=sys.stderr)
+              client_address, file=sys.stderr)
         import traceback
         traceback.print_exc()
         print('-'*40, file=sys.stderr)
@@ -498,11 +499,11 @@ class TCPServer(BaseServer):
     def shutdown_request(self, request):
         """Called to shutdown and close an individual request."""
         try:
-            #explicitly shutdown.  socket.close() merely releases
-            #the socket and waits for GC to perform the actual close.
+            # explicitly shutdown.  socket.close() merely releases
+            # the socket and waits for GC to perform the actual close.
             request.shutdown(socket.SHUT_WR)
         except OSError:
-            pass #some platforms may raise ENOTCONN here
+            pass  # some platforms may raise ENOTCONN here
         self.close_request(request)
 
     def close_request(self, request):
@@ -535,6 +536,7 @@ class UDPServer(TCPServer):
     def close_request(self, request):
         # No need to close anything.
         pass
+
 
 if hasattr(os, "fork"):
     class ForkingMixIn:
@@ -652,8 +654,8 @@ class ThreadingMixIn:
 
     def process_request(self, request, client_address):
         """Start a new thread to process the request."""
-        t = threading.Thread(target = self.process_request_thread,
-                             args = (request, client_address))
+        t = threading.Thread(target=self.process_request_thread,
+                             args=(request, client_address))
         t.daemon = self.daemon_threads
         if not t.daemon and self.block_on_close:
             if self._threads is None:
@@ -672,11 +674,20 @@ class ThreadingMixIn:
 
 
 if hasattr(os, "fork"):
-    class ForkingUDPServer(ForkingMixIn, UDPServer): pass
-    class ForkingTCPServer(ForkingMixIn, TCPServer): pass
+    class ForkingUDPServer(ForkingMixIn, UDPServer):
+        pass
 
-class ThreadingUDPServer(ThreadingMixIn, UDPServer): pass
-class ThreadingTCPServer(ThreadingMixIn, TCPServer): pass
+    class ForkingTCPServer(ForkingMixIn, TCPServer):
+        pass
+
+
+class ThreadingUDPServer(ThreadingMixIn, UDPServer):
+    pass
+
+
+class ThreadingTCPServer(ThreadingMixIn, TCPServer):
+    pass
+
 
 if hasattr(socket, 'AF_UNIX'):
 
@@ -686,9 +697,12 @@ if hasattr(socket, 'AF_UNIX'):
     class UnixDatagramServer(UDPServer):
         address_family = socket.AF_UNIX
 
-    class ThreadingUnixStreamServer(ThreadingMixIn, UnixStreamServer): pass
+    class ThreadingUnixStreamServer(ThreadingMixIn, UnixStreamServer):
+        pass
 
-    class ThreadingUnixDatagramServer(ThreadingMixIn, UnixDatagramServer): pass
+    class ThreadingUnixDatagramServer(ThreadingMixIn, UnixDatagramServer):
+        pass
+
 
 class BaseRequestHandler:
 
@@ -781,6 +795,7 @@ class StreamRequestHandler(BaseRequestHandler):
         self.wfile.close()
         self.rfile.close()
 
+
 class _SocketWriter(BufferedIOBase):
     """Simple writable BufferedIOBase implementation for a socket
 
@@ -799,6 +814,7 @@ class _SocketWriter(BufferedIOBase):
 
     def fileno(self):
         return self._sock.fileno()
+
 
 class DatagramRequestHandler(BaseRequestHandler):
 

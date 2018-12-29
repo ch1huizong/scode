@@ -81,7 +81,8 @@ _token_pattern = re.compile(r"""
                                                      # unary and bitwise ops
                                                      # not allowed
         (?P<INVALID>\w+|.)                           # invalid token
-    """, re.VERBOSE|re.DOTALL)
+    """, re.VERBOSE | re.DOTALL)
+
 
 def _tokenize(plural):
     for mo in re.finditer(_token_pattern, plural):
@@ -94,11 +95,13 @@ def _tokenize(plural):
         yield value
     yield ''
 
+
 def _error(value):
     if value:
         return ValueError('unexpected token in plural form: %s' % value)
     else:
         return ValueError('unexpected end of plural form')
+
 
 _binary_ops = (
     ('||',),
@@ -110,6 +113,7 @@ _binary_ops = (
 )
 _binary_ops = {op: i for i, ops in enumerate(_binary_ops, 1) for op in ops}
 _c2py_ops = {'||': 'or', '&&': 'and', '/': '//'}
+
 
 def _parse(tokens, priority=-1):
     result = ''
@@ -160,6 +164,7 @@ def _parse(tokens, priority=-1):
 
     return result, nexttok
 
+
 def _as_int(n):
     try:
         i = round(n)
@@ -171,6 +176,7 @@ def _as_int(n):
                   (n.__class__.__name__,),
                   DeprecationWarning, 4)
     return n
+
 
 def c2py(plural):
     """Gets a C expression as used in PO files for plural forms and returns a
@@ -210,9 +216,9 @@ def c2py(plural):
 
 def _expand_lang(loc):
     loc = locale.normalize(loc)
-    COMPONENT_CODESET   = 1 << 0
+    COMPONENT_CODESET = 1 << 0
     COMPONENT_TERRITORY = 1 << 1
-    COMPONENT_MODIFIER  = 1 << 2
+    COMPONENT_MODIFIER = 1 << 2
     # split up the locale into its base components
     mask = 0
     pos = loc.find('@')
@@ -241,13 +247,15 @@ def _expand_lang(loc):
     for i in range(mask+1):
         if not (i & ~mask):  # if all components for this combo exist ...
             val = language
-            if i & COMPONENT_TERRITORY: val += territory
-            if i & COMPONENT_CODESET:   val += codeset
-            if i & COMPONENT_MODIFIER:  val += modifier
+            if i & COMPONENT_TERRITORY:
+                val += territory
+            if i & COMPONENT_CODESET:
+                val += codeset
+            if i & COMPONENT_MODIFIER:
+                val += modifier
             ret.append(val)
     ret.reverse()
     return ret
-
 
 
 class NullTranslations:
@@ -346,7 +354,7 @@ class GNUTranslations(NullTranslations):
         # Parse the .mo file header, which consists of 5 little endian 32
         # bit words.
         self._catalog = catalog = {}
-        self.plural = lambda n: int(n != 1) # germanic plural by default
+        self.plural = lambda n: int(n != 1)  # germanic plural by default
         buf = fp.read()
         buflen = len(buf)
         # Are we big endian or little endian?
@@ -363,7 +371,8 @@ class GNUTranslations(NullTranslations):
         major_version, minor_version = self._get_versions(version)
 
         if major_version not in self.VERSIONS:
-            raise OSError(0, 'Bad version number ' + str(major_version), filename)
+            raise OSError(0, 'Bad version number ' +
+                          str(major_version), filename)
 
         # Now put all messages from the .mo file buffer into the catalog
         # dictionary.
@@ -507,9 +516,9 @@ def find(domain, localedir=None, languages=None, all=False):
     return result
 
 
-
 # a mapping between absolute .mo file path and Translation object
 _translations = {}
+
 
 def translation(domain, localedir=None, languages=None,
                 class_=None, fallback=False, codeset=None):
@@ -552,7 +561,6 @@ def install(domain, localedir=None, codeset=None, names=None):
     t.install(names)
 
 
-
 # a mapping b/w domains and locale directories
 _localedirs = {}
 # a mapping b/w domains and codesets
@@ -590,6 +598,7 @@ def dgettext(domain, message):
         return message
     return t.gettext(message)
 
+
 def ldgettext(domain, message):
     codeset = _localecodesets.get(domain)
     try:
@@ -597,6 +606,7 @@ def ldgettext(domain, message):
     except OSError:
         return message.encode(codeset or locale.getpreferredencoding())
     return t.lgettext(message)
+
 
 def dngettext(domain, msgid1, msgid2, n):
     try:
@@ -608,6 +618,7 @@ def dngettext(domain, msgid1, msgid2, n):
         else:
             return msgid2
     return t.ngettext(msgid1, msgid2, n)
+
 
 def ldngettext(domain, msgid1, msgid2, n):
     codeset = _localecodesets.get(domain)
@@ -621,14 +632,18 @@ def ldngettext(domain, msgid1, msgid2, n):
         return tmsg.encode(codeset or locale.getpreferredencoding())
     return t.lngettext(msgid1, msgid2, n)
 
+
 def gettext(message):
     return dgettext(_current_domain, message)
+
 
 def lgettext(message):
     return ldgettext(_current_domain, message)
 
+
 def ngettext(msgid1, msgid2, n):
     return dngettext(_current_domain, msgid1, msgid2, n)
+
 
 def lngettext(msgid1, msgid2, n):
     return ldngettext(_current_domain, msgid1, msgid2, n)
@@ -646,5 +661,6 @@ def lngettext(msgid1, msgid2, n):
 # The resulting catalog object currently don't support access through a
 # dictionary API, which was supported (but apparently unused) in GNOME
 # gettext.
+
 
 Catalog = translation

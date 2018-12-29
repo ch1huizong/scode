@@ -1,4 +1,9 @@
 # Module 'ntpath' -- common operations on WinNT/Win95 pathnames
+from genericpath import *
+import genericpath
+import stat
+import sys
+import os
 """Common pathname manipulations, WindowsNT/95 version.
 
 Instead of importing this module directly, import os and refer to this
@@ -17,19 +22,15 @@ altsep = '/'
 defpath = '.;C:\\bin'
 devnull = 'nul'
 
-import os
-import sys
-import stat
-import genericpath
-from genericpath import *
 
-__all__ = ["normcase","isabs","join","splitdrive","split","splitext",
-           "basename","dirname","commonprefix","getsize","getmtime",
-           "getatime","getctime", "islink","exists","lexists","isdir","isfile",
-           "ismount", "expanduser","expandvars","normpath","abspath",
-           "curdir","pardir","sep","pathsep","defpath","altsep",
-           "extsep","devnull","realpath","supports_unicode_filenames","relpath",
+__all__ = ["normcase", "isabs", "join", "splitdrive", "split", "splitext",
+           "basename", "dirname", "commonprefix", "getsize", "getmtime",
+           "getatime", "getctime", "islink", "exists", "lexists", "isdir", "isfile",
+           "ismount", "expanduser", "expandvars", "normpath", "abspath",
+           "curdir", "pardir", "sep", "pathsep", "defpath", "altsep",
+           "extsep", "devnull", "realpath", "supports_unicode_filenames", "relpath",
            "samefile", "sameopenfile", "samestat", "commonpath"]
+
 
 def _get_bothseps(path):
     if isinstance(path, bytes):
@@ -40,6 +41,7 @@ def _get_bothseps(path):
 # Normalize the case of a pathname and map slashes to backslashes.
 # Other normalizations (such as optimizing '../' away) are not done
 # (this is done by normpath).
+
 
 def normcase(s):
     """Normalize case of pathname.
@@ -84,7 +86,8 @@ def join(path, *paths):
         colon = ':'
     try:
         if not paths:
-            path[:0] + sep  #23780: Ensure compatible data type even if p is null.
+            # 23780: Ensure compatible data type even if p is null.
+            path[:0] + sep
         result_drive, result_path = splitdrive(path)
         for p in map(os.fspath, paths):
             p_drive, p_path = splitdrive(p)
@@ -106,9 +109,9 @@ def join(path, *paths):
             if result_path and result_path[-1] not in seps:
                 result_path = result_path + sep
             result_path = result_path + p_path
-        ## add separator between UNC and non-absolute path
+        # add separator between UNC and non-absolute path
         if (result_path and result_path[0] not in seps and
-            result_drive and result_drive[-1:] != colon):
+                result_drive and result_drive[-1:] != colon):
             return result_drive + sep + result_path
         return result_drive + result_path
     except (TypeError, AttributeError, BytesWarning):
@@ -204,6 +207,8 @@ def splitext(p):
         return genericpath._splitext(p, b'\\', b'/', b'.')
     else:
         return genericpath._splitext(p, '\\', '/', '.')
+
+
 splitext.__doc__ = genericpath._splitext.__doc__
 
 
@@ -223,6 +228,7 @@ def dirname(p):
 # Is a path a symbolic link?
 # This will always return false on systems where os.lstat doesn't exist.
 
+
 def islink(path):
     """Test whether a path is a symbolic link.
     This will always return false for Windows prior to 6.0.
@@ -235,6 +241,7 @@ def islink(path):
 
 # Being true for dangling symbolic links is also useful.
 
+
 def lexists(path):
     """Test whether a path exists.  Returns True for broken symbolic links"""
     try:
@@ -242,6 +249,7 @@ def lexists(path):
     except OSError:
         return False
     return True
+
 
 # Is a path a mount point?
 # Any drive letter root (eg c:\)
@@ -257,6 +265,8 @@ try:
     from nt import _getvolumepathname
 except ImportError:
     _getvolumepathname = None
+
+
 def ismount(path):
     """Test whether a path is a mount point (a drive root, the root of a
     share, or a mounted volume)"""
@@ -315,7 +325,7 @@ def expanduser(path):
     if isinstance(path, bytes):
         userhome = os.fsencode(userhome)
 
-    if i != 1: #~user
+    if i != 1:  # ~user
         userhome = join(dirname(userhome), path[1:i])
 
     return userhome + path[i:]
@@ -501,7 +511,7 @@ def normpath(path):
 try:
     from nt import _getfullpathname
 
-except ImportError: # not running on Windows - mock up something sensible
+except ImportError:  # not running on Windows - mock up something sensible
     def abspath(path):
         """Return the absolute version of a path."""
         path = os.fspath(path)
@@ -517,12 +527,12 @@ else:  # use native Windows method on Windows
     def abspath(path):
         """Return the absolute version of a path."""
 
-        if path: # Empty path must return current working directory.
+        if path:  # Empty path must return current working directory.
             path = os.fspath(path)
             try:
                 path = _getfullpathname(path)
             except OSError:
-                pass # Bad path - return unchanged.
+                pass  # Bad path - return unchanged.
         elif isinstance(path, bytes):
             path = os.getcwdb()
         else:
@@ -534,6 +544,7 @@ realpath = abspath
 # Win9x family and earlier have no Unicode filename support.
 supports_unicode_filenames = (hasattr(sys, "getwindowsversion") and
                               sys.getwindowsversion()[3] >= 2)
+
 
 def relpath(path, start=None):
     """Return a relative version of a path"""
@@ -608,7 +619,8 @@ def commonpath(paths):
         curdir = '.'
 
     try:
-        drivesplits = [splitdrive(p.replace(altsep, sep).lower()) for p in paths]
+        drivesplits = [splitdrive(p.replace(altsep, sep).lower())
+                       for p in paths]
         split_paths = [p.split(sep) for d, p in drivesplits]
 
         try:
@@ -626,7 +638,8 @@ def commonpath(paths):
         common = path.split(sep)
         common = [c for c in common if c and c != curdir]
 
-        split_paths = [[c for c in s if c and c != curdir] for s in split_paths]
+        split_paths = [[c for c in s if c and c != curdir]
+                       for s in split_paths]
         s1 = min(split_paths)
         s2 = max(split_paths)
         for i, c in enumerate(s1):

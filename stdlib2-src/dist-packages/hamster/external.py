@@ -1,1 +1,0 @@
-../../../../share/pyshared/hamster/external.py

@@ -76,11 +76,11 @@ A single exception is defined: StatisticsError is a subclass of ValueError.
 
 """
 
-__all__ = [ 'StatisticsError',
-            'pstdev', 'pvariance', 'stdev', 'variance',
-            'median',  'median_low', 'median_high', 'median_grouped',
-            'mean', 'mode', 'harmonic_mean',
-          ]
+__all__ = ['StatisticsError',
+           'pstdev', 'pvariance', 'stdev', 'variance',
+           'median',  'median_low', 'median_high', 'median_grouped',
+           'mean', 'mode', 'harmonic_mean',
+           ]
 
 import collections
 import math
@@ -90,7 +90,6 @@ from fractions import Fraction
 from decimal import Decimal
 from itertools import groupby
 from bisect import bisect_left, bisect_right
-
 
 
 # === Exceptions ===
@@ -144,7 +143,7 @@ def _sum(data, start=0):
     T = _coerce(int, type(start))
     for typ, values in groupby(data, type):
         T = _coerce(T, typ)  # or raise TypeError
-        for n,d in map(_exact_ratio, values):
+        for n, d in map(_exact_ratio, values):
             count += 1
             partials[d] = partials_get(d, 0) + n
     if None in partials:
@@ -177,16 +176,23 @@ def _coerce(T, S):
     # If the types are the same, no need to coerce anything. Put this
     # first, so that the usual case (no coercion needed) happens as soon
     # as possible.
-    if T is S:  return T
+    if T is S:
+        return T
     # Mixed int & other coerce to the other type.
-    if S is int or S is bool:  return T
-    if T is int:  return S
+    if S is int or S is bool:
+        return T
+    if T is int:
+        return S
     # If one is a (strict) subclass of the other, coerce to the subclass.
-    if issubclass(S, T):  return S
-    if issubclass(T, S):  return T
+    if issubclass(S, T):
+        return S
+    if issubclass(T, S):
+        return T
     # Ints coerce to the other type.
-    if issubclass(T, int):  return S
-    if issubclass(S, int):  return T
+    if issubclass(T, int):
+        return S
+    if issubclass(S, int):
+        return T
     # Mixed fraction & float coerces to float (or float subclass).
     if issubclass(T, Fraction) and issubclass(S, float):
         return S
@@ -377,7 +383,7 @@ def median(data):
     n = len(data)
     if n == 0:
         raise StatisticsError("no median for empty data")
-    if n%2 == 1:
+    if n % 2 == 1:
         return data[n//2]
     else:
         i = n//2
@@ -400,7 +406,7 @@ def median_low(data):
     n = len(data)
     if n == 0:
         raise StatisticsError("no median for empty data")
-    if n%2 == 1:
+    if n % 2 == 1:
         return data[n//2]
     else:
         return data[n//2 - 1]
@@ -503,8 +509,8 @@ def mode(data):
         return table[0][0]
     elif table:
         raise StatisticsError(
-                'no unique mode; found %d equally common values' % len(table)
-                )
+            'no unique mode; found %d equally common values' % len(table)
+        )
     else:
         raise StatisticsError('no mode for empty data')
 
@@ -537,7 +543,7 @@ def _ss(data, c=None):
     # error may not.
     U, total2, count2 = _sum((x-c) for x in data)
     assert T == U and count == count2
-    total -=  total2**2/len(data)
+    total -= total2**2/len(data)
     assert not total < 0, 'negative sum of square deviations: %f' % total
     return (T, total)
 

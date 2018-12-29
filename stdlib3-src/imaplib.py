@@ -22,7 +22,15 @@ Public functions:       Internaldate2tuple
 
 __version__ = "2.58"
 
-import binascii, errno, random, re, socket, subprocess, sys, time, calendar
+import binascii
+import errno
+import random
+import re
+import socket
+import subprocess
+import sys
+import time
+import calendar
 from datetime import datetime, timezone, timedelta
 from io import DEFAULT_BUFFER_SIZE
 
@@ -56,58 +64,59 @@ _MAXLINE = 1000000
 #       Commands
 
 Commands = {
-        # name            valid states
-        'APPEND':       ('AUTH', 'SELECTED'),
-        'AUTHENTICATE': ('NONAUTH',),
-        'CAPABILITY':   ('NONAUTH', 'AUTH', 'SELECTED', 'LOGOUT'),
-        'CHECK':        ('SELECTED',),
-        'CLOSE':        ('SELECTED',),
-        'COPY':         ('SELECTED',),
-        'CREATE':       ('AUTH', 'SELECTED'),
-        'DELETE':       ('AUTH', 'SELECTED'),
-        'DELETEACL':    ('AUTH', 'SELECTED'),
-        'ENABLE':       ('AUTH', ),
-        'EXAMINE':      ('AUTH', 'SELECTED'),
-        'EXPUNGE':      ('SELECTED',),
-        'FETCH':        ('SELECTED',),
-        'GETACL':       ('AUTH', 'SELECTED'),
-        'GETANNOTATION':('AUTH', 'SELECTED'),
-        'GETQUOTA':     ('AUTH', 'SELECTED'),
-        'GETQUOTAROOT': ('AUTH', 'SELECTED'),
-        'MYRIGHTS':     ('AUTH', 'SELECTED'),
-        'LIST':         ('AUTH', 'SELECTED'),
-        'LOGIN':        ('NONAUTH',),
-        'LOGOUT':       ('NONAUTH', 'AUTH', 'SELECTED', 'LOGOUT'),
-        'LSUB':         ('AUTH', 'SELECTED'),
-        'NAMESPACE':    ('AUTH', 'SELECTED'),
-        'NOOP':         ('NONAUTH', 'AUTH', 'SELECTED', 'LOGOUT'),
-        'PARTIAL':      ('SELECTED',),                                  # NB: obsolete
-        'PROXYAUTH':    ('AUTH',),
-        'RENAME':       ('AUTH', 'SELECTED'),
-        'SEARCH':       ('SELECTED',),
-        'SELECT':       ('AUTH', 'SELECTED'),
-        'SETACL':       ('AUTH', 'SELECTED'),
-        'SETANNOTATION':('AUTH', 'SELECTED'),
-        'SETQUOTA':     ('AUTH', 'SELECTED'),
-        'SORT':         ('SELECTED',),
-        'STARTTLS':     ('NONAUTH',),
-        'STATUS':       ('AUTH', 'SELECTED'),
-        'STORE':        ('SELECTED',),
-        'SUBSCRIBE':    ('AUTH', 'SELECTED'),
-        'THREAD':       ('SELECTED',),
-        'UID':          ('SELECTED',),
-        'UNSUBSCRIBE':  ('AUTH', 'SELECTED'),
-        }
+    # name            valid states
+    'APPEND':       ('AUTH', 'SELECTED'),
+    'AUTHENTICATE': ('NONAUTH',),
+    'CAPABILITY':   ('NONAUTH', 'AUTH', 'SELECTED', 'LOGOUT'),
+    'CHECK':        ('SELECTED',),
+    'CLOSE':        ('SELECTED',),
+    'COPY':         ('SELECTED',),
+    'CREATE':       ('AUTH', 'SELECTED'),
+    'DELETE':       ('AUTH', 'SELECTED'),
+    'DELETEACL':    ('AUTH', 'SELECTED'),
+    'ENABLE':       ('AUTH', ),
+    'EXAMINE':      ('AUTH', 'SELECTED'),
+    'EXPUNGE':      ('SELECTED',),
+    'FETCH':        ('SELECTED',),
+    'GETACL':       ('AUTH', 'SELECTED'),
+    'GETANNOTATION': ('AUTH', 'SELECTED'),
+    'GETQUOTA':     ('AUTH', 'SELECTED'),
+    'GETQUOTAROOT': ('AUTH', 'SELECTED'),
+    'MYRIGHTS':     ('AUTH', 'SELECTED'),
+    'LIST':         ('AUTH', 'SELECTED'),
+    'LOGIN':        ('NONAUTH',),
+    'LOGOUT':       ('NONAUTH', 'AUTH', 'SELECTED', 'LOGOUT'),
+    'LSUB':         ('AUTH', 'SELECTED'),
+    'NAMESPACE':    ('AUTH', 'SELECTED'),
+    'NOOP':         ('NONAUTH', 'AUTH', 'SELECTED', 'LOGOUT'),
+    # NB: obsolete
+    'PARTIAL':      ('SELECTED',),
+    'PROXYAUTH':    ('AUTH',),
+    'RENAME':       ('AUTH', 'SELECTED'),
+    'SEARCH':       ('SELECTED',),
+    'SELECT':       ('AUTH', 'SELECTED'),
+    'SETACL':       ('AUTH', 'SELECTED'),
+    'SETANNOTATION': ('AUTH', 'SELECTED'),
+    'SETQUOTA':     ('AUTH', 'SELECTED'),
+    'SORT':         ('SELECTED',),
+    'STARTTLS':     ('NONAUTH',),
+    'STATUS':       ('AUTH', 'SELECTED'),
+    'STORE':        ('SELECTED',),
+    'SUBSCRIBE':    ('AUTH', 'SELECTED'),
+    'THREAD':       ('SELECTED',),
+    'UID':          ('SELECTED',),
+    'UNSUBSCRIBE':  ('AUTH', 'SELECTED'),
+}
 
 #       Patterns to match server responses
 
 Continuation = re.compile(br'\+( (?P<data>.*))?')
 Flags = re.compile(br'.*FLAGS \((?P<flags>[^\)]*)\)')
 InternalDate = re.compile(br'.*INTERNALDATE "'
-        br'(?P<day>[ 0123][0-9])-(?P<mon>[A-Z][a-z][a-z])-(?P<year>[0-9][0-9][0-9][0-9])'
-        br' (?P<hour>[0-9][0-9]):(?P<min>[0-9][0-9]):(?P<sec>[0-9][0-9])'
-        br' (?P<zonen>[-+])(?P<zoneh>[0-9][0-9])(?P<zonem>[0-9][0-9])'
-        br'"')
+                          br'(?P<day>[ 0123][0-9])-(?P<mon>[A-Z][a-z][a-z])-(?P<year>[0-9][0-9][0-9][0-9])'
+                          br' (?P<hour>[0-9][0-9]):(?P<min>[0-9][0-9]):(?P<sec>[0-9][0-9])'
+                          br' (?P<zonen>[-+])(?P<zoneh>[0-9][0-9])(?P<zonem>[0-9][0-9])'
+                          br'"')
 # Literal is no longer used; kept for backward compatibility.
 Literal = re.compile(br'.*{(?P<size>\d+)}$', re.ASCII)
 MapCRLF = re.compile(br'\r\n|\r|\n')
@@ -127,7 +136,6 @@ Untagged_status = re.compile(
 # We compile these in _mode_xxx.
 _Literal = br'.*{(?P<size>\d+)}$'
 _Untagged_status = br'\* (?P<data>\d+) (?P<type>[A-Z-]+)( (?P<data2>.*))?'
-
 
 
 class IMAP4:
@@ -176,9 +184,14 @@ class IMAP4:
     most IMAP servers implement a sub-set of the commands available here.
     """
 
-    class error(Exception): pass    # Logical errors - debug required
-    class abort(error): pass        # Service errors - close and retry
-    class readonly(abort): pass     # Mailbox status changed to READ-ONLY
+    class error(Exception):
+        pass    # Logical errors - debug required
+
+    class abort(error):
+        pass        # Service errors - close and retry
+
+    class readonly(abort):
+        pass     # Mailbox status changed to READ-ONLY
 
     def __init__(self, host='', port=IMAP4_PORT):
         self.debug = Debug
@@ -186,7 +199,7 @@ class IMAP4:
         self.literal = None             # A literal argument to a command
         self.tagged_commands = {}       # Tagged commands awaiting response
         self.untagged_responses = {}    # {typ: [data, ...], ...}
-        self.continuation_response = '' # Last continuation response
+        self.continuation_response = ''  # Last continuation response
         self.is_readonly = False        # READ-ONLY desired state
         self.tagnum = 0
         self._tls_established = False
@@ -211,13 +224,11 @@ class IMAP4:
         self.Literal = re.compile(_Literal, re.ASCII)
         self.Untagged_status = re.compile(_Untagged_status, re.ASCII)
 
-
     def _mode_utf8(self):
         self.utf8_enabled = True
         self._encoding = 'utf-8'
         self.Literal = re.compile(_Literal)
         self.Untagged_status = re.compile(_Untagged_status)
-
 
     def _connect(self):
         # Create unique tag for this session,
@@ -225,8 +236,8 @@ class IMAP4:
 
         self.tagpre = Int2AP(random.randint(4096, 65535))
         self.tagre = re.compile(br'(?P<tag>'
-                        + self.tagpre
-                        + br'\d+) (?P<type>[A-Z]+) (?P<data>.*)', re.ASCII)
+                                + self.tagpre
+                                + br'\d+) (?P<type>[A-Z]+) (?P<data>.*)', re.ASCII)
 
         # Get server welcome message,
         # request and store CAPABILITY response.
@@ -260,7 +271,6 @@ class IMAP4:
 
         raise self.error('server not IMAP4 compliant')
 
-
     def __getattr__(self, attr):
         #       Allow UPPERCASE variants of IMAP4 command methods.
         if attr in Commands:
@@ -276,14 +286,12 @@ class IMAP4:
         except OSError:
             pass
 
-
     #       Overridable methods
-
 
     def _create_socket(self):
         return socket.create_connection((self.host, self.port))
 
-    def open(self, host = '', port = IMAP4_PORT):
+    def open(self, host='', port=IMAP4_PORT):
         """Setup connection to remote server on "host:port"
             (default: localhost:standard IMAP4 port).
         This connection will be used by the routines:
@@ -294,11 +302,9 @@ class IMAP4:
         self.sock = self._create_socket()
         self.file = self.sock.makefile('rb')
 
-
     def read(self, size):
         """Read 'size' bytes from remote."""
         return self.file.read(size)
-
 
     def readline(self):
         """Read line from remote."""
@@ -307,11 +313,9 @@ class IMAP4:
             raise self.error("got more than %d bytes" % _MAXLINE)
         return line
 
-
     def send(self, data):
         """Send data to remote."""
         self.sock.sendall(data)
-
 
     def shutdown(self):
         """Close I/O established in "open"."""
@@ -323,11 +327,10 @@ class IMAP4:
             # On Windows, this may result in WSAEINVAL (error 10022):
             # An invalid operation was attempted.
             if (exc.errno != errno.ENOTCONN
-               and getattr(exc, 'winerror', 0) != 10022):
+                    and getattr(exc, 'winerror', 0) != 10022):
                 raise
         finally:
             self.sock.close()
-
 
     def socket(self):
         """Return socket instance used to connect to IMAP4 server.
@@ -336,10 +339,7 @@ class IMAP4:
         """
         return self.sock
 
-
-
     #       Utility methods
-
 
     def recent(self):
         """Return most recent 'RECENT' responses if any exist,
@@ -357,7 +357,6 @@ class IMAP4:
         typ, dat = self.noop()  # Prod server for response
         return self._untagged_response(typ, dat, name)
 
-
     def response(self, code):
         """Return data for response 'code' if received, or None.
 
@@ -367,10 +366,7 @@ class IMAP4:
         """
         return self._untagged_response(code, [None], code.upper())
 
-
-
     #       IMAP4 commands
-
 
     def append(self, mailbox, flags, date_time, message):
         """Append message to named mailbox.
@@ -383,7 +379,7 @@ class IMAP4:
         if not mailbox:
             mailbox = 'INBOX'
         if flags:
-            if (flags[0],flags[-1]) != ('(',')'):
+            if (flags[0], flags[-1]) != ('(', ')'):
                 flags = '(%s)' % flags
         else:
             flags = None
@@ -396,7 +392,6 @@ class IMAP4:
             literal = b'UTF8 (' + literal + b')'
         self.literal = literal
         return self._simple_command(name, mailbox, flags, date_time)
-
 
     def authenticate(self, mechanism, authobject):
         """Authenticate command - requires response processing.
@@ -417,7 +412,7 @@ class IMAP4:
         mech = mechanism.upper()
         # XXX: shouldn't this code be removed, not commented out?
         #cap = 'AUTH=%s' % mech
-        #if not cap in self.capabilities:       # Let the server decide!
+        # if not cap in self.capabilities:       # Let the server decide!
         #    raise self.error("Server doesn't allow %s authentication." % mech)
         self.literal = _Authenticator(authobject).process
         typ, dat = self._simple_command('AUTHENTICATE', mech)
@@ -425,7 +420,6 @@ class IMAP4:
             raise self.error(dat[-1].decode('utf-8', 'replace'))
         self.state = 'AUTH'
         return typ, dat
-
 
     def capability(self):
         """(typ, [data]) = <instance>.capability()
@@ -435,14 +429,12 @@ class IMAP4:
         typ, dat = self._simple_command(name)
         return self._untagged_response(typ, dat, name)
 
-
     def check(self):
         """Checkpoint mailbox on server.
 
         (typ, [data]) = <instance>.check()
         """
         return self._simple_command('CHECK')
-
 
     def close(self):
         """Close currently selected mailbox.
@@ -458,7 +450,6 @@ class IMAP4:
             self.state = 'AUTH'
         return typ, dat
 
-
     def copy(self, message_set, new_mailbox):
         """Copy 'message_set' messages onto end of 'new_mailbox'.
 
@@ -466,14 +457,12 @@ class IMAP4:
         """
         return self._simple_command('COPY', message_set, new_mailbox)
 
-
     def create(self, mailbox):
         """Create new mailbox.
 
         (typ, [data]) = <instance>.create(mailbox)
         """
         return self._simple_command('CREATE', mailbox)
-
 
     def delete(self, mailbox):
         """Delete old mailbox.
@@ -514,7 +503,6 @@ class IMAP4:
         typ, dat = self._simple_command(name)
         return self._untagged_response(typ, dat, name)
 
-
     def fetch(self, message_set, message_parts):
         """Fetch (parts of) messages.
 
@@ -529,7 +517,6 @@ class IMAP4:
         typ, dat = self._simple_command(name, message_set, message_parts)
         return self._untagged_response(typ, dat, name)
 
-
     def getacl(self, mailbox):
         """Get the ACLs for a mailbox.
 
@@ -538,14 +525,13 @@ class IMAP4:
         typ, dat = self._simple_command('GETACL', mailbox)
         return self._untagged_response(typ, dat, 'ACL')
 
-
     def getannotation(self, mailbox, entry, attribute):
         """(typ, [data]) = <instance>.getannotation(mailbox, entry, attribute)
         Retrieve ANNOTATIONs."""
 
-        typ, dat = self._simple_command('GETANNOTATION', mailbox, entry, attribute)
+        typ, dat = self._simple_command(
+            'GETANNOTATION', mailbox, entry, attribute)
         return self._untagged_response(typ, dat, 'ANNOTATION')
-
 
     def getquota(self, root):
         """Get the quota root's resource usage and limits.
@@ -557,7 +543,6 @@ class IMAP4:
         typ, dat = self._simple_command('GETQUOTA', root)
         return self._untagged_response(typ, dat, 'QUOTA')
 
-
     def getquotaroot(self, mailbox):
         """Get the list of quota roots for the named mailbox.
 
@@ -567,7 +552,6 @@ class IMAP4:
         typ, quota = self._untagged_response(typ, dat, 'QUOTA')
         typ, quotaroot = self._untagged_response(typ, dat, 'QUOTAROOT')
         return typ, [quotaroot, quota]
-
 
     def list(self, directory='""', pattern='*'):
         """List mailbox names in directory matching pattern.
@@ -579,7 +563,6 @@ class IMAP4:
         name = 'LIST'
         typ, dat = self._simple_command(name, directory, pattern)
         return self._untagged_response(typ, dat, name)
-
 
     def login(self, user, password):
         """Identify client using plaintext password.
@@ -594,7 +577,6 @@ class IMAP4:
         self.state = 'AUTH'
         return typ, dat
 
-
     def login_cram_md5(self, user, password):
         """ Force use of CRAM-MD5 authentication.
 
@@ -603,14 +585,12 @@ class IMAP4:
         self.user, self.password = user, password
         return self.authenticate('CRAM-MD5', self._CRAM_MD5_AUTH)
 
-
     def _CRAM_MD5_AUTH(self, challenge):
         """ Authobject to use with CRAM-MD5 authentication. """
         import hmac
         pwd = (self.password.encode('utf-8') if isinstance(self.password, str)
-                                             else self.password)
+               else self.password)
         return self.user + " " + hmac.HMAC(pwd, challenge, 'md5').hexdigest()
-
 
     def logout(self):
         """Shutdown connection to server.
@@ -620,13 +600,14 @@ class IMAP4:
         Returns server 'BYE' response.
         """
         self.state = 'LOGOUT'
-        try: typ, dat = self._simple_command('LOGOUT')
-        except: typ, dat = 'NO', ['%s: %s' % sys.exc_info()[:2]]
+        try:
+            typ, dat = self._simple_command('LOGOUT')
+        except:
+            typ, dat = 'NO', ['%s: %s' % sys.exc_info()[:2]]
         self.shutdown()
         if 'BYE' in self.untagged_responses:
             return 'BYE', self.untagged_responses['BYE']
         return typ, dat
-
 
     def lsub(self, directory='""', pattern='*'):
         """List 'subscribed' mailbox names in directory matching pattern.
@@ -644,7 +625,7 @@ class IMAP4:
 
         (typ, [data]) = <instance>.myrights(mailbox)
         """
-        typ,dat = self._simple_command('MYRIGHTS', mailbox)
+        typ, dat = self._simple_command('MYRIGHTS', mailbox)
         return self._untagged_response(typ, dat, 'MYRIGHTS')
 
     def namespace(self):
@@ -656,7 +637,6 @@ class IMAP4:
         typ, dat = self._simple_command(name)
         return self._untagged_response(typ, dat, name)
 
-
     def noop(self):
         """Send NOOP command.
 
@@ -667,7 +647,6 @@ class IMAP4:
                 self._dump_ur(self.untagged_responses)
         return self._simple_command('NOOP')
 
-
     def partial(self, message_num, message_part, start, length):
         """Fetch truncated part of a message.
 
@@ -676,9 +655,9 @@ class IMAP4:
         'data' is tuple of message part envelope and data.
         """
         name = 'PARTIAL'
-        typ, dat = self._simple_command(name, message_num, message_part, start, length)
+        typ, dat = self._simple_command(
+            name, message_num, message_part, start, length)
         return self._untagged_response(typ, dat, 'FETCH')
-
 
     def proxyauth(self, user):
         """Assume authentication as "user".
@@ -692,14 +671,12 @@ class IMAP4:
         name = 'PROXYAUTH'
         return self._simple_command('PROXYAUTH', user)
 
-
     def rename(self, oldmailbox, newmailbox):
         """Rename old mailbox name to new.
 
         (typ, [data]) = <instance>.rename(oldmailbox, newmailbox)
         """
         return self._simple_command('RENAME', oldmailbox, newmailbox)
-
 
     def search(self, charset, *criteria):
         """Search mailbox for matching messages.
@@ -713,11 +690,11 @@ class IMAP4:
         if charset:
             if self.utf8_enabled:
                 raise IMAP4.error("Non-None charset not valid in UTF8 mode")
-            typ, dat = self._simple_command(name, 'CHARSET', charset, *criteria)
+            typ, dat = self._simple_command(
+                name, 'CHARSET', charset, *criteria)
         else:
             typ, dat = self._simple_command(name, *criteria)
         return self._untagged_response(typ, dat, name)
-
 
     def select(self, mailbox='INBOX', readonly=False):
         """Select a mailbox.
@@ -750,7 +727,6 @@ class IMAP4:
             raise self.readonly('%s is not writable' % mailbox)
         return typ, self.untagged_responses.get('EXISTS', [None])
 
-
     def setacl(self, mailbox, who, what):
         """Set a mailbox acl.
 
@@ -758,14 +734,12 @@ class IMAP4:
         """
         return self._simple_command('SETACL', mailbox, who, what)
 
-
     def setannotation(self, *args):
         """(typ, [data]) = <instance>.setannotation(mailbox[, entry, attribute]+)
         Set ANNOTATIONs."""
 
         typ, dat = self._simple_command('SETANNOTATION', *args)
         return self._untagged_response(typ, dat, 'ANNOTATION')
-
 
     def setquota(self, root, limits):
         """Set the quota root's resource limits.
@@ -775,20 +749,19 @@ class IMAP4:
         typ, dat = self._simple_command('SETQUOTA', root, limits)
         return self._untagged_response(typ, dat, 'QUOTA')
 
-
     def sort(self, sort_criteria, charset, *search_criteria):
         """IMAP4rev1 extension SORT command.
 
         (typ, [data]) = <instance>.sort(sort_criteria, charset, search_criteria, ...)
         """
         name = 'SORT'
-        #if not name in self.capabilities:      # Let the server decide!
+        # if not name in self.capabilities:      # Let the server decide!
         #       raise self.error('unimplemented extension command: %s' % name)
-        if (sort_criteria[0],sort_criteria[-1]) != ('(',')'):
+        if (sort_criteria[0], sort_criteria[-1]) != ('(', ')'):
             sort_criteria = '(%s)' % sort_criteria
-        typ, dat = self._simple_command(name, sort_criteria, charset, *search_criteria)
+        typ, dat = self._simple_command(
+            name, sort_criteria, charset, *search_criteria)
         return self._untagged_response(typ, dat, name)
-
 
     def starttls(self, ssl_context=None):
         name = 'STARTTLS'
@@ -812,29 +785,26 @@ class IMAP4:
             raise self.error("Couldn't establish TLS session")
         return self._untagged_response(typ, dat, name)
 
-
     def status(self, mailbox, names):
         """Request named status conditions for mailbox.
 
         (typ, [data]) = <instance>.status(mailbox, names)
         """
         name = 'STATUS'
-        #if self.PROTOCOL_VERSION == 'IMAP4':   # Let the server decide!
+        # if self.PROTOCOL_VERSION == 'IMAP4':   # Let the server decide!
         #    raise self.error('%s unimplemented in IMAP4 (obtain IMAP4rev1 server, or re-code)' % name)
         typ, dat = self._simple_command(name, mailbox, names)
         return self._untagged_response(typ, dat, name)
-
 
     def store(self, message_set, command, flags):
         """Alters flag dispositions for messages in mailbox.
 
         (typ, [data]) = <instance>.store(message_set, command, flags)
         """
-        if (flags[0],flags[-1]) != ('(',')'):
+        if (flags[0], flags[-1]) != ('(', ')'):
             flags = '(%s)' % flags  # Avoid quoting the flags
         typ, dat = self._simple_command('STORE', message_set, command, flags)
         return self._untagged_response(typ, dat, 'FETCH')
-
 
     def subscribe(self, mailbox):
         """Subscribe to new mailbox.
@@ -843,16 +813,15 @@ class IMAP4:
         """
         return self._simple_command('SUBSCRIBE', mailbox)
 
-
     def thread(self, threading_algorithm, charset, *search_criteria):
         """IMAPrev1 extension THREAD command.
 
         (type, [data]) = <instance>.thread(threading_algorithm, charset, search_criteria, ...)
         """
         name = 'THREAD'
-        typ, dat = self._simple_command(name, threading_algorithm, charset, *search_criteria)
+        typ, dat = self._simple_command(
+            name, threading_algorithm, charset, *search_criteria)
         return self._untagged_response(typ, dat, name)
-
 
     def uid(self, command, *args):
         """Execute "command arg ..." with messages identified by UID,
@@ -878,14 +847,12 @@ class IMAP4:
             name = 'FETCH'
         return self._untagged_response(typ, dat, name)
 
-
     def unsubscribe(self, mailbox):
         """Unsubscribe from old mailbox.
 
         (typ, [data]) = <instance>.unsubscribe(mailbox)
         """
         return self._simple_command('UNSUBSCRIBE', mailbox)
-
 
     def xatom(self, name, *args):
         """Allow simple extension commands
@@ -898,16 +865,13 @@ class IMAP4:
         Returns response appropriate to extension command `name'.
         """
         name = name.upper()
-        #if not name in self.capabilities:      # Let the server decide!
+        # if not name in self.capabilities:      # Let the server decide!
         #    raise self.error('unknown extension command: %s' % name)
         if not name in Commands:
             Commands[name] = (self.state,)
         return self._simple_command(name, *args)
 
-
-
     #       Private methods
-
 
     def _append_untagged(self, typ, dat):
         if dat is None:
@@ -916,18 +880,16 @@ class IMAP4:
         if __debug__:
             if self.debug >= 5:
                 self._mesg('untagged_responses[%s] %s += ["%r"]' %
-                        (typ, len(ur.get(typ,'')), dat))
+                           (typ, len(ur.get(typ, '')), dat))
         if typ in ur:
             ur[typ].append(dat)
         else:
             ur[typ] = [dat]
 
-
     def _check_bye(self):
         bye = self.untagged_responses.get('BYE')
         if bye:
             raise self.abort(bye[-1].decode(self._encoding, 'replace'))
-
 
     def _command(self, name, *args):
 
@@ -943,14 +905,15 @@ class IMAP4:
                 del self.untagged_responses[typ]
 
         if 'READ-ONLY' in self.untagged_responses \
-        and not self.is_readonly:
+                and not self.is_readonly:
             raise self.readonly('mailbox status changed to READ-ONLY')
 
         tag = self._new_tag()
         name = bytes(name, self._encoding)
         data = tag + b' ' + name
         for arg in args:
-            if arg is None: continue
+            if arg is None:
+                continue
             if isinstance(arg, str):
                 arg = bytes(arg, self._encoding)
             data = data + b' ' + arg
@@ -1005,7 +968,6 @@ class IMAP4:
 
         return tag
 
-
     def _command_complete(self, name, tag):
         # BYE is expected after LOGOUT
         if name != 'LOGOUT':
@@ -1022,7 +984,6 @@ class IMAP4:
             raise self.error('%s command error: %s %s' % (name, typ, data))
         return typ, data
 
-
     def _get_capabilities(self):
         typ, dat = self.capability()
         if dat == [None]:
@@ -1030,7 +991,6 @@ class IMAP4:
         dat = str(dat[-1], self._encoding)
         dat = dat.upper()
         self.capabilities = tuple(dat.split())
-
 
     def _get_response(self):
 
@@ -1073,8 +1033,10 @@ class IMAP4:
             typ = self.mo.group('type')
             typ = str(typ, self._encoding)
             dat = self.mo.group('data')
-            if dat is None: dat = b''        # Null untagged response
-            if dat2: dat = dat + b' ' + dat2
+            if dat is None:
+                dat = b''        # Null untagged response
+            if dat2:
+                dat = dat + b' ' + dat2
 
             # Is there a literal to come?
 
@@ -1111,7 +1073,6 @@ class IMAP4:
 
         return resp
 
-
     def _get_tagged_response(self, tag):
 
         while 1:
@@ -1138,7 +1099,6 @@ class IMAP4:
                         self.print_log()
                 raise
 
-
     def _get_line(self):
 
         line = self.readline()
@@ -1157,7 +1117,6 @@ class IMAP4:
                 self._log('< %r' % line)
         return line
 
-
     def _match(self, cre, s):
 
         # Run compiled regular expression match method on 's'.
@@ -1166,9 +1125,9 @@ class IMAP4:
         self.mo = cre.match(s)
         if __debug__:
             if self.mo is not None and self.debug >= 5:
-                self._mesg("\tmatched %r => %r" % (cre.pattern, self.mo.groups()))
+                self._mesg("\tmatched %r => %r" %
+                           (cre.pattern, self.mo.groups()))
         return self.mo is not None
-
 
     def _new_tag(self):
 
@@ -1177,7 +1136,6 @@ class IMAP4:
         self.tagged_commands[tag] = None
         return tag
 
-
     def _quote(self, arg):
 
         arg = arg.replace('\\', '\\\\')
@@ -1185,11 +1143,9 @@ class IMAP4:
 
         return '"' + arg + '"'
 
-
     def _simple_command(self, name, *args):
 
         return self._command_complete(name, self._command(name, *args))
-
 
     def _untagged_response(self, typ, dat, name):
         if typ == 'NO':
@@ -1202,22 +1158,23 @@ class IMAP4:
                 self._mesg('untagged_responses[%s] => %s' % (name, data))
         return typ, data
 
-
     if __debug__:
 
         def _mesg(self, s, secs=None):
             if secs is None:
                 secs = time.time()
             tm = time.strftime('%M:%S', time.localtime(secs))
-            sys.stderr.write('  %s.%02d %s\n' % (tm, (secs*100)%100, s))
+            sys.stderr.write('  %s.%02d %s\n' % (tm, (secs*100) % 100, s))
             sys.stderr.flush()
 
         def _dump_ur(self, dict):
             # Dump untagged responses (in `dict').
             l = dict.items()
-            if not l: return
+            if not l:
+                return
             t = '\n\t\t'
-            l = map(lambda x:'%s: "%s"' % (x[0], x[1][0] and '" "'.join(x[1]) or ''), l)
+            l = map(lambda x: '%s: "%s"' %
+                    (x[0], x[1][0] and '" "'.join(x[1]) or ''), l)
             self._mesg('untagged responses dump:%s%s' % (t, t.join(l)))
 
         def _log(self, line):
@@ -1260,7 +1217,6 @@ if HAVE_SSL:
 
         for more documentation see the docstring of the parent class IMAP4.
         """
-
 
         def __init__(self, host='', port=IMAP4_SSL_PORT, keyfile=None,
                      certfile=None, ssl_context=None):
@@ -1309,13 +1265,11 @@ class IMAP4_stream(IMAP4):
     for more documentation see the docstring of the parent class IMAP4.
     """
 
-
     def __init__(self, command):
         self.command = command
         IMAP4.__init__(self)
 
-
-    def open(self, host = None, port = None):
+    def open(self, host=None, port=None):
         """Setup a stream connection.
         This connection will be used by the routines:
             read, readline, send, shutdown.
@@ -1325,9 +1279,9 @@ class IMAP4_stream(IMAP4):
         self.sock = None
         self.file = None
         self.process = subprocess.Popen(self.command,
-            bufsize=DEFAULT_BUFFER_SIZE,
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-            shell=True, close_fds=True)
+                                        bufsize=DEFAULT_BUFFER_SIZE,
+                                        stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                        shell=True, close_fds=True)
         self.writefile = self.process.stdin
         self.readfile = self.process.stdout
 
@@ -1335,24 +1289,20 @@ class IMAP4_stream(IMAP4):
         """Read 'size' bytes from remote."""
         return self.readfile.read(size)
 
-
     def readline(self):
         """Read line from remote."""
         return self.readfile.readline()
-
 
     def send(self, data):
         """Send data to remote."""
         self.writefile.write(data)
         self.writefile.flush()
 
-
     def shutdown(self):
         """Close I/O established in "open"."""
         self.readfile.close()
         self.writefile.close()
         self.process.wait()
-
 
 
 class _Authenticator:
@@ -1399,8 +1349,10 @@ class _Authenticator:
             return b''
         return binascii.a2b_base64(inp)
 
+
 Months = ' Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ')
-Mon2num = {s.encode():n+1 for n, s in enumerate(Months[1:])}
+Mon2num = {s.encode(): n+1 for n, s in enumerate(Months[1:])}
+
 
 def Internaldate2tuple(resp):
     """Parse an IMAP4 INTERNALDATE string.
@@ -1436,12 +1388,11 @@ def Internaldate2tuple(resp):
     return time.localtime(utc)
 
 
-
 def Int2AP(num):
-
     """Convert integer to A-P string representation."""
 
-    val = b''; AP = b'ABCDEFGHIJKLMNOP'
+    val = b''
+    AP = b'ABCDEFGHIJKLMNOP'
     num = int(abs(num))
     while num:
         num, mod = divmod(num, 16)
@@ -1449,9 +1400,7 @@ def Int2AP(num):
     return val
 
 
-
 def ParseFlags(resp):
-
     """Convert IMAP4 flags response to python tuple."""
 
     mo = Flags.match(resp)
@@ -1462,7 +1411,6 @@ def ParseFlags(resp):
 
 
 def Time2Internaldate(date_time):
-
     """Convert date_time to IMAP4 INTERNALDATE representation.
 
     Return string in form: '"DD-Mmm-YYYY HH:MM:SS +HHMM"'.  The
@@ -1493,13 +1441,12 @@ def Time2Internaldate(date_time):
         if date_time.tzinfo is None:
             raise ValueError("date_time must be aware")
         dt = date_time
-    elif isinstance(date_time, str) and (date_time[0],date_time[-1]) == ('"','"'):
+    elif isinstance(date_time, str) and (date_time[0], date_time[-1]) == ('"', '"'):
         return date_time        # Assume in correct format
     else:
         raise ValueError("date_time not of a known type")
     fmt = '"%d-{}-%Y %H:%M:%S %z"'.format(Months[dt.month])
     return dt.strftime(fmt)
-
 
 
 if __name__ == '__main__':
@@ -1508,7 +1455,8 @@ if __name__ == '__main__':
     # or 'python imaplib.py -s "rsh IMAP4_server_hostname exec /etc/rimapd"'
     # to test the IMAP4_stream class
 
-    import getopt, getpass
+    import getopt
+    import getpass
 
     try:
         optlist, args = getopt.getopt(sys.argv[1:], 'd:s:')
@@ -1516,53 +1464,58 @@ if __name__ == '__main__':
         optlist, args = (), ()
 
     stream_command = None
-    for opt,val in optlist:
+    for opt, val in optlist:
         if opt == '-d':
             Debug = int(val)
         elif opt == '-s':
             stream_command = val
-            if not args: args = (stream_command,)
+            if not args:
+                args = (stream_command,)
 
-    if not args: args = ('',)
+    if not args:
+        args = ('',)
 
     host = args[0]
 
     USER = getpass.getuser()
-    PASSWD = getpass.getpass("IMAP password for %s on %s: " % (USER, host or "localhost"))
+    PASSWD = getpass.getpass("IMAP password for %s on %s: " %
+                             (USER, host or "localhost"))
 
-    test_mesg = 'From: %(user)s@localhost%(lf)sSubject: IMAP4 test%(lf)s%(lf)sdata...%(lf)s' % {'user':USER, 'lf':'\n'}
+    test_mesg = 'From: %(user)s@localhost%(lf)sSubject: IMAP4 test%(lf)s%(lf)sdata...%(lf)s' % {
+        'user': USER, 'lf': '\n'}
     test_seq1 = (
-    ('login', (USER, PASSWD)),
-    ('create', ('/tmp/xxx 1',)),
-    ('rename', ('/tmp/xxx 1', '/tmp/yyy')),
-    ('CREATE', ('/tmp/yyz 2',)),
-    ('append', ('/tmp/yyz 2', None, None, test_mesg)),
-    ('list', ('/tmp', 'yy*')),
-    ('select', ('/tmp/yyz 2',)),
-    ('search', (None, 'SUBJECT', 'test')),
-    ('fetch', ('1', '(FLAGS INTERNALDATE RFC822)')),
-    ('store', ('1', 'FLAGS', r'(\Deleted)')),
-    ('namespace', ()),
-    ('expunge', ()),
-    ('recent', ()),
-    ('close', ()),
+        ('login', (USER, PASSWD)),
+        ('create', ('/tmp/xxx 1',)),
+        ('rename', ('/tmp/xxx 1', '/tmp/yyy')),
+        ('CREATE', ('/tmp/yyz 2',)),
+        ('append', ('/tmp/yyz 2', None, None, test_mesg)),
+        ('list', ('/tmp', 'yy*')),
+        ('select', ('/tmp/yyz 2',)),
+        ('search', (None, 'SUBJECT', 'test')),
+        ('fetch', ('1', '(FLAGS INTERNALDATE RFC822)')),
+        ('store', ('1', 'FLAGS', r'(\Deleted)')),
+        ('namespace', ()),
+        ('expunge', ()),
+        ('recent', ()),
+        ('close', ()),
     )
 
     test_seq2 = (
-    ('select', ()),
-    ('response',('UIDVALIDITY',)),
-    ('uid', ('SEARCH', 'ALL')),
-    ('response', ('EXISTS',)),
-    ('append', (None, None, None, test_mesg)),
-    ('recent', ()),
-    ('logout', ()),
+        ('select', ()),
+        ('response', ('UIDVALIDITY',)),
+        ('uid', ('SEARCH', 'ALL')),
+        ('response', ('EXISTS',)),
+        ('append', (None, None, None, test_mesg)),
+        ('recent', ()),
+        ('logout', ()),
     )
 
     def run(cmd, args):
         M._mesg('%s %s' % (cmd, args))
         typ, dat = getattr(M, cmd)(*args)
         M._mesg('%s => %s %s' % (cmd, typ, dat))
-        if typ == 'NO': raise dat[0]
+        if typ == 'NO':
+            raise dat[0]
         return dat
 
     try:
@@ -1575,25 +1528,28 @@ if __name__ == '__main__':
         M._mesg('PROTOCOL_VERSION = %s' % M.PROTOCOL_VERSION)
         M._mesg('CAPABILITIES = %r' % (M.capabilities,))
 
-        for cmd,args in test_seq1:
+        for cmd, args in test_seq1:
             run(cmd, args)
 
         for ml in run('list', ('/tmp/', 'yy%')):
             mo = re.match(r'.*"([^"]+)"$', ml)
-            if mo: path = mo.group(1)
-            else: path = ml.split()[-1]
+            if mo:
+                path = mo.group(1)
+            else:
+                path = ml.split()[-1]
             run('delete', (path,))
 
-        for cmd,args in test_seq2:
+        for cmd, args in test_seq2:
             dat = run(cmd, args)
 
-            if (cmd,args) != ('uid', ('SEARCH', 'ALL')):
+            if (cmd, args) != ('uid', ('SEARCH', 'ALL')):
                 continue
 
             uid = dat[-1].split()
-            if not uid: continue
+            if not uid:
+                continue
             run('uid', ('FETCH', '%s' % uid[-1],
-                    '(FLAGS INTERNALDATE RFC822.SIZE RFC822.HEADER RFC822.TEXT)'))
+                        '(FLAGS INTERNALDATE RFC822.SIZE RFC822.HEADER RFC822.TEXT)'))
 
         print('\nAll tests OK.')
 

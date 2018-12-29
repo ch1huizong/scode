@@ -31,12 +31,14 @@ __all__ = ["check", "NannyNag", "process_tokens"]
 verbose = 0
 filename_only = 0
 
+
 def errprint(*args):
     sep = ""
     for arg in args:
         sys.stderr.write(sep + str(arg))
         sep = " "
     sys.stderr.write("\n")
+
 
 def main():
     import getopt
@@ -58,19 +60,25 @@ def main():
     for arg in args:
         check(arg)
 
+
 class NannyNag(Exception):
     """
     Raised by process_tokens() if detecting an ambiguous indent.
     Captured and handled in check().
     """
+
     def __init__(self, lineno, msg, line):
         self.lineno, self.msg, self.line = lineno, msg, line
+
     def get_lineno(self):
         return self.lineno
+
     def get_msg(self):
         return self.msg
+
     def get_line(self):
         return self.line
+
 
 def check(file):
     """check(file_or_dir)
@@ -90,7 +98,7 @@ def check(file):
             fullname = os.path.join(file, name)
             if (os.path.isdir(fullname) and
                 not os.path.islink(fullname) or
-                os.path.normcase(name[-3:]) == ".py"):
+                    os.path.normcase(name[-3:]) == ".py"):
                 check(fullname)
         return
 
@@ -122,9 +130,12 @@ def check(file):
             print("offending line: %r" % (line,))
             print(nag.get_msg())
         else:
-            if ' ' in file: file = '"' + file + '"'
-            if filename_only: print(file)
-            else: print(file, badline, repr(line))
+            if ' ' in file:
+                file = '"' + file + '"'
+            if filename_only:
+                print(file)
+            else:
+                print(file, badline, repr(line))
         return
 
     finally:
@@ -132,6 +143,7 @@ def check(file):
 
     if verbose:
         print("%r: Clean bill of health." % (file,))
+
 
 class Whitespace:
     # the characters used for space and tab
@@ -157,7 +169,7 @@ class Whitespace:
     #       true iff raw[:n] is of the form (T*)(S*)
 
     def __init__(self, ws):
-        self.raw  = ws
+        self.raw = ws
         S, T = Whitespace.S, Whitespace.T
         count = []
         b = n = nt = 0
@@ -174,8 +186,8 @@ class Whitespace:
                 b = 0
             else:
                 break
-        self.n    = n
-        self.nt   = nt
+        self.n = n
+        self.nt = nt
         self.norm = tuple(count), b
         self.is_simple = len(count) <= 1
 
@@ -221,9 +233,9 @@ class Whitespace:
         a = []
         for ts in range(1, n+1):
             if self.indent_level(ts) != other.indent_level(ts):
-                a.append( (ts,
-                           self.indent_level(ts),
-                           other.indent_level(ts)) )
+                a.append((ts,
+                          self.indent_level(ts),
+                          other.indent_level(ts)))
         return a
 
     # Return True iff self.indent_level(t) < other.indent_level(t)
@@ -262,10 +274,11 @@ class Whitespace:
         a = []
         for ts in range(1, n+1):
             if self.indent_level(ts) >= other.indent_level(ts):
-                a.append( (ts,
-                           self.indent_level(ts),
-                           other.indent_level(ts)) )
+                a.append((ts,
+                          self.indent_level(ts),
+                          other.indent_level(ts)))
         return a
+
 
 def format_witnesses(w):
     firsts = (str(tup[0]) for tup in w)
@@ -273,6 +286,7 @@ def format_witnesses(w):
     if len(w) > 1:
         prefix = prefix + "s"
     return prefix + " " + ', '.join(firsts)
+
 
 def process_tokens(tokens):
     INDENT = tokenize.INDENT

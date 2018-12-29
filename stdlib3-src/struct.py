@@ -8,7 +8,7 @@ __all__ = [
 
     # Exceptions
     'error'
-    ]
+]
 
 from _struct import *
 from _struct import _clearcache

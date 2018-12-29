@@ -2,16 +2,18 @@
 
 import _symtable
 from _symtable import (USE, DEF_GLOBAL, DEF_LOCAL, DEF_PARAM,
-     DEF_IMPORT, DEF_BOUND, DEF_ANNOT, SCOPE_OFF, SCOPE_MASK, FREE,
-     LOCAL, GLOBAL_IMPLICIT, GLOBAL_EXPLICIT, CELL)
+                       DEF_IMPORT, DEF_BOUND, DEF_ANNOT, SCOPE_OFF, SCOPE_MASK, FREE,
+                       LOCAL, GLOBAL_IMPLICIT, GLOBAL_EXPLICIT, CELL)
 
 import weakref
 
 __all__ = ["symtable", "SymbolTable", "Class", "Function", "Symbol"]
 
+
 def symtable(code, filename, compile_type):
     top = _symtable.symtable(code, filename, compile_type)
     return _newSymbolTable(top, filename)
+
 
 class SymbolTableFactory:
     def __init__(self):
@@ -30,6 +32,7 @@ class SymbolTableFactory:
         if obj is None:
             obj = self.__memo[key] = self.new(table, filename)
         return obj
+
 
 _newSymbolTable = SymbolTableFactory()
 
@@ -62,7 +65,7 @@ class SymbolTable(object):
         if self._table.type == _symtable.TYPE_CLASS:
             return "class"
         assert self._table.type in (1, 2, 3), \
-               "unexpected type: {0}".format(self._table.type)
+            "unexpected type: {0}".format(self._table.type)
 
     def get_id(self):
         return self._table.id
@@ -124,26 +127,28 @@ class Function(SymbolTable):
 
     def get_parameters(self):
         if self.__params is None:
-            self.__params = self.__idents_matching(lambda x:x & DEF_PARAM)
+            self.__params = self.__idents_matching(lambda x: x & DEF_PARAM)
         return self.__params
 
     def get_locals(self):
         if self.__locals is None:
             locs = (LOCAL, CELL)
-            test = lambda x: ((x >> SCOPE_OFF) & SCOPE_MASK) in locs
+
+            def test(x): return ((x >> SCOPE_OFF) & SCOPE_MASK) in locs
             self.__locals = self.__idents_matching(test)
         return self.__locals
 
     def get_globals(self):
         if self.__globals is None:
             glob = (GLOBAL_IMPLICIT, GLOBAL_EXPLICIT)
-            test = lambda x:((x >> SCOPE_OFF) & SCOPE_MASK) in glob
+
+            def test(x): return ((x >> SCOPE_OFF) & SCOPE_MASK) in glob
             self.__globals = self.__idents_matching(test)
         return self.__globals
 
     def get_frees(self):
         if self.__frees is None:
-            is_free = lambda x:((x >> SCOPE_OFF) & SCOPE_MASK) == FREE
+            def is_free(x): return ((x >> SCOPE_OFF) & SCOPE_MASK) == FREE
             self.__frees = self.__idents_matching(is_free)
         return self.__frees
 
@@ -166,7 +171,8 @@ class Symbol(object):
     def __init__(self, name, flags, namespaces=None):
         self.__name = name
         self.__flags = flags
-        self.__scope = (flags >> SCOPE_OFF) & SCOPE_MASK # like PyST_GetScope()
+        # like PyST_GetScope()
+        self.__scope = (flags >> SCOPE_OFF) & SCOPE_MASK
         self.__namespaces = namespaces or ()
 
     def __repr__(self):
@@ -228,8 +234,10 @@ class Symbol(object):
             raise ValueError("name is bound to multiple namespaces")
         return self.__namespaces[0]
 
+
 if __name__ == "__main__":
-    import os, sys
+    import os
+    import sys
     with open(sys.argv[0]) as f:
         src = f.read()
     mod = symtable(src, os.path.split(sys.argv[0])[1], "exec")

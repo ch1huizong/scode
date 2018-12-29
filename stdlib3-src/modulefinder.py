@@ -28,8 +28,11 @@ EXTENDED_ARG = dis.EXTENDED_ARG
 packagePathMap = {}
 
 # A Public interface
+
+
 def AddPackagePath(packagename, path):
     packagePathMap.setdefault(packagename, []).append(path)
+
 
 replacePackageMap = {}
 
@@ -38,6 +41,7 @@ replacePackageMap = {}
 # of another package into sys.modules at runtime by calling
 # ReplacePackage("real_package_name", "faked_package_name")
 # before running ModuleFinder.
+
 
 def ReplacePackage(oldname, newname):
     replacePackageMap[oldname] = newname
@@ -66,6 +70,7 @@ class Module:
             s = s + ", %r" % (self.__path__,)
         s = s + ")"
         return s
+
 
 class ModuleFinder:
 
@@ -132,7 +137,7 @@ class ModuleFinder:
             self.msgout(4, "determine_parent -> None")
             return None
         pname = caller.__name__
-        if level >= 1: # relative import
+        if level >= 1:  # relative import
             if caller.__path__:
                 level -= 1
             if level == 0:
@@ -193,7 +198,8 @@ class ModuleFinder:
         m = q
         while tail:
             i = tail.find('.')
-            if i < 0: i = len(tail)
+            if i < 0:
+                i = len(tail)
             head, tail = tail[:i], tail[i+1:]
             mname = "%s.%s" % (m.__name__, head)
             m = self.import_module(head, mname, m)
@@ -351,9 +357,9 @@ class ModuleFinder:
                     and opargs[i-1][0] == opargs[i-2][0] == LOAD_CONST):
                 level = consts[opargs[i-2][1]]
                 fromlist = consts[opargs[i-1][1]]
-                if level == 0: # absolute import
+                if level == 0:  # absolute import
                     yield "absolute_import", (fromlist, names[oparg])
-                else: # relative import
+                else:  # relative import
                     yield "relative_import", (level, fromlist, names[oparg])
                 continue
 
@@ -397,7 +403,8 @@ class ModuleFinder:
                     self._safe_import_hook(name, m, fromlist, level=level)
                 else:
                     parent = self.determine_parent(m, level=level)
-                    self._safe_import_hook(parent.__name__, None, fromlist, level=0)
+                    self._safe_import_hook(
+                        parent.__name__, None, fromlist, level=0)
             else:
                 # We don't expect anything else from the generator.
                 raise RuntimeError(what)
@@ -547,11 +554,11 @@ class ModuleFinder:
 
         if self.debug and original_filename not in self.processed_paths:
             if new_filename != original_filename:
-                self.msgout(2, "co_filename %r changed to %r" \
-                                    % (original_filename,new_filename,))
+                self.msgout(2, "co_filename %r changed to %r"
+                            % (original_filename, new_filename,))
             else:
-                self.msgout(2, "co_filename %r remains unchanged" \
-                                    % (original_filename,))
+                self.msgout(2, "co_filename %r remains unchanged"
+                            % (original_filename,))
             self.processed_paths.append(original_filename)
 
         consts = list(co.co_consts)

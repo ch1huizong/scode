@@ -11,13 +11,16 @@ import threading
 
 __all__ = ["Error", "open", "open_new", "open_new_tab", "get", "register"]
 
+
 class Error(Exception):
     pass
+
 
 _lock = threading.RLock()
 _browsers = {}                  # Dictionary of available browser controllers
 _tryorder = None                # Preference order of available browsers
 _os_preferred_browser = None    # The preferred browser
+
 
 def register(name, klass, instance=None, *, preferred=False):
     """Register a browser connector."""
@@ -33,6 +36,7 @@ def register(name, klass, instance=None, *, preferred=False):
             _tryorder.insert(0, name)
         else:
             _tryorder.append(name)
+
 
 def get(using=None):
     """Return a browser launcher instance appropriate for the environment."""
@@ -68,6 +72,7 @@ def get(using=None):
 # It is recommended one does "import webbrowser" and uses webbrowser.open(url)
 # instead of "from webbrowser import *".
 
+
 def open(url, new=0, autoraise=True):
     if _tryorder is None:
         with _lock:
@@ -79,8 +84,10 @@ def open(url, new=0, autoraise=True):
             return True
     return False
 
+
 def open_new(url):
     return open(url, 1)
+
 
 def open_new_tab(url):
     return open(url, 2)
@@ -207,7 +214,8 @@ class UnixBrowser(BaseBrowser):
             # use autoraise argument only for remote invocation
             autoraise = int(autoraise)
             opt = self.raise_opts[autoraise]
-            if opt: raise_opt = [opt]
+            if opt:
+                raise_opt = [opt]
 
         cmdline = [self.name] + raise_opt + args
 
@@ -301,6 +309,7 @@ class Chrome(UnixBrowser):
     remote_action_newwin = "--new-window"
     remote_action_newtab = ""
     background = True
+
 
 Chromium = Chrome
 
@@ -500,6 +509,7 @@ def register_X_browsers():
     if shutil.which("grail"):
         register("grail", Grail, None)
 
+
 def register_standard_browsers():
     global _tryorder
     _tryorder = []
@@ -528,7 +538,8 @@ def register_standard_browsers():
         if os.environ.get("DISPLAY"):
             try:
                 cmd = "xdg-settings get default-web-browser".split()
-                raw_result = subprocess.check_output(cmd, stderr=subprocess.DEVNULL)
+                raw_result = subprocess.check_output(
+                    cmd, stderr=subprocess.DEVNULL)
                 result = raw_result.decode().strip()
             except (FileNotFoundError, subprocess.CalledProcessError):
                 pass
@@ -566,7 +577,8 @@ def register_standard_browsers():
             if cmdline != '':
                 cmd = _synthesize(cmdline, -1)
                 if cmd[1] is None:
-                    register(cmdline, None, GenericBrowser(cmdline), preferred=True)
+                    register(cmdline, None, GenericBrowser(
+                        cmdline), preferred=True)
 
     # what to do if _tryorder is now empty?
 
@@ -603,6 +615,7 @@ if sys.platform == 'darwin':
         If no browser is specified, the default browser, as specified in the
         Internet System Preferences panel, will be used.
         """
+
         def __init__(self, name):
             self.name = name
 
@@ -616,7 +629,8 @@ if sys.platform == 'darwin':
             new = int(bool(new))
             if self.name == "default":
                 # User called open, open_new or get without a browser parameter
-                script = 'open location "%s"' % url.replace('"', '%22') # opens in default browser
+                script = 'open location "%s"' % url.replace(
+                    '"', '%22')  # opens in default browser
             else:
                 # User called get and chose a browser
                 if self.name == "OmniWeb":
@@ -645,14 +659,15 @@ if sys.platform == 'darwin':
 
         def open(self, url, new=0, autoraise=True):
             if self._name == 'default':
-                script = 'open location "%s"' % url.replace('"', '%22') # opens in default browser
+                script = 'open location "%s"' % url.replace(
+                    '"', '%22')  # opens in default browser
             else:
                 script = '''
                    tell application "%s"
                        activate
                        open location "%s"
                    end
-                   '''%(self._name, url.replace('"', '%22'))
+                   ''' % (self._name, url.replace('"', '%22'))
 
             osapipe = os.popen("osascript", "w")
             if osapipe is None:
@@ -676,8 +691,10 @@ def main():
         sys.exit(1)
     new_win = 0
     for o, a in opts:
-        if o == '-n': new_win = 1
-        elif o == '-t': new_win = 2
+        if o == '-n':
+            new_win = 1
+        elif o == '-t':
+            new_win = 2
     if len(args) != 1:
         print(usage, file=sys.stderr)
         sys.exit(1)
@@ -686,6 +703,7 @@ def main():
     open(url, new_win)
 
     print("\a")
+
 
 if __name__ == "__main__":
     main()

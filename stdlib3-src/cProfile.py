@@ -12,17 +12,21 @@ import profile as _pyprofile
 # ____________________________________________________________
 # Simple interface
 
+
 def run(statement, filename=None, sort=-1):
     return _pyprofile._Utils(Profile).run(statement, filename, sort)
+
 
 def runctx(statement, globals, locals, filename=None, sort=-1):
     return _pyprofile._Utils(Profile).runctx(statement, globals, locals,
                                              filename, sort)
 
+
 run.__doc__ = _pyprofile.run.__doc__
 runctx.__doc__ = _pyprofile.runctx.__doc__
 
 # ____________________________________________________________
+
 
 class Profile(_lsprof.Profiler):
     """Profile(custom_timer=None, time_unit=None, subcalls=True, builtins=True)
@@ -59,7 +63,7 @@ class Profile(_lsprof.Profiler):
         for entry in entries:
             func = label(entry.code)
             nc = entry.callcount         # ncalls column of pstats (before '/')
-            cc = nc - entry.reccallcount # ncalls column of pstats (after '/')
+            cc = nc - entry.reccallcount  # ncalls column of pstats (after '/')
             tt = entry.inlinetime        # tottime column of pstats
             ct = entry.totaltime         # cumtime column of pstats
             callers = {}
@@ -112,6 +116,7 @@ class Profile(_lsprof.Profiler):
 
 # ____________________________________________________________
 
+
 def label(code):
     if isinstance(code, str):
         return ('~', 0, code)    # built-in functions ('~' sorts at the end)
@@ -119,6 +124,7 @@ def label(code):
         return (code.co_filename, code.co_firstlineno, code.co_name)
 
 # ____________________________________________________________
+
 
 def main():
     import os
@@ -129,12 +135,12 @@ def main():
     parser = OptionParser(usage=usage)
     parser.allow_interspersed_args = False
     parser.add_option('-o', '--outfile', dest="outfile",
-        help="Save stats to <outfile>", default=None)
+                      help="Save stats to <outfile>", default=None)
     parser.add_option('-s', '--sort', dest="sort",
-        help="Sort order when printing to stdout, based on pstats.Stats class",
-        default=-1)
+                      help="Sort order when printing to stdout, based on pstats.Stats class",
+                      default=-1)
     parser.add_option('-m', dest="module", action="store_true",
-        help="Profile a library module", default=False)
+                      help="Profile a library module", default=False)
 
     if not sys.argv[1:]:
         parser.print_usage()
@@ -165,6 +171,7 @@ def main():
     else:
         parser.print_usage()
     return parser
+
 
 # When invoked as main program, invoke the profiler on a script
 if __name__ == '__main__':

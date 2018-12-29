@@ -1,4 +1,4 @@
-#.  Copyright (C) 2005-2010   Gregory P. Smith (greg@krypto.org)
+# .  Copyright (C) 2005-2010   Gregory P. Smith (greg@krypto.org)
 #  Licensed to PSF under a Contributor Agreement.
 #
 
@@ -69,6 +69,7 @@ __all__ = __always_supported + ('new', 'algorithms_guaranteed',
 
 
 __builtin_constructor_cache = {}
+
 
 def __get_builtin_constructor(name):
     cache = __builtin_constructor_cache
@@ -160,7 +161,7 @@ try:
     new = __hash_new
     __get_hash = __get_openssl_constructor
     algorithms_available = algorithms_available.union(
-            _hashlib.openssl_md_meth_names)
+        _hashlib.openssl_md_meth_names)
 except ImportError:
     new = __py_new
     __get_hash = __get_builtin_constructor

@@ -14,6 +14,7 @@ __all__ = ['TextWrapper', 'wrap', 'fill', 'dedent', 'indent', 'shorten']
 # some Unicode spaces (like \u00a0) are non-breaking whitespaces.
 _whitespace = '\t\n\x0b\x0c\r '
 
+
 class TextWrapper:
     """
     Object for wrapping/filling text.  The public interface consists of
@@ -139,7 +140,6 @@ class TextWrapper:
         self.max_lines = max_lines
         self.placeholder = placeholder
 
-
     # -- Private methods -----------------------------------------------
     # (possibly useful for subclasses to override)
 
@@ -155,7 +155,6 @@ class TextWrapper:
         if self.replace_whitespace:
             text = text.translate(self.unicode_whitespace_trans)
         return text
-
 
     def _split(self, text):
         """_split(text : string) -> [string]
@@ -315,7 +314,7 @@ class TextWrapper:
                 else:
                     while cur_line:
                         if (cur_line[-1].strip() and
-                            cur_len + len(self.placeholder) <= width):
+                                cur_len + len(self.placeholder) <= width):
                             cur_line.append(self.placeholder)
                             lines.append(indent + ''.join(cur_line))
                             break
@@ -378,6 +377,7 @@ def wrap(text, width=70, **kwargs):
     w = TextWrapper(width=width, **kwargs)
     return w.wrap(text)
 
+
 def fill(text, width=70, **kwargs):
     """Fill a single paragraph of text, returning a new string.
 
@@ -389,6 +389,7 @@ def fill(text, width=70, **kwargs):
     """
     w = TextWrapper(width=width, **kwargs)
     return w.fill(text)
+
 
 def shorten(text, width, **kwargs):
     """Collapse and truncate the given text to fit in the given width.
@@ -410,6 +411,7 @@ def shorten(text, width, **kwargs):
 
 _whitespace_only_re = re.compile('^[ \t]+$', re.MULTILINE)
 _leading_whitespace_re = re.compile('(^[ \t]*)(?:[^ \t\n])', re.MULTILINE)
+
 
 def dedent(text):
     """Remove any common leading whitespace from every line in `text`.
@@ -455,7 +457,7 @@ def dedent(text):
     if 0 and margin:
         for line in text.split("\n"):
             assert not line or line.startswith(margin), \
-                   "line = %r, margin = %r" % (line, margin)
+                "line = %r, margin = %r" % (line, margin)
 
     if margin:
         text = re.sub(r'(?m)^' + margin, '', text)
@@ -481,6 +483,6 @@ def indent(text, prefix, predicate=None):
 
 
 if __name__ == "__main__":
-    #print dedent("\tfoo\n\tbar")
-    #print dedent("  \thello there\n  \t  how are you?")
+    # print dedent("\tfoo\n\tbar")
+    # print dedent("  \thello there\n  \t  how are you?")
     print(dedent("Hello there.\n  This is indented."))

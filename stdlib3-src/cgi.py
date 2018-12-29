@@ -55,6 +55,7 @@ __all__ = ["MiniFieldStorage", "FieldStorage",
 logfile = ""            # Filename to log to, if not empty
 logfp = None            # File object to log to, if not None
 
+
 def initlog(*allargs):
     """Write a log message, if there is a log file.
 
@@ -90,13 +91,16 @@ def initlog(*allargs):
         log = dolog
     log(*allargs)
 
+
 def dolog(fmt, *args):
     """Write a log message to the log file.  See initlog() for docs."""
-    logfp.write(fmt%args + "\n")
+    logfp.write(fmt % args + "\n")
+
 
 def nolog(*allargs):
     """Dummy function, assigned to log when logging is disabled."""
     pass
+
 
 def closelog():
     """Close the log file."""
@@ -107,6 +111,7 @@ def closelog():
         logfp = None
     log = initlog
 
+
 log = initlog           # The current logging function
 
 
@@ -116,6 +121,7 @@ log = initlog           # The current logging function
 # Maximum input we will accept when REQUEST_METHOD is POST
 # 0 ==> unlimited input
 maxlen = 0
+
 
 def parse(fp=None, environ=os.environ, keep_blank_values=0, strict_parsing=0):
     """Parse a query in the environment or from a file (default stdin)
@@ -142,7 +148,7 @@ def parse(fp=None, environ=os.environ, keep_blank_values=0, strict_parsing=0):
 
     # field keys and values (except for files) are returned as strings
     # an encoding is required to decode the bytes read from self.fp
-    if hasattr(fp,'encoding'):
+    if hasattr(fp, 'encoding'):
         encoding = fp.encoding
     else:
         encoding = 'latin-1'
@@ -165,10 +171,12 @@ def parse(fp=None, environ=os.environ, keep_blank_values=0, strict_parsing=0):
         else:
             qs = ''                     # Unknown content-type
         if 'QUERY_STRING' in environ:
-            if qs: qs = qs + '&'
+            if qs:
+                qs = qs + '&'
             qs = qs + environ['QUERY_STRING']
         elif sys.argv[1:]:
-            if qs: qs = qs + '&'
+            if qs:
+                qs = qs + '&'
             qs = qs + sys.argv[1]
         environ['QUERY_STRING'] = qs    # XXX Shouldn't, really
     elif 'QUERY_STRING' in environ:
@@ -192,11 +200,13 @@ def parse_qs(qs, keep_blank_values=0, strict_parsing=0):
          DeprecationWarning, 2)
     return urllib.parse.parse_qs(qs, keep_blank_values, strict_parsing)
 
+
 def parse_qsl(qs, keep_blank_values=0, strict_parsing=0):
     """Parse a query given as a string argument."""
     warn("cgi.parse_qsl is deprecated, use urllib.parse.parse_qsl instead",
          DeprecationWarning, 2)
     return urllib.parse.parse_qsl(qs, keep_blank_values, strict_parsing)
+
 
 def parse_multipart(fp, pdict, encoding="utf-8", errors="replace"):
     """Parse multipart input.
@@ -219,8 +229,9 @@ def parse_multipart(fp, pdict, encoding="utf-8", errors="replace"):
     headers.set_type(ctype)
     headers['Content-Length'] = pdict['CONTENT-LENGTH']
     fs = FieldStorage(fp, headers=headers, encoding=encoding, errors=errors,
-        environ={'REQUEST_METHOD': 'POST'})
+                      environ={'REQUEST_METHOD': 'POST'})
     return {k: fs.getlist(k) for k in fs}
+
 
 def _parseparam(s):
     while s[:1] == ';':
@@ -233,6 +244,7 @@ def _parseparam(s):
         f = s[:end]
         yield f.strip()
         s = s[end:]
+
 
 def parse_header(line):
     """Parse a Content-type like header.
@@ -326,6 +338,7 @@ class FieldStorage:
     directory and unlinking them as soon as they have been opened.
 
     """
+
     def __init__(self, fp=None, headers=None, outerboundary=b'',
                  environ=os.environ, keep_blank_values=0, strict_parsing=0,
                  limit=None, encoding='utf-8', errors='replace'):
@@ -500,7 +513,7 @@ class FieldStorage:
     def __repr__(self):
         """Return a printable representation."""
         return "FieldStorage(%r, %r, %r)" % (
-                self.name, self.filename, self.value)
+            self.name, self.filename, self.value)
 
     def __iter__(self):
         return iter(self.keys())
@@ -524,7 +537,8 @@ class FieldStorage:
             raise TypeError("not indexable")
         found = []
         for item in self.list:
-            if item.name == key: found.append(item)
+            if item.name == key:
+                found.append(item)
         if not found:
             raise KeyError(key)
         if len(found) == 1:
@@ -590,7 +604,7 @@ class FieldStorage:
         """Internal: read data in query string format."""
         qs = self.fp.read(self.length)
         if not isinstance(qs, bytes):
-            raise ValueError("%s should return bytes, got %s" \
+            raise ValueError("%s should return bytes, got %s"
                              % (self.fp, type(qs).__name__))
         qs = qs.decode(self.encoding, self.errors)
         if self.qs_on_post:
@@ -619,9 +633,9 @@ class FieldStorage:
                 self.list.append(MiniFieldStorage(key, value))
 
         klass = self.FieldStorageClass or self.__class__
-        first_line = self.fp.readline() # bytes
+        first_line = self.fp.readline()  # bytes
         if not isinstance(first_line, bytes):
-            raise ValueError("%s should return bytes, got %s" \
+            raise ValueError("%s should return bytes, got %s"
                              % (self.fp, type(first_line).__name__))
         self.bytes_read += len(first_line)
 
@@ -651,7 +665,7 @@ class FieldStorage:
                 del headers['content-length']
 
             part = klass(self.fp, headers, ib, environ, keep_blank_values,
-                         strict_parsing,self.limit-self.bytes_read,
+                         strict_parsing, self.limit-self.bytes_read,
                          self.encoding, self.errors)
             self.bytes_read += part.bytes_read
             self.list.append(part)
@@ -676,7 +690,7 @@ class FieldStorage:
         todo = self.length
         if todo >= 0:
             while todo > 0:
-                data = self.fp.read(min(todo, self.bufsize)) # bytes
+                data = self.fp.read(min(todo, self.bufsize))  # bytes
                 if not isinstance(data, bytes):
                     raise ValueError("%s should return bytes, got %s"
                                      % (self.fp, type(data).__name__))
@@ -690,9 +704,9 @@ class FieldStorage:
     def read_lines(self):
         """Internal: read lines until EOF or outerboundary."""
         if self._binary_file:
-            self.file = self.__file = BytesIO() # store data as bytes for files
+            self.file = self.__file = BytesIO()  # store data as bytes for files
         else:
-            self.file = self.__file = StringIO() # as strings for other fields
+            self.file = self.__file = StringIO()  # as strings for other fields
         if self.outerboundary:
             self.read_lines_to_outerboundary()
         else:
@@ -716,7 +730,7 @@ class FieldStorage:
     def read_lines_to_eof(self):
         """Internal: read lines until EOF."""
         while 1:
-            line = self.fp.readline(1<<16) # bytes
+            line = self.fp.readline(1 << 16)  # bytes
             self.bytes_read += len(line)
             if not line:
                 self.done = -1
@@ -736,7 +750,7 @@ class FieldStorage:
         while 1:
             if _read >= self.limit:
                 break
-            line = self.fp.readline(1<<16) # bytes
+            line = self.fp.readline(1 << 16)  # bytes
             self.bytes_read += len(line)
             _read += len(line)
             if not line:
@@ -780,7 +794,7 @@ class FieldStorage:
         last_boundary = next_boundary + b"--"
         last_line_lfend = True
         while True:
-            line = self.fp.readline(1<<16)
+            line = self.fp.readline(1 << 16)
             self.bytes_read += len(line)
             if not line:
                 self.done = -1
@@ -822,7 +836,7 @@ class FieldStorage:
             return tempfile.TemporaryFile("wb+")
         else:
             return tempfile.TemporaryFile("w+",
-                encoding=self.encoding, newline = '\n')
+                                          encoding=self.encoding, newline='\n')
 
 
 # Test/debug code
@@ -845,8 +859,10 @@ def test(environ=os.environ):
         print_form(form)
         print_environ(environ)
         print_environ_usage()
+
         def f():
             exec("testing print_exception() -- <I>italics?</I>")
+
         def g(f=f):
             f()
         print("<H3>What follows is a test, not an actual exception:</H3>")
@@ -867,6 +883,7 @@ def test(environ=os.environ):
     except:
         print_exception()
 
+
 def print_exception(type=None, value=None, tb=None, limit=None):
     if type is None:
         type, value, tb = sys.exc_info()
@@ -874,12 +891,13 @@ def print_exception(type=None, value=None, tb=None, limit=None):
     print()
     print("<H3>Traceback (most recent call last):</H3>")
     list = traceback.format_tb(tb, limit) + \
-           traceback.format_exception_only(type, value)
+        traceback.format_exception_only(type, value)
     print("<PRE>%s<B>%s</B></PRE>" % (
         html.escape("".join(list[:-1])),
         html.escape(list[-1]),
-        ))
+    ))
     del tb
+
 
 def print_environ(environ=os.environ):
     """Dump the shell environment as HTML."""
@@ -891,6 +909,7 @@ def print_environ(environ=os.environ):
         print("<DT>", html.escape(key), "<DD>", html.escape(environ[key]))
     print("</DL>")
     print()
+
 
 def print_form(form):
     """Dump the contents of a form as HTML."""
@@ -908,6 +927,7 @@ def print_form(form):
     print("</DL>")
     print()
 
+
 def print_directory():
     """Dump the current directory as HTML."""
     print()
@@ -920,12 +940,14 @@ def print_directory():
         print(html.escape(pwd))
     print()
 
+
 def print_arguments():
     print()
     print("<H3>Command Line Arguments:</H3>")
     print()
     print(sys.argv)
     print()
+
 
 def print_environ_usage():
     """Dump a list of environment variables used by CGI as HTML."""
@@ -978,7 +1000,7 @@ def escape(s, quote=None):
     """Deprecated API."""
     warn("cgi.escape is deprecated, use html.escape instead",
          DeprecationWarning, stacklevel=2)
-    s = s.replace("&", "&amp;") # Must be done first!
+    s = s.replace("&", "&amp;")  # Must be done first!
     s = s.replace("<", "&lt;")
     s = s.replace(">", "&gt;")
     if quote:
@@ -996,6 +1018,7 @@ def valid_boundary(s):
 
 # Invoke mainline
 # ===============
+
 
 # Call test() when this file is run as a script (not imported as a module)
 if __name__ == '__main__':

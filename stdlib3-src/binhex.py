@@ -26,10 +26,12 @@ import os
 import struct
 import binascii
 
-__all__ = ["binhex","hexbin","Error"]
+__all__ = ["binhex", "hexbin", "Error"]
+
 
 class Error(Exception):
     pass
+
 
 # States (what have we written)
 _DID_HEADER = 0
@@ -50,6 +52,7 @@ class FInfo:
         self.Creator = '????'
         self.Flags = 0
 
+
 def getfileinfo(name):
     finfo = FInfo()
     with io.open(name, 'rb') as fp:
@@ -63,6 +66,7 @@ def getfileinfo(name):
     file = file.replace(':', '-', 1)
     return file, finfo, dsize, 0
 
+
 class openrsrc:
     def __init__(self, *args):
         pass
@@ -75,6 +79,7 @@ class openrsrc:
 
     def close(self):
         pass
+
 
 class _Hqxcoderengine:
     """Write data to the coder in 3-byte chunks"""
@@ -114,6 +119,7 @@ class _Hqxcoderengine:
         self.ofp.close()
         del self.ofp
 
+
 class _Rlecoderengine:
     """Write data to the RLE-coder in suitably large chunks"""
 
@@ -135,6 +141,7 @@ class _Rlecoderengine:
             self.ofp.write(rledata)
         self.ofp.close()
         del self.ofp
+
 
 class BinHex:
     def __init__(self, name_finfo_dlen_rlen, ofp):
@@ -222,13 +229,15 @@ class BinHex:
             if self.state != _DID_DATA:
                 raise Error('Close at the wrong time')
             if self.rlen != 0:
-                raise Error("Incorrect resource-datasize, diff=%r" % (self.rlen,))
+                raise Error("Incorrect resource-datasize, diff=%r" %
+                            (self.rlen,))
             self._writecrc()
         finally:
             self.state = None
             ofp = self.ofp
             del self.ofp
             ofp.close()
+
 
 def binhex(inp, out):
     """binhex(infilename, outfilename): create binhex-encoded copy of a file"""
@@ -239,17 +248,20 @@ def binhex(inp, out):
         # XXXX Do textfile translation on non-mac systems
         while True:
             d = ifp.read(128000)
-            if not d: break
+            if not d:
+                break
             ofp.write(d)
         ofp.close_data()
 
     ifp = openrsrc(inp, 'rb')
     while True:
         d = ifp.read(128000)
-        if not d: break
+        if not d:
+            break
         ofp.write_rsrc(d)
     ofp.close()
     ifp.close()
+
 
 class _Hqxdecoderengine:
     """Read data via the decoder in 4-byte chunks"""
@@ -266,7 +278,8 @@ class _Hqxdecoderengine:
         # The loop here is convoluted, since we don't really now how
         # much to decode: there may be newlines in the incoming data.
         while wtd > 0:
-            if self.eof: return decdata
+            if self.eof:
+                return decdata
             wtd = ((wtd + 2) // 3) * 4
             data = self.ifp.read(wtd)
             #
@@ -292,6 +305,7 @@ class _Hqxdecoderengine:
 
     def close(self):
         self.ifp.close()
+
 
 class _Rledecoderengine:
     """Read data via the RLE-coder"""
@@ -336,7 +350,7 @@ class _Rledecoderengine:
         elif self.pre_buffer[-2:] == RUNCHAR + b'\0':
             mark = mark - 2
         elif self.pre_buffer[-2:-1] == RUNCHAR:
-            pass # Decode all
+            pass  # Decode all
         else:
             mark = mark - 1
 
@@ -346,6 +360,7 @@ class _Rledecoderengine:
 
     def close(self):
         self.ifp.close()
+
 
 class HexBin:
     def __init__(self, ifp):
@@ -451,6 +466,7 @@ class HexBin:
             self.state = None
             self.ifp.close()
 
+
 def hexbin(inp, out):
     """hexbin(infilename, outfilename) - Decode binhexed file"""
     ifp = HexBin(inp)
@@ -462,7 +478,8 @@ def hexbin(inp, out):
         # XXXX Do translation on non-mac systems
         while True:
             d = ifp.read(128000)
-            if not d: break
+            if not d:
+                break
             ofp.write(d)
     ifp.close_data()
 
@@ -472,7 +489,8 @@ def hexbin(inp, out):
         ofp.write(d)
         while True:
             d = ifp.read_rsrc(128000)
-            if not d: break
+            if not d:
+                break
             ofp.write(d)
         ofp.close()
 

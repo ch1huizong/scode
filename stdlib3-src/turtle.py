@@ -22,6 +22,15 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 
+from tkinter import simpledialog
+from copy import deepcopy
+from os.path import isfile, split, join
+import sys
+import inspect
+import time
+import math
+import types
+import tkinter as TK
 """
 Turtle graphics is a popular way for introducing programming to
 kids. It was part of the original Logo programming language developed
@@ -104,51 +113,41 @@ _ver = "turtle 1.1b- - for Python 3.1   -  4. 5. 2009"
 
 # print(_ver)
 
-import tkinter as TK
-import types
-import math
-import time
-import inspect
-import sys
-
-from os.path import isfile, split, join
-from copy import deepcopy
-from tkinter import simpledialog
 
 _tg_classes = ['ScrolledCanvas', 'TurtleScreen', 'Screen',
                'RawTurtle', 'Turtle', 'RawPen', 'Pen', 'Shape', 'Vec2D']
 _tg_screen_functions = ['addshape', 'bgcolor', 'bgpic', 'bye',
-        'clearscreen', 'colormode', 'delay', 'exitonclick', 'getcanvas',
-        'getshapes', 'listen', 'mainloop', 'mode', 'numinput',
-        'onkey', 'onkeypress', 'onkeyrelease', 'onscreenclick', 'ontimer',
-        'register_shape', 'resetscreen', 'screensize', 'setup',
-        'setworldcoordinates', 'textinput', 'title', 'tracer', 'turtles', 'update',
-        'window_height', 'window_width']
+                        'clearscreen', 'colormode', 'delay', 'exitonclick', 'getcanvas',
+                        'getshapes', 'listen', 'mainloop', 'mode', 'numinput',
+                        'onkey', 'onkeypress', 'onkeyrelease', 'onscreenclick', 'ontimer',
+                        'register_shape', 'resetscreen', 'screensize', 'setup',
+                        'setworldcoordinates', 'textinput', 'title', 'tracer', 'turtles', 'update',
+                        'window_height', 'window_width']
 _tg_turtle_functions = ['back', 'backward', 'begin_fill', 'begin_poly', 'bk',
-        'circle', 'clear', 'clearstamp', 'clearstamps', 'clone', 'color',
-        'degrees', 'distance', 'dot', 'down', 'end_fill', 'end_poly', 'fd',
-        'fillcolor', 'filling', 'forward', 'get_poly', 'getpen', 'getscreen', 'get_shapepoly',
-        'getturtle', 'goto', 'heading', 'hideturtle', 'home', 'ht', 'isdown',
-        'isvisible', 'left', 'lt', 'onclick', 'ondrag', 'onrelease', 'pd',
-        'pen', 'pencolor', 'pendown', 'pensize', 'penup', 'pos', 'position',
-        'pu', 'radians', 'right', 'reset', 'resizemode', 'rt',
-        'seth', 'setheading', 'setpos', 'setposition', 'settiltangle',
-        'setundobuffer', 'setx', 'sety', 'shape', 'shapesize', 'shapetransform', 'shearfactor', 'showturtle',
-        'speed', 'st', 'stamp', 'tilt', 'tiltangle', 'towards',
-        'turtlesize', 'undo', 'undobufferentries', 'up', 'width',
-        'write', 'xcor', 'ycor']
+                        'circle', 'clear', 'clearstamp', 'clearstamps', 'clone', 'color',
+                        'degrees', 'distance', 'dot', 'down', 'end_fill', 'end_poly', 'fd',
+                        'fillcolor', 'filling', 'forward', 'get_poly', 'getpen', 'getscreen', 'get_shapepoly',
+                        'getturtle', 'goto', 'heading', 'hideturtle', 'home', 'ht', 'isdown',
+                        'isvisible', 'left', 'lt', 'onclick', 'ondrag', 'onrelease', 'pd',
+                        'pen', 'pencolor', 'pendown', 'pensize', 'penup', 'pos', 'position',
+                        'pu', 'radians', 'right', 'reset', 'resizemode', 'rt',
+                        'seth', 'setheading', 'setpos', 'setposition', 'settiltangle',
+                        'setundobuffer', 'setx', 'sety', 'shape', 'shapesize', 'shapetransform', 'shearfactor', 'showturtle',
+                        'speed', 'st', 'stamp', 'tilt', 'tiltangle', 'towards',
+                        'turtlesize', 'undo', 'undobufferentries', 'up', 'width',
+                        'write', 'xcor', 'ycor']
 _tg_utilities = ['write_docstringdict', 'done']
 
 __all__ = (_tg_classes + _tg_screen_functions + _tg_turtle_functions +
-           _tg_utilities + ['Terminator']) # + _math_functions)
+           _tg_utilities + ['Terminator'])  # + _math_functions)
 
 _alias_list = ['addshape', 'backward', 'bk', 'fd', 'ht', 'lt', 'pd', 'pos',
                'pu', 'rt', 'seth', 'setpos', 'setposition', 'st',
                'turtlesize', 'up', 'width']
 
-_CFG = {"width" : 0.5,               # Screen
-        "height" : 0.75,
-        "canvwidth" : 400,
+_CFG = {"width": 0.5,               # Screen
+        "height": 0.75,
+        "canvwidth": 400,
         "canvheight": 300,
         "leftright": None,
         "topbottom": None,
@@ -157,16 +156,17 @@ _CFG = {"width" : 0.5,               # Screen
         "delay": 10,
         "undobuffersize": 1000,      # RawTurtle
         "shape": "classic",
-        "pencolor" : "black",
-        "fillcolor" : "black",
-        "resizemode" : "noresize",
-        "visible" : True,
+        "pencolor": "black",
+        "fillcolor": "black",
+        "resizemode": "noresize",
+        "visible": True,
         "language": "english",        # docstrings
         "exampleturtle": "turtle",
         "examplescreen": "screen",
         "title": "Python Turtle Graphics",
         "using_IDLE": False
-       }
+        }
+
 
 def config_dict(filename):
     """Convert content of config-file into dictionary."""
@@ -180,7 +180,7 @@ def config_dict(filename):
         try:
             key, value = line.split("=")
         except ValueError:
-            print("Bad line in config-file %s:\n%s" % (filename,line))
+            print("Bad line in config-file %s:\n%s" % (filename, line))
             continue
         key = key.strip()
         value = value.strip()
@@ -193,9 +193,10 @@ def config_dict(filename):
                 else:
                     value = int(value)
             except ValueError:
-                pass # value need not be converted
+                pass  # value need not be converted
         cfgdict[key] = value
     return cfgdict
+
 
 def readconfig(cfgdict):
     """Read config-files, change configuration-dict accordingly.
@@ -227,10 +228,11 @@ def readconfig(cfgdict):
     _CFG.update(cfgdict2)
     _CFG.update(cfgdict1)
 
+
 try:
     readconfig(_CFG)
 except Exception:
-    print ("No configfile read, reason unknown")
+    print("No configfile read, reason unknown")
 
 
 class Vec2D(tuple):
@@ -249,21 +251,28 @@ class Vec2D(tuple):
     """
     def __new__(cls, x, y):
         return tuple.__new__(cls, (x, y))
+
     def __add__(self, other):
         return Vec2D(self[0]+other[0], self[1]+other[1])
+
     def __mul__(self, other):
         if isinstance(other, Vec2D):
             return self[0]*other[0]+self[1]*other[1]
         return Vec2D(self[0]*other, self[1]*other)
+
     def __rmul__(self, other):
         if isinstance(other, int) or isinstance(other, float):
             return Vec2D(self[0]*other, self[1]*other)
+
     def __sub__(self, other):
         return Vec2D(self[0]-other[0], self[1]-other[1])
+
     def __neg__(self):
         return Vec2D(-self[0], -self[1])
+
     def __abs__(self):
         return (self[0]**2 + self[1]**2)**0.5
+
     def rotate(self, angle):
         """rotate self counterclockwise by angle
         """
@@ -271,8 +280,10 @@ class Vec2D(tuple):
         angle = angle * math.pi / 180.0
         c, s = math.cos(angle), math.sin(angle)
         return Vec2D(self[0]*c+perp[0]*s, self[1]*c+perp[1]*s)
+
     def __getnewargs__(self):
         return (self[0], self[1])
+
     def __repr__(self):
         return "(%.2f,%.2f)" % self
 
@@ -282,8 +293,8 @@ class Vec2D(tuple):
 ### May be replaced by an interface to some different graphics toolkit     ###
 ##############################################################################
 
-## helper functions for Scrolled Canvas, to forward Canvas-methods
-## to ScrolledCanvas class
+# helper functions for Scrolled Canvas, to forward Canvas-methods
+# to ScrolledCanvas class
 
 def __methodDict(cls, _dict):
     """helper function for Scrolled Canvas"""
@@ -295,17 +306,20 @@ def __methodDict(cls, _dict):
         if type(value) == types.FunctionType:
             _dict[key] = value
 
+
 def __methods(cls):
     """helper function for Scrolled Canvas"""
     _dict = {}
     __methodDict(cls, _dict)
     return _dict.keys()
 
+
 __stringBody = (
     'def %(method)s(self, *args, **kw): return ' +
     'self.%(attribute)s.%(method)s(*args, **kw)')
 
-def __forwardmethods(fromClass, toClass, toPart, exclude = ()):
+
+def __forwardmethods(fromClass, toClass, toPart, exclude=()):
     ### MANY CHANGES ###
     _dict_1 = {}
     __methodDict(toClass, _dict_1)
@@ -321,9 +335,9 @@ def __forwardmethods(fromClass, toClass, toPart, exclude = ()):
         d = {'method': method, 'func': func}
         if isinstance(toPart, str):
             execString = \
-                __stringBody % {'method' : method, 'attribute' : toPart}
+                __stringBody % {'method': method, 'attribute': toPart}
         exec(execString, d)
-        setattr(fromClass, method, d[method])   ### NEWU!
+        setattr(fromClass, method, d[method])  # NEWU!
 
 
 class ScrolledCanvas(TK.Frame):
@@ -332,8 +346,9 @@ class ScrolledCanvas(TK.Frame):
     Used as the default canvas, which pops up automatically when
     using turtle graphics functions or the Turtle class.
     """
+
     def __init__(self, master, width=500, height=350,
-                                          canvwidth=600, canvheight=500):
+                 canvwidth=600, canvheight=500):
         TK.Frame.__init__(self, master, width=width, height=height)
         self._rootwindow = self.winfo_toplevel()
         self.width, self.height = width, height
@@ -348,16 +363,16 @@ class ScrolledCanvas(TK.Frame):
                                yscrollcommand=self.vscroll.set)
         self.rowconfigure(0, weight=1, minsize=0)
         self.columnconfigure(0, weight=1, minsize=0)
-        self._canvas.grid(padx=1, in_ = self, pady=1, row=0,
-                column=0, rowspan=1, columnspan=1, sticky='news')
-        self.vscroll.grid(padx=1, in_ = self, pady=1, row=0,
-                column=1, rowspan=1, columnspan=1, sticky='news')
-        self.hscroll.grid(padx=1, in_ = self, pady=1, row=1,
-                column=0, rowspan=1, columnspan=1, sticky='news')
+        self._canvas.grid(padx=1, in_=self, pady=1, row=0,
+                          column=0, rowspan=1, columnspan=1, sticky='news')
+        self.vscroll.grid(padx=1, in_=self, pady=1, row=0,
+                          column=1, rowspan=1, columnspan=1, sticky='news')
+        self.hscroll.grid(padx=1, in_=self, pady=1, row=1,
+                          column=0, rowspan=1, columnspan=1, sticky='news')
         self.reset()
         self._rootwindow.bind('<Configure>', self.onResize)
 
-    def reset(self, canvwidth=None, canvheight=None, bg = None):
+    def reset(self, canvwidth=None, canvheight=None, bg=None):
         """Adjust canvas and scrollbars according to given canvas size."""
         if canvwidth:
             self.canvwidth = canvwidth
@@ -366,14 +381,13 @@ class ScrolledCanvas(TK.Frame):
         if bg:
             self.bg = bg
         self._canvas.config(bg=bg,
-                        scrollregion=(-self.canvwidth//2, -self.canvheight//2,
-                                       self.canvwidth//2, self.canvheight//2))
+                            scrollregion=(-self.canvwidth//2, -self.canvheight//2,
+                                          self.canvwidth//2, self.canvheight//2))
         self._canvas.xview_moveto(0.5*(self.canvwidth - self.width + 30) /
-                                                               self.canvwidth)
-        self._canvas.yview_moveto(0.5*(self.canvheight- self.height + 30) /
-                                                              self.canvheight)
+                                  self.canvwidth)
+        self._canvas.yview_moveto(0.5*(self.canvheight - self.height + 30) /
+                                  self.canvheight)
         self.adjustScrolls()
-
 
     def adjustScrolls(self):
         """ Adjust scrollbars according to window- and canvas-size.
@@ -381,11 +395,12 @@ class ScrolledCanvas(TK.Frame):
         cwidth = self._canvas.winfo_width()
         cheight = self._canvas.winfo_height()
         self._canvas.xview_moveto(0.5*(self.canvwidth-cwidth)/self.canvwidth)
-        self._canvas.yview_moveto(0.5*(self.canvheight-cheight)/self.canvheight)
+        self._canvas.yview_moveto(
+            0.5*(self.canvheight-cheight)/self.canvheight)
         if cwidth < self.canvwidth or cheight < self.canvheight:
-            self.hscroll.grid(padx=1, in_ = self, pady=1, row=1,
+            self.hscroll.grid(padx=1, in_=self, pady=1, row=1,
                               column=0, rowspan=1, columnspan=1, sticky='news')
-            self.vscroll.grid(padx=1, in_ = self, pady=1, row=0,
+            self.vscroll.grid(padx=1, in_=self, pady=1, row=0,
                               column=1, rowspan=1, columnspan=1, sticky='news')
         else:
             self.hscroll.grid_forget()
@@ -425,11 +440,13 @@ class ScrolledCanvas(TK.Frame):
         """
         self._canvas.focus_force()
 
+
 __forwardmethods(ScrolledCanvas, TK.Canvas, '_canvas')
 
 
 class _Root(TK.Tk):
     """Root class for Screen based on Tkinter."""
+
     def __init__(self):
         TK.Tk.__init__(self)
 
@@ -441,7 +458,7 @@ class _Root(TK.Tk):
         return self._canvas
 
     def set_geometry(self, width, height, startx, starty):
-        self.geometry("%dx%d%+d%+d"%(width, height, startx, starty))
+        self.geometry("%dx%d%+d%+d" % (width, height, startx, starty))
 
     def ondestroy(self, destroy):
         self.wm_protocol("WM_DELETE_WINDOW", destroy)
@@ -451,6 +468,7 @@ class _Root(TK.Tk):
 
     def win_height(self):
         return self.winfo_screenheight()
+
 
 Canvas = TK.Canvas
 
@@ -486,7 +504,7 @@ class TurtleScreenBase(object):
         else:  # expected: ordinary TK.Canvas
             w = int(self.cv.cget("width"))
             h = int(self.cv.cget("height"))
-            self.cv.config(scrollregion = (-w//2, -h//2, w//2, h//2 ))
+            self.cv.config(scrollregion=(-w//2, -h//2, w//2, h//2))
         self.canvwidth = w
         self.canvheight = h
         self.xscale = self.yscale = 1.0
@@ -525,7 +543,7 @@ class TurtleScreenBase(object):
         """Create an invisible line item on canvas self.cv)
         """
         return self.cv.create_line(0, 0, 0, 0, fill="", width=2,
-                                   capstyle = TK.ROUND)
+                                   capstyle=TK.ROUND)
 
     def _drawline(self, lineitem, coordlist=None,
                   fill=None, width=None, top=False):
@@ -579,7 +597,7 @@ class TurtleScreenBase(object):
         """Set canvas' backgroundcolor if color is not None,
         else return backgroundcolor."""
         if color is not None:
-            self.cv.config(bg = color)
+            self.cv.config(bg=color)
             self._update()
         else:
             return self.cv.cget("bg")
@@ -592,14 +610,14 @@ class TurtleScreenBase(object):
         x, y = pos
         x = x * self.xscale
         y = y * self.yscale
-        anchor = {"left":"sw", "center":"s", "right":"se" }
-        item = self.cv.create_text(x-1, -y, text = txt, anchor = anchor[align],
-                                        fill = pencolor, font = font)
+        anchor = {"left": "sw", "center": "s", "right": "se"}
+        item = self.cv.create_text(x-1, -y, text=txt, anchor=anchor[align],
+                                   fill=pencolor, font=font)
         x0, y0, x1, y1 = self.cv.bbox(item)
         self.cv.update()
         return item, x1-1
 
-##    def _dot(self, pos, size, color):
+# def _dot(self, pos, size, color):
 ##        """may be implemented for some other graphics toolkit"""
 
     def _onclick(self, item, fun, num=1, add=None):
@@ -651,7 +669,7 @@ class TurtleScreenBase(object):
             def eventfun(event):
                 try:
                     x, y = (self.cv.canvasx(event.x)/self.xscale,
-                           -self.cv.canvasy(event.y)/self.yscale)
+                            -self.cv.canvasy(event.y)/self.yscale)
                     fun(x, y)
                 except Exception:
                     pass
@@ -754,7 +772,7 @@ class TurtleScreenBase(object):
         >>> """
         cl = self.cv.coords(item)
         pl = [(cl[i], -cl[i+1]) for i in range(0, len(cl), 2)]
-        return  pl
+        return pl
 
     def _setscrollregion(self, srx1, sry1, srx2, sry2):
         self.cv.config(scrollregion=(srx1, sry1, srx2, sry2))
@@ -793,7 +811,7 @@ class TurtleScreenBase(object):
         if width <= 1:  # the window isn't managed by a geometry manager
             width = self.cv['width']
         height = self.cv.winfo_height()
-        if height <= 1: # the window isn't managed by a geometry manager
+        if height <= 1:  # the window isn't managed by a geometry manager
             height = self.cv['height']
         return width, height
 
@@ -875,6 +893,7 @@ class Shape(object):
     attribute _data is - depending on _type a poygon-tuple,
     an image or a list constructed using the addcomponent method.
     """
+
     def __init__(self, type_, data=None):
         self._type = type_
         if type_ == "polygon":
@@ -909,7 +928,7 @@ class Shape(object):
         """
         if self._type != "compound":
             raise TurtleGraphicsError("Cannot add component to %s Shape"
-                                                                % self._type)
+                                      % self._type)
         if outline is None:
             outline = fill
         self._data.append([poly, fill, outline])
@@ -917,11 +936,13 @@ class Shape(object):
 
 class Tbuffer(object):
     """Ring buffer used as undobuffer for RawTurtle objects."""
+
     def __init__(self, bufsize=10):
         self.bufsize = bufsize
         self.buffer = [[None]] * bufsize
         self.ptr = -1
         self.cumulate = False
+
     def reset(self, bufsize=None):
         if bufsize is None:
             for i in range(self.bufsize):
@@ -930,6 +951,7 @@ class Tbuffer(object):
             self.bufsize = bufsize
             self.buffer = [[None]] * bufsize
         self.ptr = -1
+
     def push(self, item):
         if self.bufsize > 0:
             if not self.cumulate:
@@ -937,6 +959,7 @@ class Tbuffer(object):
                 self.buffer[self.ptr] = item
             else:
                 self.buffer[self.ptr].append(item)
+
     def pop(self):
         if self.bufsize > 0:
             item = self.buffer[self.ptr]
@@ -946,11 +969,12 @@ class Tbuffer(object):
                 self.buffer[self.ptr] = [None]
                 self.ptr = (self.ptr - 1) % self.bufsize
                 return (item)
+
     def nr_of_items(self):
         return self.bufsize - self.buffer.count([None])
+
     def __repr__(self):
         return str(self.buffer) + " " + str(self.ptr)
-
 
 
 class TurtleScreen(TurtleScreenBase):
@@ -965,27 +989,34 @@ class TurtleScreen(TurtleScreenBase):
     def __init__(self, cv, mode=_CFG["mode"],
                  colormode=_CFG["colormode"], delay=_CFG["delay"]):
         self._shapes = {
-                   "arrow" : Shape("polygon", ((-10,0), (10,0), (0,10))),
-                  "turtle" : Shape("polygon", ((0,16), (-2,14), (-1,10), (-4,7),
-                              (-7,9), (-9,8), (-6,5), (-7,1), (-5,-3), (-8,-6),
-                              (-6,-8), (-4,-5), (0,-7), (4,-5), (6,-8), (8,-6),
-                              (5,-3), (7,1), (6,5), (9,8), (7,9), (4,7), (1,10),
-                              (2,14))),
-                  "circle" : Shape("polygon", ((10,0), (9.51,3.09), (8.09,5.88),
-                              (5.88,8.09), (3.09,9.51), (0,10), (-3.09,9.51),
-                              (-5.88,8.09), (-8.09,5.88), (-9.51,3.09), (-10,0),
-                              (-9.51,-3.09), (-8.09,-5.88), (-5.88,-8.09),
-                              (-3.09,-9.51), (-0.00,-10.00), (3.09,-9.51),
-                              (5.88,-8.09), (8.09,-5.88), (9.51,-3.09))),
-                  "square" : Shape("polygon", ((10,-10), (10,10), (-10,10),
-                              (-10,-10))),
-                "triangle" : Shape("polygon", ((10,-5.77), (0,11.55),
-                              (-10,-5.77))),
-                  "classic": Shape("polygon", ((0,0),(-5,-9),(0,-7),(5,-9))),
-                   "blank" : Shape("image", self._blankimage())
-                  }
+            "arrow": Shape("polygon", ((-10, 0), (10, 0), (0, 10))),
+            "turtle": Shape("polygon", ((0, 16), (-2, 14), (-1, 10), (-4, 7),
+                                        (-7, 9), (-9, 8), (-6, 5), (-7,
+                                                                    1), (-5, -3), (-8, -6),
+                                        (-6, -8), (-4, -5), (0, -
+                                                             7), (4, -5), (6, -8), (8, -6),
+                                        (5, -3), (7, 1), (6, 5), (9,
+                                                                  8), (7, 9), (4, 7), (1, 10),
+                                        (2, 14))),
+            "circle": Shape("polygon", ((10, 0), (9.51, 3.09), (8.09, 5.88),
+                                        (5.88, 8.09), (3.09,
+                                                       9.51), (0, 10), (-3.09, 9.51),
+                                        (-5.88, 8.09), (-8.09,
+                                                        5.88), (-9.51, 3.09), (-10, 0),
+                                        (-9.51, -3.09), (-8.09, -
+                                                         5.88), (-5.88, -8.09),
+                                        (-3.09, -9.51), (-0.00, -
+                                                         10.00), (3.09, -9.51),
+                                        (5.88, -8.09), (8.09, -5.88), (9.51, -3.09))),
+            "square": Shape("polygon", ((10, -10), (10, 10), (-10, 10),
+                                        (-10, -10))),
+            "triangle": Shape("polygon", ((10, -5.77), (0, 11.55),
+                                          (-10, -5.77))),
+            "classic": Shape("polygon", ((0, 0), (-5, -9), (0, -7), (5, -9))),
+            "blank": Shape("image", self._blankimage())
+        }
 
-        self._bgpics = {"nopic" : ""}
+        self._bgpics = {"nopic": ""}
 
         TurtleScreenBase.__init__(self, cv)
         self._mode = mode
@@ -1061,7 +1092,7 @@ class TurtleScreen(TurtleScreenBase):
         self._mode = mode
         if mode in ["standard", "logo"]:
             self._setscrollregion(-self.canvwidth//2, -self.canvheight//2,
-                                       self.canvwidth//2, self.canvheight//2)
+                                  self.canvwidth//2, self.canvheight//2)
             self.xscale = self.yscale = 1.0
         self.reset()
 
@@ -1133,10 +1164,10 @@ class TurtleScreen(TurtleScreenBase):
                 shape = Shape("image", self._image(name))
             else:
                 raise TurtleGraphicsError("Bad arguments for register_shape.\n"
-                                          + "Use  help(register_shape)" )
+                                          + "Use  help(register_shape)")
         elif isinstance(shape, tuple):
             shape = Shape("polygon", shape)
-        ## else shape assumed to be Shape-instance
+        # else shape assumed to be Shape-instance
         self._shapes[name] = shape
 
     def _colorstr(self, color):
@@ -1507,14 +1538,15 @@ class TurtleScreen(TurtleScreenBase):
     addshape = register_shape
     onkeyrelease = onkey
 
+
 class TNavigator(object):
     """Navigation part of the RawTurtle.
     Implements methods for turtle movement.
     """
     START_ORIENTATION = {
         "standard": Vec2D(1.0, 0.0),
-        "world"   : Vec2D(1.0, 0.0),
-        "logo"    : Vec2D(0.0, 1.0)  }
+        "world": Vec2D(1.0, 0.0),
+        "logo": Vec2D(0.0, 1.0)}
     DEFAULT_MODE = "standard"
     DEFAULT_ANGLEOFFSET = 0
     DEFAULT_ANGLEORIENT = 1
@@ -1535,7 +1567,7 @@ class TNavigator(object):
         Will be overwritten by parent class
         """
         self._position = Vec2D(0.0, 0.0)
-        self._orient =  TNavigator.START_ORIENTATION[self._mode]
+        self._orient = TNavigator.START_ORIENTATION[self._mode]
 
     def _setmode(self, mode=None):
         """Set turtle-mode to 'standard', 'world' or 'logo'.
@@ -1548,7 +1580,7 @@ class TNavigator(object):
         if mode in ["standard", "world"]:
             self._angleOffset = 0
             self._angleOrient = 1
-        else: # mode == "logo":
+        else:  # mode == "logo":
             self._angleOffset = self._fullcircle/4.
             self._angleOrient = -1
 
@@ -1738,7 +1770,6 @@ class TNavigator(object):
         86.6025403784
         """
         return self._position[1]
-
 
     def goto(self, x, y=None):
         """Move turtle to an absolute position.
@@ -1932,10 +1963,10 @@ class TNavigator(object):
         """
         angle = (to_angle - self.heading())*self._angleOrient
         full = self._fullcircle
-        angle = (angle+full/2.)%full - full/2.
+        angle = (angle+full/2.) % full - full/2.
         self._rotate(angle)
 
-    def circle(self, radius, extent = None, steps = None):
+    def circle(self, radius, extent=None, steps=None):
         """ Draw a circle with given radius.
 
         Arguments:
@@ -1998,12 +2029,14 @@ class TNavigator(object):
         if self.undobuffer:
             self.undobuffer.cumulate = False
 
-## three dummy methods to be implemented by child class:
+# three dummy methods to be implemented by child class:
 
     def speed(self, s=0):
         """dummy method - to be overwritten by child class"""
+
     def _tracer(self, a=None, b=None):
         """dummy method - to be overwritten by child class"""
+
     def _delay(self, n=None):
         """dummy method - to be overwritten by child class"""
 
@@ -2022,13 +2055,14 @@ class TPen(object):
     """Drawing part of the RawTurtle.
     Implements drawing properties.
     """
+
     def __init__(self, resizemode=_CFG["resizemode"]):
-        self._resizemode = resizemode # or "user" or "noresize"
+        self._resizemode = resizemode  # or "user" or "noresize"
         self.undobuffer = None
         TPen._reset(self)
 
     def _reset(self, pencolor=_CFG["pencolor"],
-                     fillcolor=_CFG["fillcolor"]):
+               fillcolor=_CFG["fillcolor"]):
         self._pensize = 1
         self._shown = True
         self._pencolor = pencolor
@@ -2090,7 +2124,6 @@ class TPen(object):
         if width is None:
             return self._pensize
         self.pen(pensize=width)
-
 
     def penup(self):
         """Pull the pen up -- no drawing when moving.
@@ -2162,7 +2195,8 @@ class TPen(object):
         Example (for a Turtle instance named turtle):
         >>> turtle.speed(3)
         """
-        speeds = {'fastest':0, 'fast':10, 'normal':6, 'slow':3, 'slowest':1 }
+        speeds = {'fastest': 0, 'fast': 10,
+                  'normal': 6, 'slow': 3, 'slowest': 1}
         if speed is None:
             return self._speed
         if speed in speeds:
@@ -2380,17 +2414,17 @@ class TPen(object):
         'pencolor': 'red', 'pendown': True, 'fillcolor': 'green',
         'stretchfactor': (1,1), 'speed': 3, 'shearfactor': 0.0}
         """
-        _pd =  {"shown"         : self._shown,
-                "pendown"       : self._drawing,
-                "pencolor"      : self._pencolor,
-                "fillcolor"     : self._fillcolor,
-                "pensize"       : self._pensize,
-                "speed"         : self._speed,
-                "resizemode"    : self._resizemode,
-                "stretchfactor" : self._stretchfactor,
-                "shearfactor"   : self._shearfactor,
-                "outline"       : self._outlinewidth,
-                "tilt"          : self._tilt
+        _pd = {"shown": self._shown,
+               "pendown": self._drawing,
+               "pencolor": self._pencolor,
+               "fillcolor": self._fillcolor,
+               "pensize": self._pensize,
+               "speed": self._speed,
+               "resizemode": self._resizemode,
+               "stretchfactor": self._stretchfactor,
+               "shearfactor": self._shearfactor,
+               "outline": self._outlinewidth,
+               "tilt": self._tilt
                }
 
         if not (pen or pendict):
@@ -2454,18 +2488,21 @@ class TPen(object):
             scx, scy = self._stretchfactor
             shf = self._shearfactor
             sa, ca = math.sin(self._tilt), math.cos(self._tilt)
-            self._shapetrafo = ( scx*ca, scy*(shf*ca + sa),
+            self._shapetrafo = (scx*ca, scy*(shf*ca + sa),
                                 -scx*sa, scy*(ca - shf*sa))
         self._update()
 
-## three dummy methods to be implemented by child class:
+# three dummy methods to be implemented by child class:
 
-    def _newLine(self, usePos = True):
+    def _newLine(self, usePos=True):
         """dummy method - to be overwritten by child class"""
+
     def _update(self, count=True, forced=False):
         """dummy method - to be overwritten by child class"""
+
     def _color(self, args):
         """dummy method - to be overwritten by child class"""
+
     def _colorstr(self, args):
         """dummy method - to be overwritten by child class"""
 
@@ -2506,7 +2543,7 @@ class _TurtleImage(object):
             self._item = screen._createimage(screen._shapes["blank"]._data)
         elif self._type == "compound":
             self._item = [screen._createpoly() for item in
-                                          screen._shapes[shapeIndex]._data]
+                          screen._shapes[shapeIndex]._data]
 
 
 class RawTurtle(TPen, TNavigator):
@@ -2626,7 +2663,6 @@ class RawTurtle(TPen, TNavigator):
         self.clearstamps()
         self.setundobuffer(self._undobuffersize)
 
-
     def clear(self):
         """Delete the turtle's drawings from the screen. Do not move turtle.
 
@@ -2646,7 +2682,7 @@ class RawTurtle(TPen, TNavigator):
         self.screen._incrementudc()
         if self.screen._updatecounter != 0:
             return
-        if len(self.currentLine)>1:
+        if len(self.currentLine) > 1:
             self.screen._drawline(self.currentLineItem, self.currentLine,
                                   self._pencolor, self._pensize)
 
@@ -2660,7 +2696,7 @@ class RawTurtle(TPen, TNavigator):
             self._update_data()
             self._drawturtle()
             screen._update()                  # TurtleScreenBase
-            screen._delay(screen._delayvalue) # TurtleScreenBase
+            screen._delay(screen._delayvalue)  # TurtleScreenBase
         else:
             self._update_data()
             if screen._updatecounter == 0:
@@ -2802,7 +2838,8 @@ class RawTurtle(TPen, TNavigator):
             stretch_wid, stretch_len = self._stretchfactor
             return stretch_wid, stretch_len, self._outlinewidth
         if stretch_wid == 0 or stretch_len == 0:
-            raise TurtleGraphicsError("stretch_wid/stretch_len must not be zero")
+            raise TurtleGraphicsError(
+                "stretch_wid/stretch_len must not be zero")
         if stretch_wid is not None:
             if stretch_len is None:
                 stretchfactor = stretch_wid, stretch_wid
@@ -2932,12 +2969,17 @@ class RawTurtle(TPen, TNavigator):
         if t11 is t12 is t21 is t22 is None:
             return self._shapetrafo
         m11, m12, m21, m22 = self._shapetrafo
-        if t11 is not None: m11 = t11
-        if t12 is not None: m12 = t12
-        if t21 is not None: m21 = t21
-        if t22 is not None: m22 = t22
+        if t11 is not None:
+            m11 = t11
+        if t12 is not None:
+            m12 = t12
+        if t21 is not None:
+            m21 = t21
+        if t22 is not None:
+            m22 = t22
         if t11 * t22 - t12 * t21 == 0:
-            raise TurtleGraphicsError("Bad shape transform matrix: must not be singular")
+            raise TurtleGraphicsError(
+                "Bad shape transform matrix: must not be singular")
         self._shapetrafo = (m11, m12, m21, m22)
         alfa = math.atan2(-m21, m11) % (2 * math.pi)
         sa, ca = math.sin(alfa), math.cos(alfa)
@@ -2947,7 +2989,6 @@ class RawTurtle(TPen, TNavigator):
         self._shearfactor = a12/a22
         self._tilt = alfa
         self.pen(resizemode="user")
-
 
     def _polytrafo(self, poly):
         """Computes transformed polygon shapes from a shape
@@ -2959,7 +3000,7 @@ class RawTurtle(TPen, TNavigator):
         e = Vec2D(e0, e1 * screen.yscale / screen.xscale)
         e0, e1 = (1.0 / abs(e)) * e
         return [(p0+(e1*x+e0*y)/screen.xscale, p1+(-e0*x+e1*y)/screen.yscale)
-                                                           for (x, y) in poly]
+                for (x, y) in poly]
 
     def get_shapepoly(self):
         """Return the current shape polygon as tuple of coordinate pairs.
@@ -3002,13 +3043,16 @@ class RawTurtle(TPen, TNavigator):
             self._hidden_from_screen = False
             tshape = shape._data
             if ttype == "polygon":
-                if self._resizemode == "noresize": w = 1
-                elif self._resizemode == "auto": w = self._pensize
-                else: w =self._outlinewidth
+                if self._resizemode == "noresize":
+                    w = 1
+                elif self._resizemode == "auto":
+                    w = self._pensize
+                else:
+                    w = self._outlinewidth
                 shape = self._polytrafo(self._getshapepoly(tshape))
                 fc, oc = self._fillcolor, self._pencolor
                 screen._drawpoly(titem, shape, fill=fc, outline=oc,
-                                                      width=w, top=True)
+                                 width=w, top=True)
             elif ttype == "image":
                 screen._drawimage(titem, self._position, tshape)
             elif ttype == "compound":
@@ -3023,7 +3067,7 @@ class RawTurtle(TPen, TNavigator):
                 screen._drawpoly(titem, ((0, 0), (0, 0), (0, 0)), "", "")
             elif ttype == "image":
                 screen._drawimage(titem, self._position,
-                                          screen._shapes["blank"]._data)
+                                  screen._shapes["blank"]._data)
             elif ttype == "compound":
                 for item in titem:
                     screen._drawpoly(item, ((0, 0), (0, 0), (0, 0)), "", "")
@@ -3052,13 +3096,16 @@ class RawTurtle(TPen, TNavigator):
         tshape = shape._data
         if ttype == "polygon":
             stitem = screen._createpoly()
-            if self._resizemode == "noresize": w = 1
-            elif self._resizemode == "auto": w = self._pensize
-            else: w =self._outlinewidth
+            if self._resizemode == "noresize":
+                w = 1
+            elif self._resizemode == "auto":
+                w = self._pensize
+            else:
+                w = self._outlinewidth
             shape = self._polytrafo(self._getshapepoly(tshape))
             fc, oc = self._fillcolor, self._pencolor
             screen._drawpoly(stitem, shape, fill=fc, outline=oc,
-                                                  width=w, top=True)
+                             width=w, top=True)
         elif ttype == "image":
             stitem = screen._createimage("")
             screen._drawimage(stitem, self._position, tshape)
@@ -3096,7 +3143,7 @@ class RawTurtle(TPen, TNavigator):
         buf.buffer.remove(item)
         if index <= buf.ptr:
             buf.ptr = (buf.ptr - 1) % buf.bufsize
-        buf.buffer.insert((buf.ptr+1)%buf.bufsize, [None])
+        buf.buffer.insert((buf.ptr+1) % buf.bufsize, [None])
 
     def clearstamp(self, stampid):
         """Delete stamp with given stampid
@@ -3146,17 +3193,17 @@ class RawTurtle(TPen, TNavigator):
         if pen is down. All other methods for turtle movement depend
         on this one.
         """
-        ## Version with undo-stuff
-        go_modes = ( self._drawing,
-                     self._pencolor,
-                     self._pensize,
-                     isinstance(self._fillpath, list))
+        # Version with undo-stuff
+        go_modes = (self._drawing,
+                    self._pencolor,
+                    self._pensize,
+                    isinstance(self._fillpath, list))
         screen = self.screen
         undo_entry = ("go", self._position, end, go_modes,
                       (self.currentLineItem,
-                      self.currentLine[:],
-                      screen._pointlist(self.currentLineItem),
-                      self.items[:])
+                       self.currentLine[:],
+                       screen._pointlist(self.currentLineItem),
+                       self.items[:])
                       )
         if self.undobuffer:
             self.undobuffer.push(undo_entry)
@@ -3179,20 +3226,20 @@ class RawTurtle(TPen, TNavigator):
                 self._update()
             if self._drawing:
                 screen._drawline(self.drawingLineItem, ((0, 0), (0, 0)),
-                                               fill="", width=self._pensize)
+                                 fill="", width=self._pensize)
         # Turtle now at end,
-        if self._drawing: # now update currentLine
+        if self._drawing:  # now update currentLine
             self.currentLine.append(end)
         if isinstance(self._fillpath, list):
             self._fillpath.append(end)
-        ######    vererbung!!!!!!!!!!!!!!!!!!!!!!
+        # vererbung!!!!!!!!!!!!!!!!!!!!!!
         self._position = end
         if self._creatingPoly:
             self._poly.append(end)
-        if len(self.currentLine) > 42: # 42! answer to the ultimate question
+        if len(self.currentLine) > 42:  # 42! answer to the ultimate question
                                        # of life, the universe and everything
             self._newLine()
-        self._update() #count=True)
+        self._update()  # count=True)
 
     def _undogoto(self, entry):
         """Reverse a _goto. Used for undo()
@@ -3202,7 +3249,7 @@ class RawTurtle(TPen, TNavigator):
         cLI, cL, pl, items = coodata
         screen = self.screen
         if abs(self._position - new) > 0.5:
-            print ("undogoto: HALLO-DA-STIMMT-WAS-NICHT!")
+            print("undogoto: HALLO-DA-STIMMT-WAS-NICHT!")
         # restore former situation
         self.currentLineItem = cLI
         self.currentLine = cL
@@ -3214,7 +3261,7 @@ class RawTurtle(TPen, TNavigator):
         screen._drawline(cLI, pl, fill=usepc, width=ps)
 
         todelete = [i for i in self.items if (i not in items) and
-                                       (screen._type(i) == "line")]
+                    (screen._type(i) == "line")]
         for i in todelete:
             screen._delete(i)
             self.items.remove(i)
@@ -3238,13 +3285,13 @@ class RawTurtle(TPen, TNavigator):
                 self._update()
             if drawing:
                 screen._drawline(self.drawingLineItem, ((0, 0), (0, 0)),
-                                               fill="", width=ps)
+                                 fill="", width=ps)
         # Turtle now at position old,
         self._position = old
-        ##  if undo is done during creating a polygon, the last vertex
-        ##  will be deleted. if the polygon is entirely deleted,
-        ##  creatingPoly will be set to False.
-        ##  Polygons created before the last one will not be affected by undo()
+        # if undo is done during creating a polygon, the last vertex
+        # will be deleted. if the polygon is entirely deleted,
+        # creatingPoly will be set to False.
+        # Polygons created before the last one will not be affected by undo()
         if self._creatingPoly:
             if len(self._poly) > 0:
                 self._poly.pop()
@@ -3257,7 +3304,7 @@ class RawTurtle(TPen, TNavigator):
                 print("Unwahrscheinlich in _undogoto!")
             elif self._fillpath is not None:
                 self._fillpath.pop()
-        self._update() #count=True)
+        self._update()  # count=True)
 
     def _rotate(self, angle):
         """Turns pen clockwise by angle.
@@ -3284,7 +3331,7 @@ class RawTurtle(TPen, TNavigator):
         """
         if len(self.currentLine) > 1:
             self.screen._drawline(self.currentLineItem, self.currentLine,
-                                      self._pencolor, self._pensize)
+                                  self._pencolor, self._pensize)
             self.currentLineItem = self.screen._createline()
             self.items.append(self.currentLineItem)
         else:
@@ -3326,7 +3373,6 @@ class RawTurtle(TPen, TNavigator):
         if self.undobuffer:
             self.undobuffer.push(("beginfill", self._fillitem))
         self._update()
-
 
     def end_fill(self):
         """Fill the shape drawn after the call begin_fill().
@@ -3400,7 +3446,7 @@ class RawTurtle(TPen, TNavigator):
         """Performs the writing for write()
         """
         item, end = self.screen._write(self._position, txt, align, font,
-                                                          self._pencolor)
+                                       self._pencolor)
         self.items.append(item)
         if self.undobuffer:
             self.undobuffer.push(("wri", item))
@@ -3471,7 +3517,7 @@ class RawTurtle(TPen, TNavigator):
         >>> p = turtle.get_poly()
         >>> turtle.register_shape("myFavouriteShape", p)
         """
-        ## check if there is any poly?
+        # check if there is any poly?
         if self._poly is not None:
             return tuple(self._poly)
 
@@ -3510,9 +3556,8 @@ class RawTurtle(TPen, TNavigator):
 
     getpen = getturtle
 
-
     ################################################################
-    ### screen oriented methods recurring to methods of TurtleScreen
+    # screen oriented methods recurring to methods of TurtleScreen
     ################################################################
 
     def _delay(self, delay=None):
@@ -3586,7 +3631,6 @@ class RawTurtle(TPen, TNavigator):
         """
         self.screen._ondrag(self.turtle._item, fun, btn, add)
 
-
     def _undo(self, action, data):
         """Does the main part of the work for undo()
         """
@@ -3607,7 +3651,7 @@ class RawTurtle(TPen, TNavigator):
             self.items.remove(item)
         elif action == "dofill":
             item = data[0]
-            self.screen._drawpoly(item, ((0, 0),(0, 0),(0, 0)),
+            self.screen._drawpoly(item, ((0, 0), (0, 0), (0, 0)),
                                   fill="", outline="")
         elif action == "beginfill":
             item = data[0]
@@ -3650,9 +3694,11 @@ class RawTurtle(TPen, TNavigator):
 
     turtlesize = shapesize
 
+
 RawPen = RawTurtle
 
 ###  Screen - Singleton  ########################
+
 
 def Screen():
     """Return the singleton screen object.
@@ -3661,6 +3707,7 @@ def Screen():
     if Turtle._screen is None:
         Turtle._screen = _Screen()
     return Turtle._screen
+
 
 class _Screen(TurtleScreen):
 
@@ -3795,6 +3842,7 @@ class _Screen(TurtleScreen):
         except AttributeError:
             exit(0)
 
+
 class Turtle(RawTurtle):
     """RawTurtle auto-creating (scrolled) canvas.
 
@@ -3815,7 +3863,9 @@ class Turtle(RawTurtle):
                            undobuffersize=undobuffersize,
                            visible=visible)
 
+
 Pen = Turtle
+
 
 def write_docstringdict(filename="turtle_docstringdict"):
     """Create and write docstring-dictionary to file.
@@ -3838,7 +3888,7 @@ def write_docstringdict(filename="turtle_docstringdict"):
         key = "Turtle."+methodname
         docsdict[key] = eval(key).__doc__
 
-    with open("%s.py" % filename,"w") as f:
+    with open("%s.py" % filename, "w") as f:
         keys = sorted(x for x in docsdict
                       if x.split('.')[1] not in _alias_list)
         f.write('docsdict = {\n\n')
@@ -3851,6 +3901,7 @@ def write_docstringdict(filename="turtle_docstringdict"):
         f.write("}\n")
         f.close()
 
+
 def read_docstrings(lang):
     """Read in docstrings from lang-specific docstring dictionary.
 
@@ -3858,15 +3909,16 @@ def read_docstrings(lang):
     to the methods of classes Screen and Turtle and - in revised form -
     to the corresponding functions.
     """
-    modname = "turtle_docstringdict_%(language)s" % {'language':lang.lower()}
+    modname = "turtle_docstringdict_%(language)s" % {'language': lang.lower()}
     module = __import__(modname)
     docsdict = module.docsdict
     for key in docsdict:
         try:
-#            eval(key).im_func.__doc__ = docsdict[key]
+            #            eval(key).im_func.__doc__ = docsdict[key]
             eval(key).__doc__ = docsdict[key]
         except Exception:
             print("Bad docstring-entry: %s" % key)
+
 
 _LANGUAGE = _CFG["language"]
 
@@ -3876,8 +3928,8 @@ try:
 except ImportError:
     print("Cannot find docsdict for", _LANGUAGE)
 except Exception:
-    print ("Unknown Error when trying to import %s-docstring-dictionary" %
-                                                                  _LANGUAGE)
+    print("Unknown Error when trying to import %s-docstring-dictionary" %
+          _LANGUAGE)
 
 
 def getmethparlist(ob):
@@ -3911,6 +3963,7 @@ def getmethparlist(ob):
     callText = "(%s)" % callText
     return defText, callText
 
+
 def _turtle_docrevise(docstr):
     """To reduce docstrings from RawTurtle class for functions
     """
@@ -3918,10 +3971,11 @@ def _turtle_docrevise(docstr):
     if docstr is None:
         return None
     turtlename = _CFG["exampleturtle"]
-    newdocstr = docstr.replace("%s." % turtlename,"")
+    newdocstr = docstr.replace("%s." % turtlename, "")
     parexp = re.compile(r' \(.+ %s\):' % turtlename)
     newdocstr = parexp.sub(":", newdocstr)
     return newdocstr
+
 
 def _screen_docrevise(docstr):
     """To reduce docstrings from TurtleScreen class for functions
@@ -3930,14 +3984,15 @@ def _screen_docrevise(docstr):
     if docstr is None:
         return None
     screenname = _CFG["examplescreen"]
-    newdocstr = docstr.replace("%s." % screenname,"")
+    newdocstr = docstr.replace("%s." % screenname, "")
     parexp = re.compile(r' \(.+ %s\):' % screenname)
     newdocstr = parexp.sub(":", newdocstr)
     return newdocstr
 
-## The following mechanism makes all methods of RawTurtle and Turtle available
-## as functions. So we can enhance, change, add, delete methods to these
-## classes and do not need to change anything here.
+# The following mechanism makes all methods of RawTurtle and Turtle available
+# as functions. So we can enhance, change, add, delete methods to these
+# classes and do not need to change anything here.
+
 
 __func_body = """\
 def {name}{paramslist}:
@@ -3955,6 +4010,7 @@ def {name}{paramslist}:
         raise
 """
 
+
 def _make_global_funcs(functions, cls, obj, init, docrevise):
     for methodname in functions:
         method = getattr(cls, methodname)
@@ -3966,6 +4022,7 @@ def _make_global_funcs(functions, cls, obj, init, docrevise):
                                     paramslist=pl1, argslist=pl2)
         exec(defstr, globals())
         globals()[methodname].__doc__ = docrevise(method.__doc__)
+
 
 _make_global_funcs(_tg_screen_functions, _Screen,
                    'Turtle._screen', 'Screen()', _screen_docrevise)
@@ -4066,15 +4123,15 @@ if __name__ == "__main__":
             end_fill()
             laenge += 10
             lt(15)
-            speed((speed()+1)%12)
-        #end_fill()
+            speed((speed()+1) % 12)
+        # end_fill()
 
         lt(120)
         pu()
         fd(70)
         rt(30)
         pd()
-        color("red","yellow")
+        color("red", "yellow")
         speed(0)
         begin_fill()
         for _ in range(4):
@@ -4102,7 +4159,7 @@ if __name__ == "__main__":
         turtle.lt(30)
         turtle.down()
         turtle.speed(6)
-        turtle.color("blue","orange")
+        turtle.color("blue", "orange")
         turtle.pensize(2)
         tri.speed(6)
         setheading(towards(turtle))
@@ -4131,7 +4188,7 @@ if __name__ == "__main__":
             tri.undo()
             turtle.undo()
         tri.fd(50)
-        tri.write("  Click me!", font = ("Courier", 12, "bold") )
+        tri.write("  Click me!", font=("Courier", 12, "bold"))
         tri.onclick(baba, 1)
 
     demo1()

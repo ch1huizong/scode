@@ -134,8 +134,10 @@ _simple_encodings = [AUDIO_FILE_ENCODING_MULAW_8,
                      AUDIO_FILE_ENCODING_LINEAR_32,
                      AUDIO_FILE_ENCODING_ALAW_8]
 
+
 class Error(Exception):
     pass
+
 
 def _read_u32(file):
     x = 0
@@ -146,6 +148,7 @@ def _read_u32(file):
         x = x*256 + ord(byte)
     return x
 
+
 def _write_u32(file, x):
     data = []
     for i in range(4):
@@ -153,6 +156,7 @@ def _write_u32(file, x):
         data.insert(0, int(m))
         x = d
     file.write(bytes(data))
+
 
 class Au_read:
 
@@ -193,7 +197,7 @@ class Au_read:
         if self._encoding not in _simple_encodings:
             raise Error('encoding not (yet) supported')
         if self._encoding in (AUDIO_FILE_ENCODING_MULAW_8,
-                  AUDIO_FILE_ENCODING_ALAW_8):
+                              AUDIO_FILE_ENCODING_ALAW_8):
             self._sampwidth = 2
             self._framesize = 1
         elif self._encoding == AUDIO_FILE_ENCODING_LINEAR_8:
@@ -258,8 +262,8 @@ class Au_read:
 
     def getparams(self):
         return _sunau_params(self.getnchannels(), self.getsampwidth(),
-                  self.getframerate(), self.getnframes(),
-                  self.getcomptype(), self.getcompname())
+                             self.getframerate(), self.getnframes(),
+                             self.getcomptype(), self.getcompname())
 
     def getmarkers(self):
         return None
@@ -304,6 +308,7 @@ class Au_read:
             if self._opened:
                 file.close()
 
+
 class Au_write:
 
     def __init__(self, f):
@@ -337,7 +342,7 @@ class Au_write:
         self._datawritten = 0
         self._datalength = 0
         self._info = b''
-        self._comptype = 'ULAW' # default is U-law
+        self._comptype = 'ULAW'  # default is U-law
 
     def setnchannels(self, nchannels):
         if self._nframeswritten:
@@ -410,8 +415,8 @@ class Au_write:
 
     def getparams(self):
         return _sunau_params(self.getnchannels(), self.getsampwidth(),
-                  self.getframerate(), self.getnframes(),
-                  self.getcomptype(), self.getcompname())
+                             self.getframerate(), self.getnframes(),
+                             self.getcomptype(), self.getcompname())
 
     def tell(self):
         return self._nframeswritten
@@ -431,7 +436,7 @@ class Au_write:
     def writeframes(self, data):
         self.writeframesraw(data)
         if self._nframeswritten != self._nframes or \
-                  self._datalength != self._datawritten:
+                self._datalength != self._datawritten:
             self._patchheader()
 
     def close(self):
@@ -512,6 +517,7 @@ class Au_write:
         self._datalength = self._datawritten
         self._file.seek(0, 2)
 
+
 def open(f, mode=None):
     if mode is None:
         if hasattr(f, 'mode'):
@@ -524,6 +530,7 @@ def open(f, mode=None):
         return Au_write(f)
     else:
         raise Error("mode must be 'r', 'rb', 'w', or 'wb'")
+
 
 def openfp(f, mode=None):
     warnings.warn("sunau.openfp is deprecated since Python 3.7. "

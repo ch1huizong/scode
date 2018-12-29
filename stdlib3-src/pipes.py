@@ -69,13 +69,13 @@ __all__ = ["Template"]
 # Conversion step kinds
 
 FILEIN_FILEOUT = 'ff'                   # Must read & write real files
-STDIN_FILEOUT  = '-f'                   # Must write a real file
-FILEIN_STDOUT  = 'f-'                   # Must read a real file
-STDIN_STDOUT   = '--'                   # Normal pipeline element
-SOURCE         = '.-'                   # Must be first, writes stdout
-SINK           = '-.'                   # Must be last, reads stdin
+STDIN_FILEOUT = '-f'                   # Must write a real file
+FILEIN_STDOUT = 'f-'                   # Must read a real file
+STDIN_STDOUT = '--'                   # Normal pipeline element
+SOURCE = '.-'                   # Must be first, writes stdout
+SINK = '-.'                   # Must be last, reads stdin
 
-stepkinds = [FILEIN_FILEOUT, STDIN_FILEOUT, FILEIN_STDOUT, STDIN_STDOUT, \
+stepkinds = [FILEIN_FILEOUT, STDIN_FILEOUT, FILEIN_STDOUT, STDIN_STDOUT,
              SOURCE, SINK]
 
 

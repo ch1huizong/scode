@@ -35,7 +35,7 @@ __name__ = "collections.abc"
 # are not included on this list.
 bytes_iterator = type(iter(b''))
 bytearray_iterator = type(iter(bytearray()))
-#callable_iterator = ???
+# callable_iterator = ???
 dict_keyiterator = type(iter({}.keys()))
 dict_valueiterator = type(iter({}.values()))
 dict_itemiterator = type(iter({}.items()))
@@ -55,12 +55,16 @@ dict_items = type({}.items())
 mappingproxy = type(type.__dict__)
 generator = type((lambda: (yield))())
 ## coroutine ##
+
+
 async def _coro(): pass
 _coro = _coro()
 coroutine = type(_coro)
 _coro.close()  # Prevent ResourceWarning
 del _coro
 ## asynchronous generator ##
+
+
 async def _ag(): yield
 _ag = _ag()
 async_generator = type(_ag)
@@ -80,6 +84,7 @@ def _check_methods(C, *methods):
         else:
             return NotImplemented
     return True
+
 
 class Hashable(metaclass=ABCMeta):
 
@@ -274,9 +279,10 @@ class Iterator(Iterable):
             return _check_methods(C, '__iter__', '__next__')
         return NotImplemented
 
+
 Iterator.register(bytes_iterator)
 Iterator.register(bytearray_iterator)
-#Iterator.register(callable_iterator)
+# Iterator.register(callable_iterator)
 Iterator.register(dict_keyiterator)
 Iterator.register(dict_valueiterator)
 Iterator.register(dict_itemiterator)
@@ -353,6 +359,7 @@ class Generator(Iterator):
                                   'send', 'throw', 'close')
         return NotImplemented
 
+
 Generator.register(generator)
 
 
@@ -385,6 +392,7 @@ class Container(metaclass=ABCMeta):
             return _check_methods(C, "__contains__")
         return NotImplemented
 
+
 class Collection(Sized, Iterable, Container):
 
     __slots__ = ()
@@ -394,6 +402,7 @@ class Collection(Sized, Iterable, Container):
         if cls is Collection:
             return _check_methods(C,  "__len__", "__iter__", "__contains__")
         return NotImplemented
+
 
 class Callable(metaclass=ABCMeta):
 
@@ -540,7 +549,7 @@ class Set(Collection):
         h &= MASK
         for x in self:
             hx = hash(x)
-            h ^= (hx ^ (hx << 16) ^ 89869747)  * 3644798167
+            h ^= (hx ^ (hx << 16) ^ 89869747) * 3644798167
             h &= MASK
         h = h * 69069 + 907133923
         h &= MASK
@@ -549,6 +558,7 @@ class Set(Collection):
         if h == -1:
             h = 590923713
         return h
+
 
 Set.register(frozenset)
 
@@ -632,6 +642,7 @@ class MutableSet(Set):
                 self.discard(value)
         return self
 
+
 MutableSet.register(set)
 
 
@@ -688,6 +699,7 @@ class Mapping(Collection):
 
     __reversed__ = None
 
+
 Mapping.register(mappingproxy)
 
 
@@ -719,6 +731,7 @@ class KeysView(MappingView, Set):
     def __iter__(self):
         yield from self._mapping
 
+
 KeysView.register(dict_keys)
 
 
@@ -743,6 +756,7 @@ class ItemsView(MappingView, Set):
         for key in self._mapping:
             yield (key, self._mapping[key])
 
+
 ItemsView.register(dict_items)
 
 
@@ -760,6 +774,7 @@ class ValuesView(MappingView, Collection):
     def __iter__(self):
         for key in self._mapping:
             yield self._mapping[key]
+
 
 ValuesView.register(dict_values)
 
@@ -856,6 +871,7 @@ class MutableMapping(Mapping):
             self[key] = default
         return default
 
+
 MutableMapping.register(dict)
 
 
@@ -923,6 +939,7 @@ class Sequence(Reversible, Collection):
         'S.count(value) -> integer -- return number of occurrences of value'
         return sum(1 for v in self if v is value or v == value)
 
+
 Sequence.register(tuple)
 Sequence.register(str)
 Sequence.register(range)
@@ -937,6 +954,7 @@ class ByteString(Sequence):
     """
 
     __slots__ = ()
+
 
 ByteString.register(bytes)
 ByteString.register(bytearray)
@@ -1006,6 +1024,7 @@ class MutableSequence(Sequence):
     def __iadd__(self, values):
         self.extend(values)
         return self
+
 
 MutableSequence.register(list)
 MutableSequence.register(bytearray)  # Multiply inheriting, see ByteString

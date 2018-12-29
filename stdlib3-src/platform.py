@@ -113,7 +113,10 @@ __copyright__ = """
 __version__ = '1.0.8'
 
 import collections
-import sys, os, re, subprocess
+import sys
+import os
+import re
+import subprocess
 
 import warnings
 
@@ -136,7 +139,7 @@ except AttributeError:
 # Constant used by test_platform to test linux_distribution().
 _UNIXCONFDIR = '/etc'
 
-### Platform specific APIs
+# Platform specific APIs
 
 _libc_search = re.compile(b'(__libc_init)'
                           b'|'
@@ -144,10 +147,10 @@ _libc_search = re.compile(b'(__libc_init)'
                           b'|'
                           br'(libc(_\w+)?\.so(?:\.(\d[0-9.]*))?)', re.ASCII)
 
+
 def libc_ver(executable=sys.executable, lib='', version='',
 
              chunksize=16384):
-
     """ Tries to determine the libc version that the file executable
         (which defaults to the Python interpreter) is linked against.
 
@@ -201,8 +204,8 @@ def libc_ver(executable=sys.executable, lib='', version='',
             pos = m.end()
     return lib, version
 
-def _dist_try_harder(distname, version, id):
 
+def _dist_try_harder(distname, version, id):
     """ Tries some special tricks to get the distribution
         information in case the default method fails.
 
@@ -249,6 +252,7 @@ def _dist_try_harder(distname, version, id):
 
     return distname, version, id
 
+
 _release_filename = re.compile(r'(\w+)[-_](release|version)', re.ASCII)
 _lsb_release_version = re.compile(r'(.+)'
                                   r' release '
@@ -268,6 +272,7 @@ _supported_dists = (
     'SuSE', 'debian', 'fedora', 'redhat', 'centos',
     'mandrake', 'mandriva', 'rocks', 'slackware', 'yellowdog', 'gentoo',
     'UnitedLinux', 'turbolinux', 'arch', 'mageia')
+
 
 def _parse_release_file(firstline):
 
@@ -296,6 +301,7 @@ def _parse_release_file(firstline):
             id = l[1]
     return '', version, id
 
+
 def linux_distribution(distname='', version='', id='',
 
                        supported_dists=_supported_dists,
@@ -306,9 +312,9 @@ def linux_distribution(distname='', version='', id='',
     return _linux_distribution(distname, version, id, supported_dists,
                                full_distribution_name)
 
+
 def _linux_distribution(distname, version, id, supported_dists,
                         full_distribution_name):
-
     """ Tries to determine the name of the Linux OS distribution name.
 
         The function first looks for a distribution release file in
@@ -360,10 +366,10 @@ def _linux_distribution(distname, version, id, supported_dists,
 
 # To maintain backwards compatibility:
 
+
 def dist(distname='', version='', id='',
 
          supported_dists=_supported_dists):
-
     """ Tries to determine the name of the Linux OS distribution name.
 
         The function first looks for a distribution release file in
@@ -381,16 +387,16 @@ def dist(distname='', version='', id='',
                                supported_dists=supported_dists,
                                full_distribution_name=0)
 
-def popen(cmd, mode='r', bufsize=-1):
 
+def popen(cmd, mode='r', bufsize=-1):
     """ Portable popen() interface.
     """
     import warnings
     warnings.warn('use os.popen instead', DeprecationWarning, stacklevel=2)
     return os.popen(cmd, mode, bufsize)
 
-def _norm_version(version, build=''):
 
+def _norm_version(version, build=''):
     """ Normalize the version and build strings and return a single
         version string using the format major.minor.build (or patchlevel).
     """
@@ -406,6 +412,7 @@ def _norm_version(version, build=''):
     version = '.'.join(strings[:3])
     return version
 
+
 _ver_output = re.compile(r'(?:([\w ]+) ([\w.]+) '
                          r'.*'
                          r'\[.* ([\d.]+)\])')
@@ -419,10 +426,10 @@ _ver_output = re.compile(r'(?:([\w ]+) ([\w.]+) '
 # Note that the "Version" string gets localized on different
 # Windows versions.
 
+
 def _syscmd_ver(system='', release='', version='',
 
-               supported_platforms=('win32', 'win16', 'dos')):
-
+                supported_platforms=('win32', 'win16', 'dos')):
     """ Tries to figure out the OS version used and returns
         a tuple (system, release, version).
 
@@ -446,7 +453,7 @@ def _syscmd_ver(system='', release='', version='',
             # XXX How can I suppress shell errors from being written
             #     to stderr ?
         except OSError as why:
-            #print 'Command %s failed: %s' % (cmd, why)
+            # print 'Command %s failed: %s' % (cmd, why)
             continue
         else:
             break
@@ -467,6 +474,7 @@ def _syscmd_ver(system='', release='', version='',
         # zeros)
         version = _norm_version(version)
     return system, release, version
+
 
 _WIN32_CLIENT_RELEASES = {
     (5, 0): "2000",
@@ -496,6 +504,7 @@ _WIN32_SERVER_RELEASES = {
     (6, 3): "2012ServerR2",
     (6, None): "post2012ServerR2",
 }
+
 
 def win32_ver(release='', version='', csd='', ptype=''):
     try:
@@ -568,7 +577,6 @@ def _mac_ver_xml():
 
 
 def mac_ver(release='', versioninfo=('', '', ''), machine=''):
-
     """ Get MacOS version information and return it as tuple (release,
         versioninfo, machine) with versioninfo being a tuple (version,
         dev_stage, non_release_version).
@@ -586,6 +594,7 @@ def mac_ver(release='', versioninfo=('', '', ''), machine=''):
     # If that also doesn't work return the default values
     return release, versioninfo, machine
 
+
 def _java_getprop(name, default):
 
     from java.lang import System
@@ -597,8 +606,8 @@ def _java_getprop(name, default):
     except AttributeError:
         return default
 
-def java_ver(release='', vendor='', vminfo=('', '', ''), osinfo=('', '', '')):
 
+def java_ver(release='', vendor='', vminfo=('', '', ''), osinfo=('', '', '')):
     """ Version interface for Jython.
 
         Returns a tuple (release, vendor, vminfo, osinfo) with vminfo being
@@ -630,10 +639,10 @@ def java_ver(release='', vendor='', vminfo=('', '', ''), osinfo=('', '', '')):
 
     return release, vendor, vminfo, osinfo
 
-### System name aliasing
+# System name aliasing
+
 
 def system_alias(system, release, version):
-
     """ Returns (system, release, version) aliased to common
         marketing names used for some systems.
 
@@ -684,10 +693,10 @@ def system_alias(system, release, version):
 
     return system, release, version
 
-### Various internal helpers
+# Various internal helpers
+
 
 def _platform(*args):
-
     """ Helper to format the platform string in a filename
         compatible format e.g. "system-version-machine".
     """
@@ -718,8 +727,8 @@ def _platform(*args):
 
     return platform
 
-def _node(default=''):
 
+def _node(default=''):
     """ Helper to determine the node name of this machine.
     """
     try:
@@ -733,8 +742,8 @@ def _node(default=''):
         # Still not working...
         return default
 
-def _follow_symlinks(filepath):
 
+def _follow_symlinks(filepath):
     """ In case filepath is a symlink, follow it until a
         real file is reached.
     """
@@ -744,8 +753,8 @@ def _follow_symlinks(filepath):
             os.path.join(os.path.dirname(filepath), os.readlink(filepath)))
     return filepath
 
-def _syscmd_uname(option, default=''):
 
+def _syscmd_uname(option, default=''):
     """ Interface to the system's uname command.
     """
     if sys.platform in ('dos', 'win32', 'win16'):
@@ -762,8 +771,8 @@ def _syscmd_uname(option, default=''):
     else:
         return output
 
-def _syscmd_file(target, default=''):
 
+def _syscmd_file(target, default=''):
     """ Interface to the system's file command.
 
         The function uses the -b option of the file command to have it
@@ -777,7 +786,7 @@ def _syscmd_file(target, default=''):
     target = _follow_symlinks(target)
     try:
         proc = subprocess.Popen(['file', target],
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     except (AttributeError, OSError):
         return default
@@ -788,7 +797,8 @@ def _syscmd_file(target, default=''):
     else:
         return output
 
-### Information about the used architecture
+# Information about the used architecture
+
 
 # Default values for architecture; non-empty strings override the
 # defaults given as parameters
@@ -798,8 +808,8 @@ _default_architecture = {
     'dos': ('', 'MSDOS'),
 }
 
-def architecture(executable=sys.executable, bits='', linkage=''):
 
+def architecture(executable=sys.executable, bits='', linkage=''):
     """ Queries the given executable (defaults to the Python interpreter
         binary) for various architecture information.
 
@@ -880,15 +890,16 @@ def architecture(executable=sys.executable, bits='', linkage=''):
 
     return bits, linkage
 
-### Portable uname() interface
+# Portable uname() interface
+
 
 uname_result = collections.namedtuple("uname_result",
-                    "system node release version machine processor")
+                                      "system node release version machine processor")
 
 _uname_cache = None
 
-def uname():
 
+def uname():
     """ Fairly portable uname interface. Returns a tuple
         of strings (system, node, release, version, machine, processor)
         identifying the underlying platform.
@@ -915,7 +926,7 @@ def uname():
 
     if no_os_uname or not list(filter(None, (system, node, release, version, machine))):
         # Hmm, no there is either no uname or uname has returned
-        #'unknowns'... we'll have to poke around the system then.
+        # 'unknowns'... we'll have to poke around the system then.
         if no_os_uname:
             system = sys.platform
             release = ''
@@ -1000,7 +1011,7 @@ def uname():
         # Get processor information from the uname system command
         processor = _syscmd_uname('-p', '')
 
-    #If any unknowns still exist, replace them with ''s, which are more portable
+    # If any unknowns still exist, replace them with ''s, which are more portable
     if system == 'unknown':
         system = ''
     if node == 'unknown':
@@ -1023,10 +1034,10 @@ def uname():
                                 machine, processor)
     return _uname_cache
 
-### Direct interfaces to some of the uname() return values
+# Direct interfaces to some of the uname() return values
+
 
 def system():
-
     """ Returns the system/OS name, e.g. 'Linux', 'Windows' or 'Java'.
 
         An empty string is returned if the value cannot be determined.
@@ -1034,8 +1045,8 @@ def system():
     """
     return uname().system
 
-def node():
 
+def node():
     """ Returns the computer's network name (which may not be fully
         qualified)
 
@@ -1044,8 +1055,8 @@ def node():
     """
     return uname().node
 
-def release():
 
+def release():
     """ Returns the system's release, e.g. '2.2.0' or 'NT'
 
         An empty string is returned if the value cannot be determined.
@@ -1053,8 +1064,8 @@ def release():
     """
     return uname().release
 
-def version():
 
+def version():
     """ Returns the system's release version, e.g. '#3 on degas'
 
         An empty string is returned if the value cannot be determined.
@@ -1062,8 +1073,8 @@ def version():
     """
     return uname().version
 
-def machine():
 
+def machine():
     """ Returns the machine type, e.g. 'i386'
 
         An empty string is returned if the value cannot be determined.
@@ -1071,8 +1082,8 @@ def machine():
     """
     return uname().machine
 
-def processor():
 
+def processor():
     """ Returns the (true) processor name, e.g. 'amdk6'
 
         An empty string is returned if the value cannot be
@@ -1083,7 +1094,8 @@ def processor():
     """
     return uname().processor
 
-### Various APIs for extracting information from sys.version
+# Various APIs for extracting information from sys.version
+
 
 _sys_version_parser = re.compile(
     r'([\w.+]+)\s*'  # "version<space>"
@@ -1113,8 +1125,8 @@ _pypy_sys_version_parser = re.compile(
 
 _sys_version_cache = {}
 
-def _sys_version(sys_version=None):
 
+def _sys_version(sys_version=None):
     """ Returns a parsed version of Python's sys.version as tuple
         (name, version, branch, revision, buildno, builddate, compiler)
         referring to the Python implementation name, version, branch,
@@ -1191,7 +1203,7 @@ def _sys_version(sys_version=None):
                 'failed to parse CPython sys.version: %s' %
                 repr(sys_version))
         version, buildno, builddate, buildtime, compiler = \
-              match.groups()
+            match.groups()
         name = 'CPython'
         if builddate is None:
             builddate = ''
@@ -1217,8 +1229,8 @@ def _sys_version(sys_version=None):
     _sys_version_cache[sys_version] = result
     return result
 
-def python_implementation():
 
+def python_implementation():
     """ Returns a string identifying the Python implementation.
 
         Currently, the following implementations are identified:
@@ -1230,8 +1242,8 @@ def python_implementation():
     """
     return _sys_version()[0]
 
-def python_version():
 
+def python_version():
     """ Returns the Python version as string 'major.minor.patchlevel'
 
         Note that unlike the Python sys.version, the returned value
@@ -1240,8 +1252,8 @@ def python_version():
     """
     return _sys_version()[1]
 
-def python_version_tuple():
 
+def python_version_tuple():
     """ Returns the Python version as tuple (major, minor, patchlevel)
         of strings.
 
@@ -1251,8 +1263,8 @@ def python_version_tuple():
     """
     return tuple(_sys_version()[1].split('.'))
 
-def python_branch():
 
+def python_branch():
     """ Returns a string identifying the Python implementation
         branch.
 
@@ -1265,8 +1277,8 @@ def python_branch():
 
     return _sys_version()[2]
 
-def python_revision():
 
+def python_revision():
     """ Returns a string identifying the Python implementation
         revision.
 
@@ -1278,28 +1290,29 @@ def python_revision():
     """
     return _sys_version()[3]
 
-def python_build():
 
+def python_build():
     """ Returns a tuple (buildno, builddate) stating the Python
         build number and date as strings.
 
     """
     return _sys_version()[4:6]
 
-def python_compiler():
 
+def python_compiler():
     """ Returns a string identifying the compiler used for compiling
         Python.
 
     """
     return _sys_version()[6]
 
-### The Opus Magnum of platform strings :-)
+# The Opus Magnum of platform strings :-)
+
 
 _platform_cache = {}
 
-def platform(aliased=0, terse=0):
 
+def platform(aliased=0, terse=0):
     """ Returns a single string identifying the underlying platform
         with as much useful information as possible (but no more :).
 
@@ -1387,7 +1400,8 @@ def platform(aliased=0, terse=0):
     _platform_cache[(aliased, terse)] = platform
     return platform
 
-### Command line interface
+# Command line interface
+
 
 if __name__ == '__main__':
     # Default is to print the aliased verbose platform string

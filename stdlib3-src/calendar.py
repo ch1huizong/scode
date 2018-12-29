@@ -21,9 +21,12 @@ __all__ = ["IllegalMonthError", "IllegalWeekdayError", "setfirstweekday",
 error = ValueError
 
 # Exceptions raised for bad input
+
+
 class IllegalMonthError(ValueError):
     def __init__(self, month):
         self.month = month
+
     def __str__(self):
         return "bad month number %r; must be 1-12" % self.month
 
@@ -31,6 +34,7 @@ class IllegalMonthError(ValueError):
 class IllegalWeekdayError(ValueError):
     def __init__(self, weekday):
         self.weekday = weekday
+
     def __str__(self):
         return "bad weekday number %r; must be 0 (Monday) to 6 (Sunday)" % self.weekday
 
@@ -46,6 +50,7 @@ mdays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 # English strings.  The classes following emulate a read-only version of
 # that, but supply localized names.  Note that the values are computed
 # fresh on each call, in case the user changes locale between calls.
+
 
 class _localized_month:
 
@@ -152,7 +157,7 @@ class Calendar(object):
     """
 
     def __init__(self, firstweekday=0):
-        self.firstweekday = firstweekday # 0 = Monday, 6 = Sunday
+        self.firstweekday = firstweekday  # 0 = Monday, 6 = Sunday
 
     def getfirstweekday(self):
         return self._firstweekday % 7
@@ -168,7 +173,7 @@ class Calendar(object):
         configured first one.
         """
         for i in range(self.firstweekday, self.firstweekday + 7):
-            yield i%7
+            yield i % 7
 
     def itermonthdates(self, year, month):
         """
@@ -231,7 +236,7 @@ class Calendar(object):
         Each row represents a week; week entries are datetime.date values.
         """
         dates = list(self.itermonthdates(year, month))
-        return [ dates[i:i+7] for i in range(0, len(dates), 7) ]
+        return [dates[i:i+7] for i in range(0, len(dates), 7)]
 
     def monthdays2calendar(self, year, month):
         """
@@ -241,7 +246,7 @@ class Calendar(object):
         are zero.
         """
         days = list(self.itermonthdays2(year, month))
-        return [ days[i:i+7] for i in range(0, len(days), 7) ]
+        return [days[i:i+7] for i in range(0, len(days), 7)]
 
     def monthdayscalendar(self, year, month):
         """
@@ -249,7 +254,7 @@ class Calendar(object):
         Each row represents a week; days outside this month are zero.
         """
         days = list(self.itermonthdays(year, month))
-        return [ days[i:i+7] for i in range(0, len(days), 7) ]
+        return [days[i:i+7] for i in range(0, len(days), 7)]
 
     def yeardatescalendar(self, year, width=3):
         """
@@ -262,7 +267,7 @@ class Calendar(object):
             self.monthdatescalendar(year, i)
             for i in range(January, January+12)
         ]
-        return [months[i:i+width] for i in range(0, len(months), width) ]
+        return [months[i:i+width] for i in range(0, len(months), width)]
 
     def yeardays2calendar(self, year, width=3):
         """
@@ -275,7 +280,7 @@ class Calendar(object):
             self.monthdays2calendar(year, i)
             for i in range(January, January+12)
         ]
-        return [months[i:i+width] for i in range(0, len(months), width) ]
+        return [months[i:i+width] for i in range(0, len(months), width)]
 
     def yeardayscalendar(self, year, width=3):
         """
@@ -287,7 +292,7 @@ class Calendar(object):
             self.monthdayscalendar(year, i)
             for i in range(January, January+12)
         ]
-        return [months[i:i+width] for i in range(0, len(months), width) ]
+        return [months[i:i+width] for i in range(0, len(months), width)]
 
 
 class TextCalendar(Calendar):
@@ -593,6 +598,7 @@ class LocaleHTMLCalendar(HTMLCalendar):
     an encoding all strings containing month and weekday names will be returned
     as unicode.
     """
+
     def __init__(self, firstweekday=0, locale=None):
         HTMLCalendar.__init__(self, firstweekday)
         if locale is None:
@@ -617,10 +623,12 @@ c = TextCalendar()
 
 firstweekday = c.getfirstweekday
 
+
 def setfirstweekday(firstweekday):
     if not MONDAY <= firstweekday <= SUNDAY:
         raise IllegalWeekdayError(firstweekday)
     c.firstweekday = firstweekday
+
 
 monthcalendar = c.monthdayscalendar
 prweek = c.prweek

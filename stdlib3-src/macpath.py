@@ -1,3 +1,8 @@
+import warnings
+from genericpath import *
+import genericpath
+from stat import *
+import os
 """Pathname and path-related operations for the Macintosh."""
 
 # strings representing various path-related bits and pieces
@@ -12,21 +17,17 @@ defpath = ':'
 altsep = None
 devnull = 'Dev:Null'
 
-import os
-from stat import *
-import genericpath
-from genericpath import *
-import warnings
 
 warnings.warn('the macpath module is deprecated in 3.7 and will be removed '
               'in 3.8', DeprecationWarning, stacklevel=2)
 
-__all__ = ["normcase","isabs","join","splitdrive","split","splitext",
-           "basename","dirname","commonprefix","getsize","getmtime",
-           "getatime","getctime", "islink","exists","lexists","isdir","isfile",
-           "expanduser","expandvars","normpath","abspath",
-           "curdir","pardir","sep","pathsep","defpath","altsep","extsep",
-           "devnull","realpath","supports_unicode_filenames"]
+__all__ = ["normcase", "isabs", "join", "splitdrive", "split", "splitext",
+           "basename", "dirname", "commonprefix", "getsize", "getmtime",
+           "getatime", "getctime", "islink", "exists", "lexists", "isdir", "isfile",
+           "expanduser", "expandvars", "normpath", "abspath",
+           "curdir", "pardir", "sep", "pathsep", "defpath", "altsep", "extsep",
+           "devnull", "realpath", "supports_unicode_filenames"]
+
 
 def _get_colon(path):
     if isinstance(path, bytes):
@@ -35,6 +36,7 @@ def _get_colon(path):
         return ':'
 
 # Normalize the case of a pathname.  Dummy in Posix, but <s>.lower() here.
+
 
 def normcase(path):
     if not isinstance(path, (bytes, str)):
@@ -59,7 +61,8 @@ def join(s, *p):
         colon = _get_colon(s)
         path = s
         if not p:
-            path[:0] + colon  #23780: Ensure compatible data type even if p is null.
+            # 23780: Ensure compatible data type even if p is null.
+            path[:0] + colon
         for t in p:
             if (not path) or isabs(t):
                 path = t
@@ -83,10 +86,12 @@ def split(s):
     The result (s, t) is such that join(s, t) yields the original argument."""
 
     colon = _get_colon(s)
-    if colon not in s: return s[:0], s
+    if colon not in s:
+        return s[:0], s
     col = 0
     for i in range(len(s)):
-        if s[i:i+1] == colon: col = i + 1
+        if s[i:i+1] == colon:
+            col = i + 1
     path, file = s[:col-1], s[col:]
     if path and not colon in path:
         path = path + colon
@@ -98,7 +103,10 @@ def splitext(p):
         return genericpath._splitext(p, b':', altsep, b'.')
     else:
         return genericpath._splitext(p, sep, altsep, extsep)
+
+
 splitext.__doc__ = genericpath._splitext.__doc__
+
 
 def splitdrive(p):
     """Split a pathname into a drive specification and the rest of the
@@ -113,13 +121,17 @@ def splitdrive(p):
 # Short interfaces to split()
 
 def dirname(s): return split(s)[0]
+
+
 def basename(s): return split(s)[1]
+
 
 def ismount(s):
     if not isabs(s):
         return False
     components = split(s)
     return len(components) == 2 and not components[1]
+
 
 def islink(s):
     """Return true if the pathname refers to a symbolic link."""
@@ -133,6 +145,7 @@ def islink(s):
 # Is `stat`/`lstat` a meaningful difference on the Mac?  This is safe in any
 # case.
 
+
 def lexists(path):
     """Test whether a path exists.  Returns True for broken symbolic links"""
 
@@ -141,6 +154,7 @@ def lexists(path):
     except OSError:
         return False
     return True
+
 
 def expandvars(path):
     """Dummy to retain interface-compatibility with other operating systems."""
@@ -151,8 +165,10 @@ def expanduser(path):
     """Dummy to retain interface-compatibility with other operating systems."""
     return path
 
+
 class norm_error(Exception):
     """Path cannot be normalized"""
+
 
 def normpath(s):
     """Normalize a pathname.  Will return the same result for
@@ -183,6 +199,7 @@ def normpath(s):
         s = s[:-1]
     return s
 
+
 def abspath(path):
     """Return an absolute path."""
     if not isabs(path):
@@ -194,6 +211,8 @@ def abspath(path):
     return normpath(path)
 
 # realpath is a no-op on systems without islink support
+
+
 def realpath(path):
     path = abspath(path)
     try:
@@ -212,5 +231,6 @@ def realpath(path):
         except Carbon.File.Error:
             pass
     return path
+
 
 supports_unicode_filenames = True

@@ -40,7 +40,7 @@ import sys as _sys
 import types as _types
 from io import StringIO as _StringIO
 
-__all__ = ["pprint","pformat","isreadable","isrecursive","saferepr",
+__all__ = ["pprint", "pformat", "isreadable", "isrecursive", "saferepr",
            "PrettyPrinter"]
 
 
@@ -52,22 +52,27 @@ def pprint(object, stream=None, indent=1, width=80, depth=None, *,
         compact=compact)
     printer.pprint(object)
 
+
 def pformat(object, indent=1, width=80, depth=None, *, compact=False):
     """Format a Python object into a pretty-printed representation."""
     return PrettyPrinter(indent=indent, width=width, depth=depth,
                          compact=compact).pformat(object)
 
+
 def saferepr(object):
     """Version of repr() which can handle recursive data structures."""
     return _safe_repr(object, {}, None, 0)[0]
+
 
 def isreadable(object):
     """Determine if saferepr(object) is readable by eval()."""
     return _safe_repr(object, {}, None, 0)[1]
 
+
 def isrecursive(object):
     """Determine if object requires a recursive representation."""
     return _safe_repr(object, {}, None, 0)[2]
+
 
 class _safe_key:
     """Helper function for key functions when sorting unorderable objects.
@@ -88,12 +93,14 @@ class _safe_key:
         try:
             return self.obj < other.obj
         except TypeError:
-            return ((str(type(self.obj)), id(self.obj)) < \
+            return ((str(type(self.obj)), id(self.obj)) <
                     (str(type(other.obj)), id(other.obj)))
+
 
 def _safe_tuple(t):
     "Helper function for comparing 2-tuples"
     return _safe_key(t[0]), _safe_key(t[1])
+
 
 class PrettyPrinter:
     def __init__(self, indent=1, width=80, depth=None, stream=None, *,
@@ -412,7 +419,8 @@ class PrettyPrinter:
         cls = object.__class__
         indent += len(cls.__name__) + 1
         stream.write('%s(%s,\n%s' % (cls.__name__, rdf, ' ' * indent))
-        self._pprint_dict(object, stream, indent, allowance + 1, context, level)
+        self._pprint_dict(object, stream, indent,
+                          allowance + 1, context, level)
         stream.write(')')
 
     _dispatch[_collections.defaultdict.__repr__] = _pprint_default_dict
@@ -471,21 +479,25 @@ class PrettyPrinter:
     _dispatch[_collections.deque.__repr__] = _pprint_deque
 
     def _pprint_user_dict(self, object, stream, indent, allowance, context, level):
-        self._format(object.data, stream, indent, allowance, context, level - 1)
+        self._format(object.data, stream, indent,
+                     allowance, context, level - 1)
 
     _dispatch[_collections.UserDict.__repr__] = _pprint_user_dict
 
     def _pprint_user_list(self, object, stream, indent, allowance, context, level):
-        self._format(object.data, stream, indent, allowance, context, level - 1)
+        self._format(object.data, stream, indent,
+                     allowance, context, level - 1)
 
     _dispatch[_collections.UserList.__repr__] = _pprint_user_list
 
     def _pprint_user_string(self, object, stream, indent, allowance, context, level):
-        self._format(object.data, stream, indent, allowance, context, level - 1)
+        self._format(object.data, stream, indent,
+                     allowance, context, level - 1)
 
     _dispatch[_collections.UserString.__repr__] = _pprint_user_string
 
 # Return triple (repr_string, isreadable, isrecursive).
+
 
 def _safe_repr(object, context, maxlevels, level):
     typ = type(object)
@@ -555,8 +567,10 @@ def _safe_repr(object, context, maxlevels, level):
     rep = repr(object)
     return rep, (rep and not rep.startswith('<')), False
 
+
 _builtin_scalars = frozenset({str, bytes, bytearray, int, float, complex,
                               bool, type(None)})
+
 
 def _recursion(object):
     return ("<Recursion on %s with id=%s>"
@@ -576,6 +590,7 @@ def _perfcheck(object=None):
     print("_safe_repr:", t2 - t1)
     print("pformat:", t3 - t2)
 
+
 def _wrap_bytes_repr(object, width, allowance):
     current = b''
     last = len(object) // 4 * 4
@@ -592,6 +607,7 @@ def _wrap_bytes_repr(object, width, allowance):
             current = candidate
     if current:
         yield repr(current)
+
 
 if __name__ == "__main__":
     _perfcheck()

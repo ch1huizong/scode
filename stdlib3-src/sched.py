@@ -31,13 +31,20 @@ from time import monotonic as _time
 
 __all__ = ["scheduler"]
 
+
 class Event(namedtuple('Event', 'time, priority, action, argument, kwargs')):
     __slots__ = []
+
     def __eq__(s, o): return (s.time, s.priority) == (o.time, o.priority)
-    def __lt__(s, o): return (s.time, s.priority) <  (o.time, o.priority)
+
+    def __lt__(s, o): return (s.time, s.priority) < (o.time, o.priority)
+
     def __le__(s, o): return (s.time, s.priority) <= (o.time, o.priority)
-    def __gt__(s, o): return (s.time, s.priority) >  (o.time, o.priority)
+
+    def __gt__(s, o): return (s.time, s.priority) > (o.time, o.priority)
+
     def __ge__(s, o): return (s.time, s.priority) >= (o.time, o.priority)
+
 
 Event.time.__doc__ = ('''Numeric type compatible with the return value of the
 timefunc function passed to the constructor.''')
@@ -51,6 +58,7 @@ Event.kwargs.__doc__ = ('''kwargs is a dictionary holding the keyword
 arguments for the action.''')
 
 _sentinel = object()
+
 
 class scheduler:
 
@@ -74,7 +82,7 @@ class scheduler:
         event = Event(time, priority, action, argument, kwargs)
         with self._lock:
             heapq.heappush(self._queue, event)
-        return event # The ID
+        return event  # The ID
 
     def enter(self, delay, priority, action, argument=(), kwargs=_sentinel):
         """A variant that specifies the time as a relative time.

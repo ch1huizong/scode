@@ -1,3 +1,4 @@
+from _thread import stack_size
 """Thread module emulating a subset of Java's threading model."""
 
 import os as _os
@@ -48,6 +49,7 @@ del _thread
 _profile_hook = None
 _trace_hook = None
 
+
 def setprofile(func):
     """Set a profile function for all threads started from the threading module.
 
@@ -57,6 +59,7 @@ def setprofile(func):
     """
     global _profile_hook
     _profile_hook = func
+
 
 def settrace(func):
     """Set a trace function for all threads started from the threading module.
@@ -70,7 +73,9 @@ def settrace(func):
 
 # Synchronization classes
 
+
 Lock = _allocate_lock
+
 
 def RLock(*args, **kwargs):
     """Factory function that returns a new reentrant lock.
@@ -84,6 +89,7 @@ def RLock(*args, **kwargs):
     if _CRLock is None:
         return _PyRLock(*args, **kwargs)
     return _CRLock(*args, **kwargs)
+
 
 class _RLock:
     """This class implements reentrant lock objects.
@@ -197,6 +203,7 @@ class _RLock:
 
     def _is_owned(self):
         return self._owner == get_ident()
+
 
 _PyRLock = _RLock
 
@@ -586,7 +593,7 @@ class Barrier:
         self._action = action
         self._timeout = timeout
         self._parties = parties
-        self._state = 0 #0 filling, 1, draining, -1 resetting, -2 broken
+        self._state = 0  # 0 filling, 1, draining, -1 resetting, -2 broken
         self._count = 0
 
     def wait(self, timeout=None):
@@ -601,7 +608,7 @@ class Barrier:
         if timeout is None:
             timeout = self._timeout
         with self._cond:
-            self._enter() # Block while the barrier drains.
+            self._enter()  # Block while the barrier drains.
             index = self._count
             self._count += 1
             try:
@@ -623,7 +630,7 @@ class Barrier:
         while self._state in (-1, 1):
             # It is draining or resetting, wait until done
             self._cond.wait()
-        #see if the barrier is in a broken state
+        # see if the barrier is in a broken state
         if self._state < 0:
             raise BrokenBarrierError
         assert self._state == 0
@@ -638,15 +645,15 @@ class Barrier:
             self._state = 1
             self._cond.notify_all()
         except:
-            #an exception during the _action handler.  Break and reraise
+            # an exception during the _action handler.  Break and reraise
             self._break()
             raise
 
     # Wait in the barrier until we are released.  Raise an exception
     # if the barrier is reset or broken.
     def _wait(self, timeout):
-        if not self._cond.wait_for(lambda : self._state != 0, timeout):
-            #timed out.  Break the barrier
+        if not self._cond.wait_for(lambda: self._state != 0, timeout):
+            # timed out.  Break the barrier
             self._break()
             raise BrokenBarrierError
         if self._state < 0:
@@ -672,11 +679,11 @@ class Barrier:
         with self._cond:
             if self._count > 0:
                 if self._state == 0:
-                    #reset the barrier, waking up threads
+                    # reset the barrier, waking up threads
                     self._state = -1
                 elif self._state == -2:
-                    #was broken, set it to reset state
-                    #which clears when the last thread exits
+                    # was broken, set it to reset state
+                    # which clears when the last thread exits
                     self._state = -1
             else:
                 self._state = 0
@@ -718,15 +725,20 @@ class Barrier:
         return self._state == -2
 
 # exception raised by the Barrier class
+
+
 class BrokenBarrierError(RuntimeError):
     pass
 
 
 # Helper to generate new thread names
 _counter = _count().__next__
-_counter() # Consume 0 so first non-main thread has id 1.
+_counter()  # Consume 0 so first non-main thread has id 1.
+
+
 def _newname(template="Thread-%d"):
     return template % _counter()
+
 
 # Active thread administration
 _active_limbo_lock = _allocate_lock()
@@ -735,6 +747,7 @@ _limbo = {}
 _dangling = WeakSet()
 
 # Main class for threads
+
 
 class Thread:
     """A class that represents a thread of control.
@@ -753,7 +766,7 @@ class Thread:
     _exc_info = _sys.exc_info
     # Keep sys.exc_clear too to clear the exception just before
     # allowing .join() to return.
-    #XXX __exc_clear = _sys.exc_clear
+    # XXX __exc_clear = _sys.exc_clear
 
     def __init__(self, group=None, target=None, name=None,
                  args=(), kwargs=None, *, daemon=None):
@@ -817,7 +830,7 @@ class Thread:
         status = "initial"
         if self._started.is_set():
             status = "started"
-        self.is_alive() # easy way to get ._is_stopped set when appropriate
+        self.is_alive()  # easy way to get ._is_stopped set when appropriate
         if self._is_stopped:
             status = "stopped"
         if self._daemonic:
@@ -943,7 +956,8 @@ class Thread:
                                     exc_tb.tb_lineno,
                                     exc_tb.tb_frame.f_code.co_name)), file=self._stderr)
                             exc_tb = exc_tb.tb_next
-                        print(("%s: %s" % (exc_type, exc_value)), file=self._stderr)
+                        print(("%s: %s" % (exc_type, exc_value)),
+                              file=self._stderr)
                         self._stderr.flush()
                     # Make sure that exc_tb gets deleted since it is a memory
                     # hog; deleting everything else is just for thoroughness
@@ -954,7 +968,7 @@ class Thread:
                 # test_threading.test_no_refcycle_through_target when
                 # the exception keeps the target alive past when we
                 # assert that it's dead.
-                #XXX self._exc_clear()
+                # XXX self._exc_clear()
                 pass
         finally:
             with _active_limbo_lock:
@@ -1131,6 +1145,7 @@ class Thread:
 
 # The timer class was contributed by Itamar Shtull-Trauring
 
+
 class Timer(Thread):
     """Call a function after a specified number of seconds:
 
@@ -1215,7 +1230,9 @@ def current_thread():
     except KeyError:
         return _DummyThread()
 
+
 currentThread = current_thread
+
 
 def active_count():
     """Return the number of Thread objects currently alive.
@@ -1227,11 +1244,14 @@ def active_count():
     with _active_limbo_lock:
         return len(_active) + len(_limbo)
 
+
 activeCount = active_count
+
 
 def _enumerate():
     # Same as enumerate(), but without the lock. Internal use only.
     return list(_active.values()) + list(_limbo.values())
+
 
 def enumerate():
     """Return a list of all Thread objects currently alive.
@@ -1244,13 +1264,12 @@ def enumerate():
     with _active_limbo_lock:
         return list(_active.values()) + list(_limbo.values())
 
-from _thread import stack_size
 
 # Create the main thread object,
 # and make it available for the interpreter
 # (Py_Main) as threading._shutdown.
-
 _main_thread = _MainThread()
+
 
 def _shutdown():
     # Obscure:  other threads may be waiting to join _main_thread.  That's
@@ -1273,11 +1292,13 @@ def _shutdown():
         t.join()
         t = _pickSomeNonDaemonThread()
 
+
 def _pickSomeNonDaemonThread():
     for t in enumerate():
         if not t.daemon and t.is_alive():
             return t
     return None
+
 
 def main_thread():
     """Return the main thread object.
@@ -1289,6 +1310,7 @@ def main_thread():
 
 # get thread-local implementation, either from the thread
 # module, or from the python fallback
+
 
 try:
     from _thread import _local as local

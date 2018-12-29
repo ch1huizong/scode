@@ -1,3 +1,4 @@
+from threading import current_thread, RLock
 """Thread-local objects.
 
 (Note that this module provides a Python version of the threading.local
@@ -143,6 +144,7 @@ __all__ = ["local"]
 # then, so problems introduced by fiddling the order of imports here won't
 # manifest.
 
+
 class _localimpl:
     """A class managing thread-local dicts"""
     __slots__ = 'key', 'dicts', 'localargs', 'locallock', '__weakref__'
@@ -167,11 +169,13 @@ class _localimpl:
         key = self.key
         thread = current_thread()
         idt = id(thread)
+
         def local_deleted(_, key=key):
             # When the localimpl is deleted, remove the thread attribute.
             thread = wrthread()
             if thread is not None:
                 del thread.__dict__[key]
+
         def thread_deleted(_, idt=idt):
             # When the thread is deleted, remove the local dict.
             # Note that this is suboptimal if the thread object gets
@@ -237,6 +241,3 @@ class local:
                 % self.__class__.__name__)
         with _patch(self):
             return object.__delattr__(self, name)
-
-
-from threading import current_thread, RLock

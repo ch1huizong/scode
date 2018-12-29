@@ -2,13 +2,16 @@
 
 # Module and documentation by Eric S. Raymond, 21 Dec 1998
 
-import os, shlex, stat
+import os
+import shlex
+import stat
 
 __all__ = ["netrc", "NetrcParseError"]
 
 
 class NetrcParseError(Exception):
     """Exception raised on syntax errors in the .netrc file."""
+
     def __init__(self, msg, filename=None, lineno=None):
         self.filename = filename
         self.lineno = lineno
@@ -69,7 +72,7 @@ class netrc:
             while 1:
                 tt = lexer.get_token()
                 if (tt.startswith('#') or
-                    tt in {'', 'machine', 'default', 'macdef'}):
+                        tt in {'', 'machine', 'default', 'macdef'}):
                     if password:
                         self.hosts[entryname] = (login, account, password)
                         lexer.push_token(tt)
@@ -102,9 +105,9 @@ class netrc:
                                 file, lexer.lineno)
                         if (prop.st_mode & (stat.S_IRWXG | stat.S_IRWXO)):
                             raise NetrcParseError(
-                               "~/.netrc access too permissive: access"
-                               " permissions must restrict access to only"
-                               " the owner", file, lexer.lineno)
+                                "~/.netrc access too permissive: access"
+                                " permissions must restrict access to only"
+                                " the owner", file, lexer.lineno)
                     password = lexer.get_token()
                 else:
                     raise NetrcParseError("bad follower token %r" % tt,
@@ -134,6 +137,7 @@ class netrc:
                 rep += line
             rep += "\n"
         return rep
+
 
 if __name__ == '__main__':
     print(netrc())

@@ -15,9 +15,9 @@ __all__ = [
 # like "-arch" or "-isdkroot", that may need customization for
 # the user environment
 _UNIVERSAL_CONFIG_VARS = ('CFLAGS', 'LDFLAGS', 'CPPFLAGS', 'BASECFLAGS',
-                            'BLDSHARED', 'LDSHARED', 'CC', 'CXX',
-                            'PY_CFLAGS', 'PY_LDFLAGS', 'PY_CPPFLAGS',
-                            'PY_CORE_CFLAGS')
+                          'BLDSHARED', 'LDSHARED', 'CC', 'CXX',
+                          'PY_CFLAGS', 'PY_LDFLAGS', 'PY_CPPFLAGS',
+                          'PY_CORE_CFLAGS')
 
 # configuration variables that may contain compiler calls
 _COMPILER_CONFIG_VARS = ('BLDSHARED', 'LDSHARED', 'CC', 'CXX')
@@ -63,7 +63,7 @@ def _read_output(commandstring):
         import tempfile
         fp = tempfile.NamedTemporaryFile()
     except ImportError:
-        fp = open("/tmp/_osx_support.%s"%(
+        fp = open("/tmp/_osx_support.%s" % (
             os.getpid(),), "w+b")
 
     with contextlib.closing(fp) as fp:
@@ -74,11 +74,13 @@ def _read_output(commandstring):
 def _find_build_tool(toolname):
     """Find a build tool on current path or using xcrun"""
     return (_find_executable(toolname)
-                or _read_output("/usr/bin/xcrun -find %s" % (toolname,))
-                or ''
+            or _read_output("/usr/bin/xcrun -find %s" % (toolname,))
+            or ''
             )
 
+
 _SYSTEM_VERSION = None
+
 
 def _get_system_version():
     """Return the OS X system version as a string"""
@@ -110,12 +112,14 @@ def _get_system_version():
 
     return _SYSTEM_VERSION
 
+
 def _remove_original_values(_config_vars):
     """Remove original unmodified values for testing"""
     # This is needed for higher-level cross-platform tests of get_platform.
     for k in list(_config_vars):
         if k.startswith(_INITPRE):
             del _config_vars[k]
+
 
 def _save_modified_value(_config_vars, cv, newvalue):
     """Save modified and original unmodified value of configuration var"""
@@ -124,6 +128,7 @@ def _save_modified_value(_config_vars, cv, newvalue):
     if (oldvalue != newvalue) and (_INITPRE + cv not in _config_vars):
         _config_vars[_INITPRE + cv] = oldvalue
     _config_vars[cv] = newvalue
+
 
 def _supports_universal_builds():
     """Returns True if universal builds are supported on this system"""
@@ -181,14 +186,14 @@ def _find_appropriate_compiler(_config_vars):
     elif os.path.basename(cc).startswith('gcc'):
         # Compiler is GCC, check if it is LLVM-GCC
         data = _read_output("'%s' --version"
-                             % (cc.replace("'", "'\"'\"'"),))
+                            % (cc.replace("'", "'\"'\"'"),))
         if data and 'llvm-gcc' in data:
             # Found LLVM-GCC, fall back to clang
             cc = _find_build_tool('clang')
 
     if not cc:
         raise SystemError(
-               "Cannot locate working compiler")
+            "Cannot locate working compiler")
 
     if cc != oldcc:
         # Found a replacement compiler.
@@ -238,7 +243,7 @@ def _remove_unsupported_archs(_config_vars):
         status = os.system(
             """echo 'int main{};' | """
             """'%s' -c -arch ppc -x c -o /dev/null /dev/null 2>/dev/null"""
-            %(_config_vars['CC'].replace("'", "'\"'\"'"),))
+            % (_config_vars['CC'].replace("'", "'\"'\"'"),))
         if status:
             # The compile failed for some reason.  Because of differences
             # across Xcode and compiler versions, there is no reliable way
@@ -359,7 +364,7 @@ def compiler_fixup(compiler_so, cc_args):
     if sysroot and not os.path.isdir(sysroot):
         from distutils import log
         log.warn("Compiling with an SDK that doesn't seem to exist: %s",
-                sysroot)
+                 sysroot)
         log.warn("Please check your Xcode installation")
 
     return compiler_so
@@ -449,7 +454,7 @@ def get_platform_osx(_config_vars, osname, release, machine):
         # Otherwise, distutils may consider this a cross-compiling
         # case and disallow installs.
         cflags = _config_vars.get(_INITPRE+'CFLAGS',
-                                    _config_vars.get('CFLAGS', ''))
+                                  _config_vars.get('CFLAGS', ''))
         if macrelease:
             try:
                 macrelease = tuple(int(i) for i in macrelease.split('.')[0:2])
@@ -482,7 +487,7 @@ def get_platform_osx(_config_vars, osname, release, machine):
                 machine = 'universal'
             else:
                 raise ValueError(
-                   "Don't know machine value for archs=%r" % (archs,))
+                    "Don't know machine value for archs=%r" % (archs,))
 
         elif machine == 'i386':
             # On OSX the machine type returned by uname is always the

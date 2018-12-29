@@ -57,6 +57,7 @@ if sys.version_info >= (3, 5):
     SelectorKey.data.__doc__ = ('''Optional opaque data associated to this file object.
     For example, this could be used to store a per-client session ID.''')
 
+
 class _SelectorMapping(Mapping):
     """Mapping of file objects to selector keys."""
 

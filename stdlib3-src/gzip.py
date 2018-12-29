@@ -5,7 +5,10 @@ but random access is not allowed."""
 
 # based on Andrew Kuchling's minigzip.py distributed with the zlib module
 
-import struct, sys, time, os
+import struct
+import sys
+import time
+import os
 import zlib
 import builtins
 import io
@@ -16,6 +19,7 @@ __all__ = ["GzipFile", "open", "compress", "decompress"]
 FTEXT, FHCRC, FEXTRA, FNAME, FCOMMENT = 1, 2, 4, 8, 16
 
 READ, WRITE = 1, 2
+
 
 def open(filename, mode="rb", compresslevel=9,
          encoding=None, errors=None, newline=None):
@@ -42,7 +46,8 @@ def open(filename, mode="rb", compresslevel=9,
             raise ValueError("Invalid mode: %r" % (mode,))
     else:
         if encoding is not None:
-            raise ValueError("Argument 'encoding' not supported in binary mode")
+            raise ValueError(
+                "Argument 'encoding' not supported in binary mode")
         if errors is not None:
             raise ValueError("Argument 'errors' not supported in binary mode")
         if newline is not None:
@@ -61,10 +66,12 @@ def open(filename, mode="rb", compresslevel=9,
     else:
         return binary_file
 
+
 def write32u(output, value):
     # The L format writes the bit pattern correctly whether signed
     # or unsigned.
     output.write(struct.pack("<L", value))
+
 
 class _PaddedFile:
     """Minimal read-only file object that prepends a string to the contents
@@ -88,7 +95,7 @@ class _PaddedFile:
             read = self._read
             self._read = None
             return self._buffer[read:] + \
-                   self.file.read(size-self._length+read)
+                self.file.read(size-self._length+read)
 
     def prepend(self, prepend=b''):
         if self._read is None:
@@ -106,6 +113,7 @@ class _PaddedFile:
 
     def seekable(self):
         return True  # Allows fast-forwarding even in unseekable streams
+
 
 class GzipFile(_compression.BaseStream):
     """The GzipFile class simulates most of the methods of a file object with
@@ -244,7 +252,7 @@ class GzipFile(_compression.BaseStream):
         if fname:
             self.fileobj.write(fname + b'\000')
 
-    def write(self,data):
+    def write(self, data):
         self._check_not_closed()
         if self.mode != WRITE:
             import errno
@@ -318,7 +326,7 @@ class GzipFile(_compression.BaseStream):
                 self.myfileobj = None
                 myfileobj.close()
 
-    def flush(self,zlib_mode=zlib.Z_SYNC_FLUSH):
+    def flush(self, zlib_mode=zlib.Z_SYNC_FLUSH):
         self._check_not_closed()
         if self.mode == WRITE:
             # Ensure the compressor's buffer is flushed
@@ -423,13 +431,13 @@ class _GzipReader(_compression.DecompressReader):
             # Read and discard a null-terminated string containing the filename
             while True:
                 s = self._fp.read(1)
-                if not s or s==b'\000':
+                if not s or s == b'\000':
                     break
         if flag & FCOMMENT:
             # Read and discard a null-terminated string containing a comment
             while True:
                 s = self._fp.read(1)
-                if not s or s==b'\000':
+                if not s or s == b'\000':
                     break
         if flag & FHCRC:
             self._read_exact(2)     # Read & discard the 16-bit header CRC
@@ -482,7 +490,7 @@ class _GzipReader(_compression.DecompressReader):
                 raise EOFError("Compressed file ended before the "
                                "end-of-stream marker was reached")
 
-        self._add_read_data( uncompress )
+        self._add_read_data(uncompress)
         self._pos += len(uncompress)
         return uncompress
 
@@ -515,6 +523,7 @@ class _GzipReader(_compression.DecompressReader):
         super()._rewind()
         self._new_member = True
 
+
 def compress(data, compresslevel=9):
     """Compress data in one shot and return the compressed string.
     Optional argument is the compression level, in range of 0-9.
@@ -523,6 +532,7 @@ def compress(data, compresslevel=9):
     with GzipFile(fileobj=buf, mode='wb', compresslevel=compresslevel) as f:
         f.write(data)
     return buf.getvalue()
+
 
 def decompress(data):
     """Decompress a gzip compressed string in one shot.
@@ -569,6 +579,7 @@ def _test():
             g.close()
         if f is not sys.stdin.buffer:
             f.close()
+
 
 if __name__ == '__main__':
     _test()

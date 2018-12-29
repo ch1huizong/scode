@@ -26,6 +26,7 @@ TIMEOUT_MAX = 2**31
 
 error = RuntimeError
 
+
 def start_new_thread(function, args, kwargs={}):
     """Dummy implementation of _thread.start_new_thread().
 
@@ -58,9 +59,11 @@ def start_new_thread(function, args, kwargs={}):
         _interrupt = False
         raise KeyboardInterrupt
 
+
 def exit():
     """Dummy implementation of _thread.exit()."""
     raise SystemExit
+
 
 def get_ident():
     """Dummy implementation of _thread.get_ident().
@@ -71,9 +74,11 @@ def get_ident():
     """
     return 1
 
+
 def allocate_lock():
     """Dummy implementation of _thread.allocate_lock()."""
     return LockType()
+
 
 def stack_size(size=None):
     """Dummy implementation of _thread.stack_size()."""
@@ -81,9 +86,11 @@ def stack_size(size=None):
         raise error("setting thread stack size not supported")
     return 0
 
+
 def _set_sentinel():
     """Dummy implementation of _thread._set_sentinel()."""
     return LockType()
+
 
 class LockType(object):
     """Class implementing dummy implementation of _thread.LockType.
@@ -148,10 +155,12 @@ class LockType(object):
             hex(id(self))
         )
 
+
 # Used to signal that interrupt_main was called in a "thread"
 _interrupt = False
 # True when not executing in a "thread"
 _main = True
+
 
 def interrupt_main():
     """Set _interrupt flag to True to have start_new_thread raise

@@ -12,6 +12,7 @@ from codeop import CommandCompiler, compile_command
 __all__ = ["InteractiveInterpreter", "InteractiveConsole", "interact",
            "compile_command"]
 
+
 class InteractiveInterpreter:
     """Base class for InteractiveConsole.
 
@@ -274,7 +275,6 @@ class InteractiveConsole(InteractiveInterpreter):
         return input(prompt)
 
 
-
 def interact(banner=None, readfunc=None, local=None, exitmsg=None):
     """Closely emulate the interactive Python interpreter.
 
@@ -306,7 +306,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-q', action='store_true',
-                       help="don't print version and copyright messages")
+                        help="don't print version and copyright messages")
     args = parser.parse_args()
     if args.q or sys.flags.quiet:
         banner = ''

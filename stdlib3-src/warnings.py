@@ -7,15 +7,18 @@ __all__ = ["warn", "warn_explicit", "showwarning",
            "formatwarning", "filterwarnings", "simplefilter",
            "resetwarnings", "catch_warnings"]
 
+
 def showwarning(message, category, filename, lineno, file=None, line=None):
     """Hook to write a warning to a file; replace if you like."""
     msg = WarningMessage(message, category, filename, lineno, file, line)
     _showwarnmsg_impl(msg)
 
+
 def formatwarning(message, category, filename, lineno, line=None):
     """Function to format a warning the standard way."""
     msg = WarningMessage(message, category, filename, lineno, None, line)
     return _formatwarnmsg_impl(msg)
+
 
 def _showwarnmsg_impl(msg):
     file = msg.file
@@ -32,9 +35,10 @@ def _showwarnmsg_impl(msg):
         # the file (probably stderr) is invalid - this warning gets lost.
         pass
 
+
 def _formatwarnmsg_impl(msg):
-    s =  ("%s:%s: %s: %s\n"
-          % (msg.filename, msg.lineno, msg.category.__name__,
+    s = ("%s:%s: %s: %s\n"
+         % (msg.filename, msg.lineno, msg.category.__name__,
              msg.message))
 
     if msg.line is None:
@@ -79,8 +83,10 @@ def _formatwarnmsg_impl(msg):
                     s += '    %s\n' % line
     return s
 
+
 # Keep a reference to check if the function was replaced
 _showwarning_orig = showwarning
+
 
 def _showwarnmsg(msg):
     """Hook to write a warning to a file; replace if you like."""
@@ -100,8 +106,10 @@ def _showwarnmsg(msg):
             return
     _showwarnmsg_impl(msg)
 
+
 # Keep a reference to check if the function was replaced
 _formatwarning_orig = formatwarning
+
 
 def _formatwarnmsg(msg):
     """Function to format a warning the standard way."""
@@ -115,6 +123,7 @@ def _formatwarnmsg(msg):
             return fw(msg.message, msg.category,
                       msg.filename, msg.lineno, line=msg.line)
     return _formatwarnmsg_impl(msg)
+
 
 def filterwarnings(action, message="", category=Warning, module="", lineno=0,
                    append=False):
@@ -135,7 +144,7 @@ def filterwarnings(action, message="", category=Warning, module="", lineno=0,
     assert issubclass(category, Warning), "category must be a Warning subclass"
     assert isinstance(module, str), "module must be a string"
     assert isinstance(lineno, int) and lineno >= 0, \
-           "lineno must be an int >= 0"
+        "lineno must be an int >= 0"
 
     if message or module:
         import re
@@ -151,6 +160,7 @@ def filterwarnings(action, message="", category=Warning, module="", lineno=0,
 
     _add_filter(action, message, category, module, lineno, append=append)
 
+
 def simplefilter(action, category=Warning, lineno=0, append=False):
     """Insert a simple entry into the list of warnings filters (at the front).
 
@@ -164,8 +174,9 @@ def simplefilter(action, category=Warning, lineno=0, append=False):
     assert action in ("error", "ignore", "always", "default", "module",
                       "once"), "invalid action: %r" % (action,)
     assert isinstance(lineno, int) and lineno >= 0, \
-           "lineno must be an int >= 0"
+        "lineno must be an int >= 0"
     _add_filter(action, None, category, None, lineno, append=append)
+
 
 def _add_filter(*item, append):
     # Remove possible duplicate filters, so new one will be placed
@@ -181,16 +192,20 @@ def _add_filter(*item, append):
             filters.append(item)
     _filters_mutated()
 
+
 def resetwarnings():
     """Clear the list of warning filters, so that no filters are active."""
     filters[:] = []
     _filters_mutated()
+
 
 class _OptionError(Exception):
     """Exception used by option processing helpers."""
     pass
 
 # Helper to process -W options passed via sys.warnoptions
+
+
 def _processoptions(args):
     for arg in args:
         try:
@@ -199,6 +214,8 @@ def _processoptions(args):
             print("Invalid -W option ignored:", msg, file=sys.stderr)
 
 # Helper for _processoptions()
+
+
 def _setoption(arg):
     import re
     parts = arg.split(':')
@@ -226,16 +243,21 @@ def _setoption(arg):
     filterwarnings(action, message, category, module, lineno)
 
 # Helper for _setoption()
+
+
 def _getaction(action):
     if not action:
         return "default"
-    if action == "all": return "always" # Alias
+    if action == "all":
+        return "always"  # Alias
     for a in ('default', 'always', 'ignore', 'module', 'once', 'error'):
         if a.startswith(action):
             return a
     raise _OptionError("invalid action: %r" % (action,))
 
 # Helper for _setoption()
+
+
 def _getcategory(category):
     import re
     if not category:
@@ -244,7 +266,8 @@ def _getcategory(category):
         try:
             cat = eval(category)
         except NameError:
-            raise _OptionError("unknown warning category: %r" % (category,)) from None
+            raise _OptionError("unknown warning category: %r" %
+                               (category,)) from None
     else:
         i = category.rfind(".")
         module = category[:i]
@@ -256,7 +279,8 @@ def _getcategory(category):
         try:
             cat = getattr(m, klass)
         except AttributeError:
-            raise _OptionError("unknown warning category: %r" % (category,)) from None
+            raise _OptionError("unknown warning category: %r" %
+                               (category,)) from None
     if not issubclass(cat, Warning):
         raise _OptionError("invalid warning category: %r" % (category,))
     return cat
@@ -329,6 +353,7 @@ def warn(message, category=None, stacklevel=1, source=None):
     warn_explicit(message, category, filename, lineno, module, registry,
                   globals, source)
 
+
 def warn_explicit(message, category, filename, lineno,
                   module=None, registry=None, module_globals=None,
                   source=None):
@@ -336,7 +361,7 @@ def warn_explicit(message, category, filename, lineno,
     if module is None:
         module = filename or "<unknown>"
         if module[-3:].lower() == ".py":
-            module = module[:-3] # XXX What about leading pathname?
+            module = module[:-3]  # XXX What about leading pathname?
     if registry is None:
         registry = {}
     if registry.get('version', 0) != _filters_version:
@@ -358,7 +383,7 @@ def warn_explicit(message, category, filename, lineno,
         if ((msg is None or msg.match(text)) and
             issubclass(category, cat) and
             (mod is None or mod.match(module)) and
-            (ln == 0 or lineno == ln)):
+                (ln == 0 or lineno == ln)):
             break
     else:
         action = defaultaction
@@ -393,8 +418,8 @@ def warn_explicit(message, category, filename, lineno,
     else:
         # Unrecognized actions are errors
         raise RuntimeError(
-              "Unrecognized action (%r) in warnings.filters:\n %s" %
-              (action, item))
+            "Unrecognized action (%r) in warnings.filters:\n %s" %
+            (action, item))
     # Print message and context
     msg = WarningMessage(message, category, filename, lineno, source)
     _showwarnmsg(msg)
@@ -418,8 +443,8 @@ class WarningMessage(object):
 
     def __str__(self):
         return ("{message : %r, category : %r, filename : %r, lineno : %s, "
-                    "line : %r}" % (self.message, self._category_name,
-                                    self.filename, self.lineno, self.line))
+                "line : %r}" % (self.message, self._category_name,
+                                self.filename, self.lineno, self.line))
 
 
 class catch_warnings(object):
@@ -494,7 +519,9 @@ def _warn_unawaited_coroutine(coro):
         f"coroutine '{coro.__qualname__}' was never awaited\n"
     ]
     if coro.cr_origin is not None:
-        import linecache, traceback
+        import linecache
+        import traceback
+
         def extract():
             for filename, lineno, funcname in reversed(coro.cr_origin):
                 line = linecache.getline(filename, lineno)

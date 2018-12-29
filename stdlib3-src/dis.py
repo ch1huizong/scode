@@ -18,6 +18,7 @@ _have_code = (types.MethodType, types.FunctionType, types.CodeType,
 
 FORMAT_VALUE = opmap['FORMAT_VALUE']
 
+
 def _try_compile(source, name):
     """Attempts to compile the given source, first as an expression and
        then as a statement if the first approach fails.
@@ -30,6 +31,7 @@ def _try_compile(source, name):
     except SyntaxError:
         c = compile(source, name, 'exec')
     return c
+
 
 def dis(x=None, *, file=None, depth=None):
     """Disassemble classes, methods, functions, and other compiled objects.
@@ -49,11 +51,11 @@ def dis(x=None, *, file=None, depth=None):
     # Extract compiled code objects from...
     if hasattr(x, '__code__'):  # ...a function, or
         x = x.__code__
-    elif hasattr(x, 'gi_code'):  #...a generator object, or
+    elif hasattr(x, 'gi_code'):  # ...a generator object, or
         x = x.gi_code
-    elif hasattr(x, 'ag_code'):  #...an asynchronous generator object, or
+    elif hasattr(x, 'ag_code'):  # ...an asynchronous generator object, or
         x = x.ag_code
-    elif hasattr(x, 'cr_code'):  #...a coroutine.
+    elif hasattr(x, 'cr_code'):  # ...a coroutine.
         x = x.cr_code
     # Perform the disassembly.
     if hasattr(x, '__dict__'):  # Class or module
@@ -66,15 +68,16 @@ def dis(x=None, *, file=None, depth=None):
                 except TypeError as msg:
                     print("Sorry:", msg, file=file)
                 print(file=file)
-    elif hasattr(x, 'co_code'): # Code object
+    elif hasattr(x, 'co_code'):  # Code object
         _disassemble_recursive(x, file=file, depth=depth)
-    elif isinstance(x, (bytes, bytearray)): # Raw bytecode
+    elif isinstance(x, (bytes, bytearray)):  # Raw bytecode
         _disassemble_bytes(x, file=file)
     elif isinstance(x, str):    # Source code
         _disassemble_str(x, file=file, depth=depth)
     else:
         raise TypeError("don't know how to disassemble %s objects" %
                         type(x).__name__)
+
 
 def distb(tb=None, *, file=None):
     """Disassemble a traceback (default: last traceback)."""
@@ -83,30 +86,33 @@ def distb(tb=None, *, file=None):
             tb = sys.last_traceback
         except AttributeError:
             raise RuntimeError("no last traceback to disassemble") from None
-        while tb.tb_next: tb = tb.tb_next
+        while tb.tb_next:
+            tb = tb.tb_next
     disassemble(tb.tb_frame.f_code, tb.tb_lasti, file=file)
+
 
 # The inspect module interrogates this dictionary to build its
 # list of CO_* constants. It is also used by pretty_flags to
 # turn the co_flags field into a human readable list.
 COMPILER_FLAG_NAMES = {
-     1: "OPTIMIZED",
-     2: "NEWLOCALS",
-     4: "VARARGS",
-     8: "VARKEYWORDS",
+    1: "OPTIMIZED",
+    2: "NEWLOCALS",
+    4: "VARARGS",
+    8: "VARKEYWORDS",
     16: "NESTED",
     32: "GENERATOR",
     64: "NOFREE",
-   128: "COROUTINE",
-   256: "ITERABLE_COROUTINE",
-   512: "ASYNC_GENERATOR",
+    128: "COROUTINE",
+    256: "ITERABLE_COROUTINE",
+    512: "ASYNC_GENERATOR",
 }
+
 
 def pretty_flags(flags):
     """Return pretty representation of code flags."""
     names = []
     for i in range(32):
-        flag = 1<<i
+        flag = 1 << i
         if flags & flag:
             names.append(COMPILER_FLAG_NAMES.get(flag, hex(flag)))
             flags ^= flag
@@ -116,6 +122,7 @@ def pretty_flags(flags):
         names.append(hex(flags))
     return ", ".join(names)
 
+
 def _get_code_object(x):
     """Helper to handle methods, compiled or raw code objects, and strings."""
     # Extract functions from methods.
@@ -124,11 +131,11 @@ def _get_code_object(x):
     # Extract compiled code objects from...
     if hasattr(x, '__code__'):  # ...a function, or
         x = x.__code__
-    elif hasattr(x, 'gi_code'):  #...a generator object, or
+    elif hasattr(x, 'gi_code'):  # ...a generator object, or
         x = x.gi_code
-    elif hasattr(x, 'ag_code'):  #...an asynchronous generator object, or
+    elif hasattr(x, 'ag_code'):  # ...an asynchronous generator object, or
         x = x.ag_code
-    elif hasattr(x, 'cr_code'):  #...a coroutine.
+    elif hasattr(x, 'cr_code'):  # ...a coroutine.
         x = x.cr_code
     # Handle source code.
     if isinstance(x, str):
@@ -139,9 +146,11 @@ def _get_code_object(x):
     raise TypeError("don't know how to disassemble %s objects" %
                     type(x).__name__)
 
+
 def code_info(x):
     """Formatted details of methods, functions, or code."""
     return _format_code_info(_get_code_object(x))
+
 
 def _format_code_info(co):
     lines = []
@@ -174,6 +183,7 @@ def _format_code_info(co):
             lines.append("%4d: %s" % i_n)
     return "\n".join(lines)
 
+
 def show_code(co, *, file=None):
     """Print details of methods, functions, or code to *file*.
 
@@ -181,8 +191,9 @@ def show_code(co, *, file=None):
     """
     print(code_info(co), file=file)
 
+
 _Instruction = collections.namedtuple("_Instruction",
-     "opname opcode arg argval argrepr offset starts_line is_jump_target")
+                                      "opname opcode arg argval argrepr offset starts_line is_jump_target")
 
 _Instruction.opname.__doc__ = "Human readable name for operation"
 _Instruction.opcode.__doc__ = "Numeric code for operation"
@@ -195,6 +206,7 @@ _Instruction.is_jump_target.__doc__ = "True if other code jumps to here, otherwi
 
 _OPNAME_WIDTH = 20
 _OPARG_WIDTH = 5
+
 
 class Instruction(_Instruction):
     """Details for a bytecode operation
@@ -270,6 +282,7 @@ def get_instructions(x, *, first_line=None):
                                    co.co_consts, cell_names, linestarts,
                                    line_offset)
 
+
 def _get_const_info(const_index, const_list):
     """Helper to get optional details about const references
 
@@ -281,6 +294,7 @@ def _get_const_info(const_index, const_list):
     if const_list is not None:
         argval = const_list[const_index]
     return argval, repr(argval)
+
 
 def _get_name_info(name_index, name_list):
     """Helper to get optional details about named references
@@ -299,7 +313,7 @@ def _get_name_info(name_index, name_list):
 
 
 def _get_instructions_bytes(code, varnames=None, names=None, constants=None,
-                      cells=None, linestarts=None, line_offset=0):
+                            cells=None, linestarts=None, line_offset=0):
     """Iterate over the instructions in a bytecode string.
 
     Generates a sequence of Instruction namedtuples giving the details of each
@@ -349,12 +363,14 @@ def _get_instructions_bytes(code, varnames=None, names=None, constants=None,
                           arg, argval, argrepr,
                           offset, starts_line, is_jump_target)
 
+
 def disassemble(co, lasti=-1, *, file=None):
     """Disassemble a code object."""
     cell_names = co.co_cellvars + co.co_freevars
     linestarts = dict(findlinestarts(co))
     _disassemble_bytes(co.co_code, lasti, co.co_varnames, co.co_names,
                        co.co_consts, cell_names, linestarts, file=file)
+
 
 def _disassemble_recursive(co, *, file=None, depth=None):
     disassemble(co, file=file)
@@ -366,6 +382,7 @@ def _disassemble_recursive(co, *, file=None, depth=None):
                 print(file=file)
                 print("Disassembly of %r:" % (x,), file=file)
                 _disassemble_recursive(x, file=file, depth=depth)
+
 
 def _disassemble_bytes(code, lasti=-1, varnames=None, names=None,
                        constants=None, cells=None, linestarts=None,
@@ -397,11 +414,14 @@ def _disassemble_bytes(code, lasti=-1, varnames=None, names=None,
         print(instr._disassemble(lineno_width, is_current_instr, offset_width),
               file=file)
 
+
 def _disassemble_str(source, **kwargs):
     """Compile the source string, then disassemble the code object."""
     _disassemble_recursive(_try_compile(source, '<dis>'), **kwargs)
 
+
 disco = disassemble                     # XXX For backwards compatibility
+
 
 def _unpack_opargs(code):
     extended_arg = 0
@@ -413,6 +433,7 @@ def _unpack_opargs(code):
         else:
             arg = None
         yield (i, op, arg)
+
 
 def findlabels(code):
     """Detect all offsets in a byte code which are jump targets.
@@ -432,6 +453,7 @@ def findlabels(code):
             if label not in labels:
                 labels.append(label)
     return labels
+
 
 def findlinestarts(code):
     """Find the offsets in a byte code which are start of lines in the source.
@@ -458,6 +480,7 @@ def findlinestarts(code):
     if lineno != lastlineno:
         yield (addr, lineno)
 
+
 class Bytecode:
     """The bytecode operations of a piece of code
 
@@ -466,6 +489,7 @@ class Bytecode:
 
     Iterating over this yields the bytecode operations as Instruction instances.
     """
+
     def __init__(self, x, *, first_line=None, current_offset=None):
         self.codeobj = co = _get_code_object(x)
         if first_line is None:
@@ -524,12 +548,14 @@ def _test():
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('infile', type=argparse.FileType(), nargs='?', default='-')
+    parser.add_argument('infile', type=argparse.FileType(),
+                        nargs='?', default='-')
     args = parser.parse_args()
     with args.infile as infile:
         source = infile.read()
     code = compile(source, args.infile.name, "exec")
     dis(code)
+
 
 if __name__ == "__main__":
     _test()

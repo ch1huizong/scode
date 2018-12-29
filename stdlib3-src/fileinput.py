@@ -72,13 +72,15 @@ XXX Possible additions:
 
 """
 
-import sys, os
+import sys
+import os
 
 __all__ = ["input", "close", "nextfile", "filename", "lineno", "filelineno",
            "fileno", "isfirstline", "isstdin", "FileInput", "hook_compressed",
            "hook_encoded"]
 
 _state = None
+
 
 def input(files=None, inplace=False, backup="", bufsize=0,
           mode="r", openhook=None):
@@ -94,6 +96,7 @@ def input(files=None, inplace=False, backup="", bufsize=0,
     _state = FileInput(files, inplace, backup, bufsize, mode, openhook)
     return _state
 
+
 def close():
     """Close the sequence."""
     global _state
@@ -101,6 +104,7 @@ def close():
     _state = None
     if state:
         state.close()
+
 
 def nextfile():
     """
@@ -116,6 +120,7 @@ def nextfile():
         raise RuntimeError("no active input()")
     return _state.nextfile()
 
+
 def filename():
     """
     Return the name of the file currently being read.
@@ -124,6 +129,7 @@ def filename():
     if not _state:
         raise RuntimeError("no active input()")
     return _state.filename()
+
 
 def lineno():
     """
@@ -135,6 +141,7 @@ def lineno():
         raise RuntimeError("no active input()")
     return _state.lineno()
 
+
 def filelineno():
     """
     Return the line number in the current file. Before the first line
@@ -145,6 +152,7 @@ def filelineno():
         raise RuntimeError("no active input()")
     return _state.filelineno()
 
+
 def fileno():
     """
     Return the file number of the current file. When no file is currently
@@ -153,6 +161,7 @@ def fileno():
     if not _state:
         raise RuntimeError("no active input()")
     return _state.fileno()
+
 
 def isfirstline():
     """
@@ -163,6 +172,7 @@ def isfirstline():
         raise RuntimeError("no active input()")
     return _state.isfirstline()
 
+
 def isstdin():
     """
     Returns true if the last line was read from sys.stdin,
@@ -171,6 +181,7 @@ def isstdin():
     if not _state:
         raise RuntimeError("no active input()")
     return _state.isstdin()
+
 
 class FileInput:
     """FileInput([files[, inplace[, backup[, bufsize, [, mode[, openhook]]]]]])
@@ -224,7 +235,8 @@ class FileInput:
         self._mode = mode
         if openhook:
             if inplace:
-                raise ValueError("FileInput cannot use an opening hook in inplace mode")
+                raise ValueError(
+                    "FileInput cannot use an opening hook in inplace mode")
             if not callable(openhook):
                 raise ValueError("FileInput openhook must be callable")
         self._openhook = openhook
@@ -291,8 +303,10 @@ class FileInput:
                 backupfilename = self._backupfilename
                 self._backupfilename = None
                 if backupfilename and not self._backup:
-                    try: os.unlink(backupfilename)
-                    except OSError: pass
+                    try:
+                        os.unlink(backupfilename)
+                    except OSError:
+                        pass
 
                 self._isstdin = False
 
@@ -414,14 +428,19 @@ def _test():
     backup = False
     opts, args = getopt.getopt(sys.argv[1:], "ib:")
     for o, a in opts:
-        if o == '-i': inplace = True
-        if o == '-b': backup = a
+        if o == '-i':
+            inplace = True
+        if o == '-b':
+            backup = a
     for line in input(args, inplace=inplace, backup=backup):
-        if line[-1:] == '\n': line = line[:-1]
-        if line[-1:] == '\r': line = line[:-1]
+        if line[-1:] == '\n':
+            line = line[:-1]
+        if line[-1:] == '\r':
+            line = line[:-1]
         print("%d: %s[%d]%s %s" % (lineno(), filename(), filelineno(),
                                    isfirstline() and "*" or "", line))
     print("%d: %s[%d]" % (lineno(), filename(), filelineno()))
+
 
 if __name__ == '__main__':
     _test()

@@ -61,9 +61,11 @@ HIGHEST_PROTOCOL = 4
 # there are too many issues with that.
 DEFAULT_PROTOCOL = 3
 
+
 class PickleError(Exception):
     """A common base class for the other pickling exceptions."""
     pass
+
 
 class PicklingError(PickleError):
     """This exception is raised when an unpicklable object is passed to the
@@ -71,6 +73,7 @@ class PicklingError(PickleError):
 
     """
     pass
+
 
 class UnpicklingError(PickleError):
     """This exception is raised when there is a problem unpickling an object,
@@ -85,9 +88,12 @@ class UnpicklingError(PickleError):
 
 # An instance of _Stop is raised by Unpickler.load_stop() in response to
 # the STOP opcode, passing the object that is the result of unpickling.
+
+
 class _Stop(Exception):
     def __init__(self, value):
         self.value = value
+
 
 # Jython has PyStringMap; it's a dict subclass with string keys
 try:
@@ -99,84 +105,84 @@ except ImportError:
 # here is in kind-of alphabetical order of 1-character pickle code.
 # pickletools groups them by purpose.
 
-MARK           = b'('   # push special markobject on stack
-STOP           = b'.'   # every pickle ends with STOP
-POP            = b'0'   # discard topmost stack item
-POP_MARK       = b'1'   # discard stack top through topmost markobject
-DUP            = b'2'   # duplicate top stack item
-FLOAT          = b'F'   # push float object; decimal string argument
-INT            = b'I'   # push integer or bool; decimal string argument
-BININT         = b'J'   # push four-byte signed int
-BININT1        = b'K'   # push 1-byte unsigned int
-LONG           = b'L'   # push long; decimal string argument
-BININT2        = b'M'   # push 2-byte unsigned int
-NONE           = b'N'   # push None
-PERSID         = b'P'   # push persistent object; id is taken from string arg
-BINPERSID      = b'Q'   #  "       "         "  ;  "  "   "     "  stack
-REDUCE         = b'R'   # apply callable to argtuple, both on stack
-STRING         = b'S'   # push string; NL-terminated string argument
-BINSTRING      = b'T'   # push string; counted binary string argument
-SHORT_BINSTRING= b'U'   #  "     "   ;    "      "       "      " < 256 bytes
-UNICODE        = b'V'   # push Unicode string; raw-unicode-escaped'd argument
-BINUNICODE     = b'X'   #   "     "       "  ; counted UTF-8 string argument
-APPEND         = b'a'   # append stack top to list below it
-BUILD          = b'b'   # call __setstate__ or __dict__.update()
-GLOBAL         = b'c'   # push self.find_class(modname, name); 2 string args
-DICT           = b'd'   # build a dict from stack items
-EMPTY_DICT     = b'}'   # push empty dict
-APPENDS        = b'e'   # extend list on stack by topmost stack slice
-GET            = b'g'   # push item from memo on stack; index is string arg
-BINGET         = b'h'   #   "    "    "    "   "   "  ;   "    " 1-byte arg
-INST           = b'i'   # build & push class instance
-LONG_BINGET    = b'j'   # push item from memo on stack; index is 4-byte arg
-LIST           = b'l'   # build list from topmost stack items
-EMPTY_LIST     = b']'   # push empty list
-OBJ            = b'o'   # build & push class instance
-PUT            = b'p'   # store stack top in memo; index is string arg
-BINPUT         = b'q'   #   "     "    "   "   " ;   "    " 1-byte arg
-LONG_BINPUT    = b'r'   #   "     "    "   "   " ;   "    " 4-byte arg
-SETITEM        = b's'   # add key+value pair to dict
-TUPLE          = b't'   # build tuple from topmost stack items
-EMPTY_TUPLE    = b')'   # push empty tuple
-SETITEMS       = b'u'   # modify dict by adding topmost key+value pairs
-BINFLOAT       = b'G'   # push float; arg is 8-byte float encoding
+MARK = b'('   # push special markobject on stack
+STOP = b'.'   # every pickle ends with STOP
+POP = b'0'   # discard topmost stack item
+POP_MARK = b'1'   # discard stack top through topmost markobject
+DUP = b'2'   # duplicate top stack item
+FLOAT = b'F'   # push float object; decimal string argument
+INT = b'I'   # push integer or bool; decimal string argument
+BININT = b'J'   # push four-byte signed int
+BININT1 = b'K'   # push 1-byte unsigned int
+LONG = b'L'   # push long; decimal string argument
+BININT2 = b'M'   # push 2-byte unsigned int
+NONE = b'N'   # push None
+PERSID = b'P'   # push persistent object; id is taken from string arg
+BINPERSID = b'Q'  # "       "         "  ;  "  "   "     "  stack
+REDUCE = b'R'   # apply callable to argtuple, both on stack
+STRING = b'S'   # push string; NL-terminated string argument
+BINSTRING = b'T'   # push string; counted binary string argument
+SHORT_BINSTRING = b'U'  # "     "   ;    "      "       "      " < 256 bytes
+UNICODE = b'V'   # push Unicode string; raw-unicode-escaped'd argument
+BINUNICODE = b'X'  # "     "       "  ; counted UTF-8 string argument
+APPEND = b'a'   # append stack top to list below it
+BUILD = b'b'   # call __setstate__ or __dict__.update()
+GLOBAL = b'c'   # push self.find_class(modname, name); 2 string args
+DICT = b'd'   # build a dict from stack items
+EMPTY_DICT = b'}'   # push empty dict
+APPENDS = b'e'   # extend list on stack by topmost stack slice
+GET = b'g'   # push item from memo on stack; index is string arg
+BINGET = b'h'  # "    "    "    "   "   "  ;   "    " 1-byte arg
+INST = b'i'   # build & push class instance
+LONG_BINGET = b'j'   # push item from memo on stack; index is 4-byte arg
+LIST = b'l'   # build list from topmost stack items
+EMPTY_LIST = b']'   # push empty list
+OBJ = b'o'   # build & push class instance
+PUT = b'p'   # store stack top in memo; index is string arg
+BINPUT = b'q'  # "     "    "   "   " ;   "    " 1-byte arg
+LONG_BINPUT = b'r'  # "     "    "   "   " ;   "    " 4-byte arg
+SETITEM = b's'   # add key+value pair to dict
+TUPLE = b't'   # build tuple from topmost stack items
+EMPTY_TUPLE = b')'   # push empty tuple
+SETITEMS = b'u'   # modify dict by adding topmost key+value pairs
+BINFLOAT = b'G'   # push float; arg is 8-byte float encoding
 
-TRUE           = b'I01\n'  # not an opcode; see INT docs in pickletools.py
-FALSE          = b'I00\n'  # not an opcode; see INT docs in pickletools.py
+TRUE = b'I01\n'  # not an opcode; see INT docs in pickletools.py
+FALSE = b'I00\n'  # not an opcode; see INT docs in pickletools.py
 
 # Protocol 2
 
-PROTO          = b'\x80'  # identify pickle protocol
-NEWOBJ         = b'\x81'  # build object by applying cls.__new__ to argtuple
-EXT1           = b'\x82'  # push object from extension registry; 1-byte index
-EXT2           = b'\x83'  # ditto, but 2-byte index
-EXT4           = b'\x84'  # ditto, but 4-byte index
-TUPLE1         = b'\x85'  # build 1-tuple from stack top
-TUPLE2         = b'\x86'  # build 2-tuple from two topmost stack items
-TUPLE3         = b'\x87'  # build 3-tuple from three topmost stack items
-NEWTRUE        = b'\x88'  # push True
-NEWFALSE       = b'\x89'  # push False
-LONG1          = b'\x8a'  # push long from < 256 bytes
-LONG4          = b'\x8b'  # push really big long
+PROTO = b'\x80'  # identify pickle protocol
+NEWOBJ = b'\x81'  # build object by applying cls.__new__ to argtuple
+EXT1 = b'\x82'  # push object from extension registry; 1-byte index
+EXT2 = b'\x83'  # ditto, but 2-byte index
+EXT4 = b'\x84'  # ditto, but 4-byte index
+TUPLE1 = b'\x85'  # build 1-tuple from stack top
+TUPLE2 = b'\x86'  # build 2-tuple from two topmost stack items
+TUPLE3 = b'\x87'  # build 3-tuple from three topmost stack items
+NEWTRUE = b'\x88'  # push True
+NEWFALSE = b'\x89'  # push False
+LONG1 = b'\x8a'  # push long from < 256 bytes
+LONG4 = b'\x8b'  # push really big long
 
 _tuplesize2code = [EMPTY_TUPLE, TUPLE1, TUPLE2, TUPLE3]
 
 # Protocol 3 (Python 3.x)
 
-BINBYTES       = b'B'   # push bytes; counted binary string argument
-SHORT_BINBYTES = b'C'   #  "     "   ;    "      "       "      " < 256 bytes
+BINBYTES = b'B'   # push bytes; counted binary string argument
+SHORT_BINBYTES = b'C'  # "     "   ;    "      "       "      " < 256 bytes
 
 # Protocol 4
 SHORT_BINUNICODE = b'\x8c'  # push short string; UTF-8 length < 256 bytes
-BINUNICODE8      = b'\x8d'  # push very long string
-BINBYTES8        = b'\x8e'  # push very long bytes string
-EMPTY_SET        = b'\x8f'  # push empty set on the stack
-ADDITEMS         = b'\x90'  # modify set by adding topmost stack items
-FROZENSET        = b'\x91'  # build frozenset from topmost stack items
-NEWOBJ_EX        = b'\x92'  # like NEWOBJ but work with keyword only arguments
-STACK_GLOBAL     = b'\x93'  # same as GLOBAL but using names on the stacks
-MEMOIZE          = b'\x94'  # store top of the stack in memo
-FRAME            = b'\x95'  # indicate the beginning of a new frame
+BINUNICODE8 = b'\x8d'  # push very long string
+BINBYTES8 = b'\x8e'  # push very long bytes string
+EMPTY_SET = b'\x8f'  # push empty set on the stack
+ADDITEMS = b'\x90'  # modify set by adding topmost stack items
+FROZENSET = b'\x91'  # build frozenset from topmost stack items
+NEWOBJ_EX = b'\x92'  # like NEWOBJ but work with keyword only arguments
+STACK_GLOBAL = b'\x93'  # same as GLOBAL but using names on the stacks
+MEMOIZE = b'\x94'  # store top of the stack in memo
+FRAME = b'\x95'  # indicate the beginning of a new frame
 
 __all__.extend([x for x in dir() if re.match("[A-Z][A-Z0-9_]+$", x)])
 
@@ -299,6 +305,7 @@ def _getattribute(obj, name):
                                  .format(name, obj)) from None
     return obj, parent
 
+
 def whichmodule(obj, name):
     """Find the module an object belong to."""
     module_name = getattr(obj, '__module__', None)
@@ -315,6 +322,7 @@ def whichmodule(obj, name):
         except AttributeError:
             pass
     return '__main__'
+
 
 def encode_long(x):
     r"""Encode a long to a two's complement little-endian binary string.
@@ -345,6 +353,7 @@ def encode_long(x):
         if result[-1] == 0xff and (result[-2] & 0x80) != 0:
             result = result[:-1]
     return result
+
 
 def decode_long(data):
     r"""Decode a long from a two's complement little-endian binary string.
@@ -399,7 +408,8 @@ class _Pickler:
         if protocol < 0:
             protocol = HIGHEST_PROTOCOL
         elif not 0 <= protocol <= HIGHEST_PROTOCOL:
-            raise ValueError("pickle protocol must be <= %d" % HIGHEST_PROTOCOL)
+            raise ValueError("pickle protocol must be <= %d" %
+                             HIGHEST_PROTOCOL)
         try:
             self._file_write = file.write
         except AttributeError:
@@ -501,7 +511,7 @@ class _Pickler:
         t = type(obj)
         f = self.dispatch.get(t)
         if f is not None:
-            f(self, obj) # Call unbound method with explicit self
+            f(self, obj)  # Call unbound method with explicit self
             return
 
         # Check private dispatch table if any, or else copyreg.dispatch_table
@@ -512,7 +522,7 @@ class _Pickler:
             # Check for a class with a custom metaclass; treat as regular class
             try:
                 issc = issubclass(t, type)
-            except TypeError: # t is not a class (old Boost; see SF #502085)
+            except TypeError:  # t is not a class (old Boost; see SF #502085)
                 issc = False
             if issc:
                 self.save_global(obj)
@@ -717,7 +727,7 @@ class _Pickler:
 
     def save_bytes(self, obj):
         if self.proto < 3:
-            if not obj: # bytes object is empty
+            if not obj:  # bytes object is empty
                 self.save_reduce(bytes, (), obj=obj)
             else:
                 self.save_reduce(codecs.encode,
@@ -756,7 +766,7 @@ class _Pickler:
     dispatch[str] = save_str
 
     def save_tuple(self, obj):
-        if not obj: # tuple is empty
+        if not obj:  # tuple is empty
             if self.bin:
                 self.write(EMPTY_TUPLE)
             else:
@@ -1328,7 +1338,7 @@ class _Unpickler:
     # object, following which are the arguments for klass.__init__.
     def _instantiate(self, klass, args):
         if (args or not isinstance(klass, type) or
-            hasattr(klass, "__getinitargs__")):
+                hasattr(klass, "__getinitargs__")):
             try:
                 value = klass(*args)
             except TypeError as err:
@@ -1405,7 +1415,7 @@ class _Unpickler:
             return
         key = _inverted_registry.get(code)
         if not key:
-            if code <= 0: # note that 0 is forbidden
+            if code <= 0:  # note that 0 is forbidden
                 # Corrupt or hostile pickle.
                 raise UnpicklingError("EXT specifies code <= 0")
             raise ValueError("unregistered extension code %d" % code)
@@ -1581,6 +1591,7 @@ class _Unpickler:
 def _dump(obj, file, protocol=None, *, fix_imports=True):
     _Pickler(file, protocol, fix_imports=fix_imports).dump(obj)
 
+
 def _dumps(obj, protocol=None, *, fix_imports=True):
     f = io.BytesIO()
     _Pickler(f, protocol, fix_imports=fix_imports).dump(obj)
@@ -1588,9 +1599,11 @@ def _dumps(obj, protocol=None, *, fix_imports=True):
     assert isinstance(res, bytes_types)
     return res
 
+
 def _load(file, *, fix_imports=True, encoding="ASCII", errors="strict"):
     return _Unpickler(file, fix_imports=fix_imports,
-                     encoding=encoding, errors=errors).load()
+                      encoding=encoding, errors=errors).load()
+
 
 def _loads(s, *, fix_imports=True, encoding="ASCII", errors="strict"):
     if isinstance(s, str):
@@ -1598,6 +1611,7 @@ def _loads(s, *, fix_imports=True, encoding="ASCII", errors="strict"):
     file = io.BytesIO(s)
     return _Unpickler(file, fix_imports=fix_imports,
                       encoding=encoding, errors=errors).load()
+
 
 # Use the faster _pickle if possible
 try:
@@ -1617,9 +1631,12 @@ except ImportError:
     dump, dumps, load, loads = _dump, _dumps, _load, _loads
 
 # Doctest
+
+
 def _test():
     import doctest
     return doctest.testmod()
+
 
 if __name__ == "__main__":
     import argparse

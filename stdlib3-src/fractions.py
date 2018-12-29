@@ -13,7 +13,6 @@ import sys
 __all__ = ['Fraction', 'gcd']
 
 
-
 def gcd(a, b):
     """Calculate the Greatest Common Divisor of a and b.
 
@@ -29,11 +28,13 @@ def gcd(a, b):
         return math.gcd(a, b)
     return _gcd(a, b)
 
+
 def _gcd(a, b):
     # Supports non-integers for backward compatibility.
     while b:
-        a, b = b, a%b
+        a, b = b, a % b
     return a
+
 
 # Constants related to the hash implementation;  hash(x) is based
 # on the reduction of x modulo the prime _PyHASH_MODULUS.
@@ -162,14 +163,14 @@ class Fraction(numbers.Rational):
                                 "or a Rational instance")
 
         elif type(numerator) is int is type(denominator):
-            pass # *very* normal case
+            pass  # *very* normal case
 
         elif (isinstance(numerator, numbers.Rational) and
-            isinstance(denominator, numbers.Rational)):
+              isinstance(denominator, numbers.Rational)):
             numerator, denominator = (
                 numerator.numerator * denominator.denominator,
                 denominator.numerator * numerator.denominator
-                )
+            )
         else:
             raise TypeError("both arguments should be "
                             "Rational instances")

@@ -148,20 +148,29 @@ __all__ = ['dataclass',
 
 
 # Raised when an attempt is made to modify a frozen class.
-class FrozenInstanceError(AttributeError): pass
+class FrozenInstanceError(AttributeError):
+    pass
 
 # A sentinel object for default values to signal that a default
 # factory will be used.  This is given a nice repr() which will appear
 # in the function signature of dataclasses' constructors.
+
+
 class _HAS_DEFAULT_FACTORY_CLASS:
     def __repr__(self):
         return '<factory>'
+
+
 _HAS_DEFAULT_FACTORY = _HAS_DEFAULT_FACTORY_CLASS()
 
 # A sentinel object to detect if a parameter is supplied or not.  Use
 # a class to give it a better repr.
+
+
 class _MISSING_TYPE:
     pass
+
+
 MISSING = _MISSING_TYPE()
 
 # Since most per-field metadata will be unused, create an empty
@@ -169,11 +178,16 @@ MISSING = _MISSING_TYPE()
 _EMPTY_METADATA = types.MappingProxyType({})
 
 # Markers for the various kinds of fields and pseudo-fields.
+
+
 class _FIELD_BASE:
     def __init__(self, name):
         self.name = name
+
     def __repr__(self):
         return self.name
+
+
 _FIELD = _FIELD_BASE('_FIELD')
 _FIELD_CLASSVAR = _FIELD_BASE('_FIELD_CLASSVAR')
 _FIELD_INITVAR = _FIELD_BASE('_FIELD_INITVAR')
@@ -195,9 +209,11 @@ _POST_INIT_NAME = '__post_init__'
 # https://bugs.python.org/issue33453 for details.
 _MODULE_IDENTIFIER_RE = re.compile(r'^(?:\s*(\w+)\s*\.)?\s*(\w+)')
 
+
 class _InitVarMeta(type):
     def __getitem__(self, params):
         return self
+
 
 class InitVar(metaclass=_InitVarMeta):
     pass
@@ -503,23 +519,23 @@ def _frozen_get_del_attr(cls, fields):
     # XXX: globals is modified on the first call to _create_fn, then
     # the modified version is used in the second call.  Is this okay?
     globals = {'cls': cls,
-              'FrozenInstanceError': FrozenInstanceError}
+               'FrozenInstanceError': FrozenInstanceError}
     if fields:
         fields_str = '(' + ','.join(repr(f.name) for f in fields) + ',)'
     else:
         # Special case for the zero-length tuple.
         fields_str = '()'
     return (_create_fn('__setattr__',
-                      ('self', 'name', 'value'),
-                      (f'if type(self) is cls or name in {fields_str}:',
+                       ('self', 'name', 'value'),
+                       (f'if type(self) is cls or name in {fields_str}:',
                         ' raise FrozenInstanceError(f"cannot assign to field {name!r}")',
-                       f'super(cls, self).__setattr__(name, value)'),
+                        f'super(cls, self).__setattr__(name, value)'),
                        globals=globals),
             _create_fn('__delattr__',
-                      ('self', 'name'),
-                      (f'if type(self) is cls or name in {fields_str}:',
+                       ('self', 'name'),
+                       (f'if type(self) is cls or name in {fields_str}:',
                         ' raise FrozenInstanceError(f"cannot delete field {name!r}")',
-                       f'super(cls, self).__delattr__(name)'),
+                        f'super(cls, self).__delattr__(name)'),
                        globals=globals),
             )
 
@@ -532,9 +548,9 @@ def _cmp_fn(name, op, self_tuple, other_tuple):
 
     return _create_fn(name,
                       ('self', 'other'),
-                      [ 'if other.__class__ is self.__class__:',
+                      ['if other.__class__ is self.__class__:',
                        f' return {self_tuple}{op}{other_tuple}',
-                        'return NotImplemented'])
+                       'return NotImplemented'])
 
 
 def _hash_fn(fields):
@@ -716,14 +732,17 @@ def _set_new_attribute(cls, name, value):
 def _hash_set_none(cls, fields):
     return None
 
+
 def _hash_add(cls, fields):
     flds = [f for f in fields if (f.compare if f.hash is None else f.hash)]
     return _hash_fn(flds)
+
 
 def _hash_exception(cls, fields):
     # Raise an exception.
     raise TypeError(f'Cannot overwrite attribute __hash__ '
                     f'in class {cls.__name__}')
+
 
 #
 #                +-------------------------------------- unsafe_hash?
@@ -735,21 +754,21 @@ def _hash_exception(cls, fields):
 #                |      |      |      |        |
 #                v      v      v      v        v
 _hash_action = {(False, False, False, False): None,
-                (False, False, False, True ): None,
+                (False, False, False, True): None,
                 (False, False, True,  False): None,
-                (False, False, True,  True ): None,
+                (False, False, True,  True): None,
                 (False, True,  False, False): _hash_set_none,
-                (False, True,  False, True ): None,
+                (False, True,  False, True): None,
                 (False, True,  True,  False): _hash_add,
-                (False, True,  True,  True ): None,
+                (False, True,  True,  True): None,
                 (True,  False, False, False): _hash_add,
-                (True,  False, False, True ): _hash_exception,
+                (True,  False, False, True): _hash_exception,
                 (True,  False, True,  False): _hash_add,
-                (True,  False, True,  True ): _hash_exception,
+                (True,  False, True,  True): _hash_exception,
                 (True,  True,  False, False): _hash_add,
-                (True,  True,  False, True ): _hash_exception,
+                (True,  True,  False, True): _hash_exception,
                 (True,  True,  True,  False): _hash_add,
-                (True,  True,  True,  True ): _hash_exception,
+                (True,  True,  True,  True): _hash_exception,
                 }
 # See https://bugs.python.org/issue32929#msg312829 for an if-statement
 # version of this table.
@@ -870,8 +889,8 @@ def _process_class(cls, init, repr, eq, order, unsafe_hash, frozen):
                                     # param in __init__.  Use "self"
                                     # if possible.
                                     '__dataclass_self__' if 'self' in fields
-                                            else 'self',
-                          ))
+                                    else 'self',
+                                    ))
 
     # Get the fields as a list, and include only real fields.  This is
     # used in all of the following methods.
@@ -1024,7 +1043,7 @@ def _asdict_inner(obj, dict_factory):
         return type(obj)(_asdict_inner(v, dict_factory) for v in obj)
     elif isinstance(obj, dict):
         return type(obj)((_asdict_inner(k, dict_factory), _asdict_inner(v, dict_factory))
-                          for k, v in obj.items())
+                         for k, v in obj.items())
     else:
         return copy.deepcopy(obj)
 
@@ -1064,7 +1083,7 @@ def _astuple_inner(obj, tuple_factory):
         return type(obj)(_astuple_inner(v, tuple_factory) for v in obj)
     elif isinstance(obj, dict):
         return type(obj)((_astuple_inner(k, tuple_factory), _astuple_inner(v, tuple_factory))
-                          for k, v in obj.items())
+                         for k, v in obj.items())
     else:
         return copy.deepcopy(obj)
 

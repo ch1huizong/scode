@@ -54,8 +54,8 @@ import warnings
 
 import os
 from errno import EALREADY, EINPROGRESS, EWOULDBLOCK, ECONNRESET, EINVAL, \
-     ENOTCONN, ESHUTDOWN, EISCONN, EBADF, ECONNABORTED, EPIPE, EAGAIN, \
-     errorcode
+    ENOTCONN, ESHUTDOWN, EISCONN, EBADF, ECONNABORTED, EPIPE, EAGAIN, \
+    errorcode
 
 _DISCONNECTED = frozenset({ECONNRESET, ENOTCONN, ESHUTDOWN, ECONNABORTED, EPIPE,
                            EBADF})
@@ -65,18 +65,22 @@ try:
 except NameError:
     socket_map = {}
 
+
 def _strerror(err):
     try:
         return os.strerror(err)
     except (ValueError, OverflowError, NameError):
         if err in errorcode:
             return errorcode[err]
-        return "Unknown error %s" %err
+        return "Unknown error %s" % err
+
 
 class ExitNow(Exception):
     pass
 
+
 _reraised_exceptions = (ExitNow, KeyboardInterrupt, SystemExit)
+
 
 def read(obj):
     try:
@@ -86,6 +90,7 @@ def read(obj):
     except:
         obj.handle_error()
 
+
 def write(obj):
     try:
         obj.handle_write_event()
@@ -94,6 +99,7 @@ def write(obj):
     except:
         obj.handle_error()
 
+
 def _exception(obj):
     try:
         obj.handle_expt_event()
@@ -101,6 +107,7 @@ def _exception(obj):
         raise
     except:
         obj.handle_error()
+
 
 def readwrite(obj, flags):
     try:
@@ -122,11 +129,14 @@ def readwrite(obj, flags):
     except:
         obj.handle_error()
 
+
 def poll(timeout=0.0, map=None):
     if map is None:
         map = socket_map
     if map:
-        r = []; w = []; e = []
+        r = []
+        w = []
+        e = []
         for fd, obj in list(map.items()):
             is_r = obj.readable()
             is_w = obj.writable()
@@ -161,6 +171,7 @@ def poll(timeout=0.0, map=None):
                 continue
             _exception(obj)
 
+
 def poll2(timeout=0.0, map=None):
     # Use the poll() support added to the select module in Python 2.0
     if map is None:
@@ -187,7 +198,9 @@ def poll2(timeout=0.0, map=None):
                 continue
             readwrite(obj, flags)
 
+
 poll3 = poll2                           # Alias for backward compatibility
+
 
 def loop(timeout=30.0, use_poll=False, map=None, count=None):
     if map is None:
@@ -206,6 +219,7 @@ def loop(timeout=30.0, use_poll=False, map=None, count=None):
         while map and count > 0:
             poll_fun(timeout, map)
             count = count - 1
+
 
 class dispatcher:
 
@@ -297,7 +311,7 @@ class dispatcher:
                 socket.SOL_SOCKET, socket.SO_REUSEADDR,
                 self.socket.getsockopt(socket.SOL_SOCKET,
                                        socket.SO_REUSEADDR) | 1
-                )
+            )
         except OSError:
             pass
 
@@ -332,7 +346,7 @@ class dispatcher:
         self.connecting = True
         err = self.socket.connect_ex(address)
         if err in (EINPROGRESS, EALREADY, EWOULDBLOCK) \
-        or err == EINVAL and os.name == 'nt':
+                or err == EINVAL and os.name == 'nt':
             self.addr = address
             return
         if err in (0, EISCONN):
@@ -470,9 +484,9 @@ class dispatcher:
                 t,
                 v,
                 tbinfo
-                ),
+            ),
             'error'
-            )
+        )
         self.handle_close()
 
     def handle_expt(self):
@@ -505,6 +519,7 @@ class dispatcher:
 # [for more sophisticated usage use asynchat.async_chat]
 # ---------------------------------------------------------------------------
 
+
 class dispatcher_with_send(dispatcher):
 
     def __init__(self, sock=None, map=None):
@@ -532,17 +547,18 @@ class dispatcher_with_send(dispatcher):
 # used for debugging.
 # ---------------------------------------------------------------------------
 
+
 def compact_traceback():
     t, v, tb = sys.exc_info()
     tbinfo = []
-    if not tb: # Must have a traceback
+    if not tb:  # Must have a traceback
         raise AssertionError("traceback does not exist")
     while tb:
         tbinfo.append((
             tb.tb_frame.f_code.co_filename,
             tb.tb_frame.f_code.co_name,
             str(tb.tb_lineno)
-            ))
+        ))
         tb = tb.tb_next
 
     # just to be safe
@@ -551,6 +567,7 @@ def compact_traceback():
     file, function, line = tbinfo[-1]
     info = ' '.join(['[%s|%s|%s]' % x for x in tbinfo])
     return (file, function, line), t, v, info
+
 
 def close_all(map=None, ignore_all=False):
     if map is None:
@@ -583,6 +600,7 @@ def close_all(map=None, ignore_all=False):
 #
 # Regardless, this is useful for pipes, and stdin/stdout...
 
+
 if os.name == 'posix':
     class file_wrapper:
         # Here we override just enough to make a file
@@ -607,7 +625,7 @@ if os.name == 'posix':
         def getsockopt(self, level, optname, buflen=None):
             if (level == socket.SOL_SOCKET and
                 optname == socket.SO_ERROR and
-                not buflen):
+                    not buflen):
                 return 0
             raise NotImplementedError("Only asyncore specific behaviour "
                                       "implemented.")

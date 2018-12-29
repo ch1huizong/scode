@@ -86,8 +86,10 @@ class Restart(Exception):
     """Causes a debugger to be restarted for the debugged python program."""
     pass
 
+
 __all__ = ["run", "pm", "Pdb", "runeval", "runctx", "runcall", "set_trace",
            "post_mortem", "help"]
+
 
 def find_function(funcname, filename):
     cre = re.compile(r'def\s+%s\s*[(]' % re.escape(funcname))
@@ -102,6 +104,7 @@ def find_function(funcname, filename):
                 return funcname, filename, lineno
     return None
 
+
 def getsourcelines(obj):
     lines, lineno = inspect.findsource(obj)
     if inspect.isframe(obj) and obj.f_globals is obj.f_locals:
@@ -110,6 +113,7 @@ def getsourcelines(obj):
     elif inspect.ismodule(obj):
         return lines, 1
     return inspect.getblock(lines[lineno:]), lineno+1
+
 
 def lasti2lineno(code, lasti):
     linestarts = list(dis.findlinestarts(code))
@@ -122,6 +126,7 @@ def lasti2lineno(code, lasti):
 
 class _rstr(str):
     """String that doesn't quote its repr."""
+
     def __repr__(self):
         return self
 
@@ -132,6 +137,7 @@ class _rstr(str):
 # command "pdb.line_prefix = '\n% '".
 # line_prefix = ': '    # Use this to get the old situation back
 line_prefix = '\n-> '   # Probably a better default
+
 
 class Pdb(bdb.Bdb, cmd.Cmd):
 
@@ -175,15 +181,15 @@ class Pdb(bdb.Bdb, cmd.Cmd):
             except OSError:
                 pass
 
-        self.commands = {} # associates a command list to breakpoint numbers
-        self.commands_doprompt = {} # for each bp num, tells if the prompt
-                                    # must be disp. after execing the cmd list
-        self.commands_silent = {} # for each bp num, tells if the stack trace
-                                  # must be disp. after execing the cmd list
-        self.commands_defining = False # True while in the process of defining
-                                       # a command list
-        self.commands_bnum = None # The breakpoint number for which we are
-                                  # defining a list
+        self.commands = {}  # associates a command list to breakpoint numbers
+        self.commands_doprompt = {}  # for each bp num, tells if the prompt
+        # must be disp. after execing the cmd list
+        self.commands_silent = {}  # for each bp num, tells if the stack trace
+        # must be disp. after execing the cmd list
+        self.commands_defining = False  # True while in the process of defining
+        # a command list
+        self.commands_bnum = None  # The breakpoint number for which we are
+        # defining a list
 
     def sigint_handler(self, signum, frame):
         if self.allow_kbdint:
@@ -254,7 +260,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         """This function is called when we stop or break at this line."""
         if self._wait_for_mainpyfile:
             if (self.mainpyfile != self.canonic(frame.f_code.co_filename)
-                or frame.f_lineno <= 0):
+                    or frame.f_lineno <= 0):
                 return
             self._wait_for_mainpyfile = False
         if self.bp_commands(frame):
@@ -268,7 +274,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         False otherwise."""
         # self.currentbp is set in bdb in Bdb.break_here if a breakpoint was hit
         if getattr(self, "currentbp", False) and \
-               self.currentbp in self.commands:
+                self.currentbp in self.commands:
             currentbp = self.currentbp
             self.currentbp = 0
             lastcmd_back = self.lastcmd
@@ -306,9 +312,9 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         # actually occurred in this case. The debugger uses this debug event to
         # stop when the debuggee is returning from such generators.
         prefix = 'Internal ' if (not exc_traceback
-                                    and exc_type is StopIteration) else ''
+                                 and exc_type is StopIteration) else ''
         self.message('%s%s' % (prefix,
-            traceback.format_exception_only(exc_type, exc_value)[-1].strip()))
+                               traceback.format_exception_only(exc_type, exc_value)[-1].strip()))
         self.interaction(frame, exc_traceback)
 
     # General interaction function
@@ -361,7 +367,8 @@ class Pdb(bdb.Bdb, cmd.Cmd):
             self.message(repr(obj))
 
     def default(self, line):
-        if line[:1] == '!': line = line[1:]
+        if line[:1] == '!':
+            line = line[1:]
         locals = self.curframe_locals
         globals = self.curframe.f_globals
         try:
@@ -392,7 +399,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
             ii = 1
             for tmpArg in args[1:]:
                 line = line.replace("%" + str(ii),
-                                      tmpArg)
+                                    tmpArg)
                 ii += 1
             line = line.replace("%*", ' '.join(args[1:]))
             args = line.split()
@@ -426,10 +433,10 @@ class Pdb(bdb.Bdb, cmd.Cmd):
             return
         if cmd == 'silent':
             self.commands_silent[self.commands_bnum] = True
-            return # continue to handle other cmd def in the cmd list
+            return  # continue to handle other cmd def in the cmd list
         elif cmd == 'end':
             self.cmdqueue = []
-            return 1 # end of cmd list
+            return 1  # end of cmd list
         cmdlist = self.commands[self.commands_bnum]
         if arg:
             cmdlist.append(cmd+' '+arg)
@@ -593,7 +600,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
 
     complete_commands = _complete_bpnumber
 
-    def do_break(self, arg, temporary = 0):
+    def do_break(self, arg, temporary=0):
         """b(reak) [ ([filename:]lineno | function) [, condition] ]
         Without argument, list all breaks.
 
@@ -657,8 +664,8 @@ class Pdb(bdb.Bdb, cmd.Cmd):
                     if hasattr(func, '__func__'):
                         func = func.__func__
                     code = func.__code__
-                    #use co_name to identify the bkpt (function names
-                    #could be aliased, but co_name is invariant)
+                    # use co_name to identify the bkpt (function names
+                    # could be aliased, but co_name is invariant)
                     funcname = code.co_name
                     lineno = code.co_firstlineno
                     filename = code.co_filename
@@ -669,7 +676,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
                         self.error('The specified object %r is not a function '
                                    'or was not found along sys.path.' % arg)
                         return
-                    funcname = ok # ok contains a function name
+                    funcname = ok  # ok contains a function name
                     lineno = int(ln)
         if not filename:
             filename = self.defaultFile()
@@ -719,7 +726,8 @@ class Pdb(bdb.Bdb, cmd.Cmd):
             id = idstring[1].strip()
         else:
             return failed
-        if id == '': return failed
+        if id == '':
+            return failed
         parts = id.split('.')
         # Protection for derived debuggers
         if parts[0] == 'self':
@@ -756,7 +764,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         line = line.strip()
         # Don't allow setting breakpoint at a blank line
         if (not line or (line[0] == '#') or
-             (line[:3] == '"""') or line[:3] == "'''"):
+                (line[:3] == '"""') or line[:3] == "'''"):
             self.error('Blank or comment')
             return 0
         return lineno
@@ -821,7 +829,8 @@ class Pdb(bdb.Bdb, cmd.Cmd):
             if not cond:
                 self.message('Breakpoint %d is now unconditional.' % bp.number)
             else:
-                self.message('New condition set for breakpoint %d.' % bp.number)
+                self.message(
+                    'New condition set for breakpoint %d.' % bp.number)
 
     complete_condition = _complete_bpnumber
 
@@ -906,7 +915,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
             else:
                 self.clear_bpbynumber(i)
                 self.message('Deleted %s' % bp)
-    do_cl = do_clear # 'c' is already an abbreviation for 'continue'
+    do_cl = do_clear  # 'c' is already an abbreviation for 'continue'
 
     complete_clear = _complete_location
     complete_cl = _complete_location
@@ -1130,8 +1139,10 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         co = self.curframe.f_code
         dict = self.curframe_locals
         n = co.co_argcount
-        if co.co_flags & 4: n = n+1
-        if co.co_flags & 8: n = n+1
+        if co.co_flags & 4:
+            n = n+1
+        if co.co_flags & 8:
+            n = n+1
         for i in range(n):
             name = co.co_varnames[i]
             if name in dict:
@@ -1322,7 +1333,8 @@ class Pdb(bdb.Bdb, cmd.Cmd):
             return
         # Is it a class?
         if value.__class__ is type:
-            self.message('Class %s.%s' % (value.__module__, value.__qualname__))
+            self.message('Class %s.%s' %
+                         (value.__module__, value.__qualname__))
             return
         # None of the above...
         self.message(type(value))
@@ -1417,7 +1429,8 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         Delete the specified alias.
         """
         args = arg.split()
-        if len(args) == 0: return
+        if len(args) == 0:
+            return
         if args[0] in self.aliases:
             del self.aliases[args[0]]
 
@@ -1503,10 +1516,10 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         lookupmodule() translates (possibly incomplete) file or module name
         into an absolute file name.
         """
-        if os.path.isabs(filename) and  os.path.exists(filename):
+        if os.path.isabs(filename) and os.path.exists(filename):
             return filename
         f = os.path.join(sys.path[0], filename)
-        if  os.path.exists(f) and self.canonic(f) == self.mainpyfile:
+        if os.path.exists(f) and self.canonic(f) == self.mainpyfile:
             return f
         root, ext = os.path.splitext(filename)
         if ext == '':
@@ -1547,10 +1560,10 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         # (this gets rid of pdb's globals and cleans old variables on restarts).
         import __main__
         __main__.__dict__.clear()
-        __main__.__dict__.update({"__name__"    : "__main__",
-                                  "__file__"    : filename,
+        __main__.__dict__.update({"__name__": "__main__",
+                                  "__file__": filename,
                                   "__builtins__": __builtins__,
-                                 })
+                                  })
 
         # When bdb sets tracing, a number of call and line events happens
         # BEFORE debugger even reaches user's code (and the exact sequence of
@@ -1566,6 +1579,7 @@ class Pdb(bdb.Bdb, cmd.Cmd):
         self.run(statement)
 
 # Collect all command help into docstring, if not run with -OO
+
 
 if __doc__ is not None:
     # unfortunately we can't guess this order from the class definition
@@ -1589,15 +1603,19 @@ if __doc__ is not None:
 def run(statement, globals=None, locals=None):
     Pdb().run(statement, globals, locals)
 
+
 def runeval(expression, globals=None, locals=None):
     return Pdb().runeval(expression, globals, locals)
+
 
 def runctx(statement, globals, locals):
     # B/W compatibility
     run(statement, globals, locals)
 
+
 def runcall(*args, **kwds):
     return Pdb().runcall(*args, **kwds)
+
 
 def set_trace(*, header=None):
     pdb = Pdb()
@@ -1606,6 +1624,7 @@ def set_trace(*, header=None):
     pdb.set_trace(sys._getframe().f_back)
 
 # Post-Mortem interface
+
 
 def post_mortem(t=None):
     # handling the default
@@ -1621,6 +1640,7 @@ def post_mortem(t=None):
     p.reset()
     p.interaction(None, t)
 
+
 def pm():
     post_mortem(sys.last_traceback)
 
@@ -1629,13 +1649,17 @@ def pm():
 
 TESTCMD = 'import x; x.main()'
 
+
 def test():
     run(TESTCMD)
 
 # print help
+
+
 def help():
     import pydoc
     pydoc.pager(__doc__)
+
 
 _usage = """\
 usage: pdb.py [-c command] ... [-m module | pyfile] [arg] ...
@@ -1651,6 +1675,7 @@ and in the current directory, if they exist.  Commands supplied with
 To let the script run until an exception occurs, use "-c continue".
 To let the script run up to a given line X in the debugged file, use
 "-c 'until X'"."""
+
 
 def main():
     import getopt

@@ -49,7 +49,10 @@ the setsockopt() and getsockopt() methods.
 import _socket
 from _socket import *
 
-import os, sys, io, selectors
+import os
+import sys
+import io
+import selectors
 from enum import IntEnum, IntFlag
 
 try:
@@ -61,7 +64,7 @@ EAGAIN = getattr(errno, 'EAGAIN', 11)
 EWOULDBLOCK = getattr(errno, 'EWOULDBLOCK', 11)
 
 __all__ = ["fromfd", "getfqdn", "create_connection",
-        "AddressFamily", "SocketKind"]
+           "AddressFamily", "SocketKind"]
 __all__.extend(os._get_exports_list(_socket))
 
 # Set up the socket.AF_* socket.SOCK_* constants as members of IntEnums for
@@ -71,26 +74,26 @@ __all__.extend(os._get_exports_list(_socket))
 # where needed (e.g. .family property of a socket object).
 
 IntEnum._convert(
-        'AddressFamily',
-        __name__,
-        lambda C: C.isupper() and C.startswith('AF_'))
+    'AddressFamily',
+    __name__,
+    lambda C: C.isupper() and C.startswith('AF_'))
 
 IntEnum._convert(
-        'SocketKind',
-        __name__,
-        lambda C: C.isupper() and C.startswith('SOCK_'))
+    'SocketKind',
+    __name__,
+    lambda C: C.isupper() and C.startswith('SOCK_'))
 
 IntFlag._convert(
-        'MsgFlag',
-        __name__,
-        lambda C: C.isupper() and C.startswith('MSG_'))
+    'MsgFlag',
+    __name__,
+    lambda C: C.isupper() and C.startswith('MSG_'))
 
 IntFlag._convert(
-        'AddressInfo',
-        __name__,
-        lambda C: C.isupper() and C.startswith('AI_'))
+    'AddressInfo',
+    __name__,
+    lambda C: C.isupper() and C.startswith('AI_'))
 
-_LOCALHOST    = '127.0.0.1'
+_LOCALHOST = '127.0.0.1'
 _LOCALHOST_V6 = '::1'
 
 
@@ -104,6 +107,7 @@ def _intenum_converter(value, enum_klass):
     except ValueError:
         return value
 
+
 _realsocket = socket
 
 # WSA error codes
@@ -112,7 +116,7 @@ if sys.platform.lower().startswith("win"):
     errorTab[10004] = "The operation was interrupted."
     errorTab[10009] = "A bad file handle was passed."
     errorTab[10013] = "Permission denied."
-    errorTab[10014] = "A fault occurred on the network??" # WSAEFAULT
+    errorTab[10014] = "A fault occurred on the network??"  # WSAEFAULT
     errorTab[10022] = "An invalid operation was attempted."
     errorTab[10035] = "The socket operation would block"
     errorTab[10036] = "A blocking operation is already in progress."
@@ -127,7 +131,8 @@ if sys.platform.lower().startswith("win"):
     __all__.append("errorTab")
 
 
-class _GiveupOnSendfile(Exception): pass
+class _GiveupOnSendfile(Exception):
+    pass
 
 
 class socket(_socket.socket):
@@ -227,7 +232,8 @@ class socket(_socket.socket):
         """
         # XXX refactor to share code?
         if not set(mode) <= {"r", "w", "b"}:
-            raise ValueError("invalid mode %r (only r, w, b allowed)" % (mode,))
+            raise ValueError(
+                "invalid mode %r (only r, w, b allowed)" % (mode,))
         writing = "w" in mode
         reading = "r" in mode or not writing
         assert reading or writing
@@ -444,15 +450,18 @@ class socket(_socket.socket):
     if os.name == 'nt':
         def get_inheritable(self):
             return os.get_handle_inheritable(self.fileno())
+
         def set_inheritable(self, inheritable):
             os.set_handle_inheritable(self.fileno(), inheritable)
     else:
         def get_inheritable(self):
             return os.get_inheritable(self.fileno())
+
         def set_inheritable(self, inheritable):
             os.set_inheritable(self.fileno(), inheritable)
     get_inheritable.__doc__ = "Get the inheritable flag of the socket"
     set_inheritable.__doc__ = "Set the inheritable flag of the socket"
+
 
 def fromfd(fd, family, type, proto=0):
     """ fromfd(fd, family, type[, proto]) -> socket object
@@ -462,6 +471,7 @@ def fromfd(fd, family, type, proto=0):
     """
     nfd = dup(fd)
     return socket(family, type, proto, nfd)
+
 
 if hasattr(_socket.socket, "share"):
     def fromshare(info):
@@ -541,7 +551,8 @@ The arguments are the same as for socket() except the default family is AF_UNIX
 if defined on the platform; otherwise, the default is AF_INET.
 """
 
-_blocking_errnos = { EAGAIN, EWOULDBLOCK }
+_blocking_errnos = {EAGAIN, EWOULDBLOCK}
+
 
 class SocketIO(io.RawIOBase):
 
@@ -688,6 +699,7 @@ def getfqdn(name=''):
 
 _GLOBAL_DEFAULT_TIMEOUT = object()
 
+
 def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
                       source_address=None):
     """Connect to *address* and return the socket object.
@@ -727,6 +739,7 @@ def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
         raise err
     else:
         raise error("getaddrinfo returns an empty list")
+
 
 def getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
     """Resolve host and port into list of address info entries.

@@ -7,6 +7,14 @@
 # Licensed to PSF under a Contributor Agreement.
 # See http://www.python.org/2.4/license for licensing details.
 
+from time import monotonic as _time
+import errno
+import warnings
+import builtins
+import signal
+import time
+import os
+import io
 r"""Subprocesses with accessible I/O streams
 
 This module allows you to spawn processes, connect to their
@@ -44,17 +52,10 @@ getstatusoutput(...): Runs a command in the shell, waits for it to complete,
 import sys
 _mswindows = (sys.platform == "win32")
 
-import io
-import os
-import time
-import signal
-import builtins
-import warnings
-import errno
-from time import monotonic as _time
 
 # Exception classes used by this module.
-class SubprocessError(Exception): pass
+class SubprocessError(Exception):
+    pass
 
 
 class CalledProcessError(SubprocessError):
@@ -64,6 +65,7 @@ class CalledProcessError(SubprocessError):
     Attributes:
       cmd, returncode, stdout, stderr, output
     """
+
     def __init__(self, returncode, cmd, output=None, stderr=None):
         self.returncode = returncode
         self.cmd = cmd
@@ -74,13 +76,13 @@ class CalledProcessError(SubprocessError):
         if self.returncode and self.returncode < 0:
             try:
                 return "Command '%s' died with %r." % (
-                        self.cmd, signal.Signals(-self.returncode))
+                    self.cmd, signal.Signals(-self.returncode))
             except ValueError:
                 return "Command '%s' died with unknown signal %d." % (
-                        self.cmd, -self.returncode)
+                    self.cmd, -self.returncode)
         else:
             return "Command '%s' returned non-zero exit status %d." % (
-                    self.cmd, self.returncode)
+                self.cmd, self.returncode)
 
     @property
     def stdout(self):
@@ -101,6 +103,7 @@ class TimeoutExpired(SubprocessError):
     Attributes:
         cmd, output, stdout, stderr, timeout
     """
+
     def __init__(self, cmd, timeout, output=None, stderr=None):
         self.cmd = cmd
         self.timeout = timeout
@@ -126,6 +129,7 @@ if _mswindows:
     import threading
     import msvcrt
     import _winapi
+
     class STARTUPINFO:
         def __init__(self, *, dwFlags=0, hStdInput=None, hStdOutput=None,
                      hStdError=None, wShowWindow=0, lpAttributeList=None):
@@ -158,8 +162,8 @@ else:
 __all__ = ["Popen", "PIPE", "STDOUT", "call", "check_call", "getstatusoutput",
            "getoutput", "check_output", "run", "CalledProcessError", "DEVNULL",
            "SubprocessError", "TimeoutExpired", "CompletedProcess"]
-           # NOTE: We intentionally exclude list2cmdline as it is
-           # considered an internal implementation detail.  issue10838.
+# NOTE: We intentionally exclude list2cmdline as it is
+# considered an internal implementation detail.  issue10838.
 
 if _mswindows:
     from _winapi import (CREATE_NEW_CONSOLE, CREATE_NEW_PROCESS_GROUP,
@@ -210,6 +214,7 @@ if _mswindows:
 # zombie processes.
 _active = []
 
+
 def _cleanup():
     for inst in _active[:]:
         res = inst._internal_poll(_deadstate=sys.maxsize)
@@ -220,6 +225,7 @@ def _cleanup():
                 # This can happen if two threads create a new Popen instance.
                 # It's harmless that it was already removed, so ignore.
                 pass
+
 
 PIPE = -1
 STDOUT = -2
@@ -370,7 +376,8 @@ def check_output(*popenargs, timeout=None, **kwargs):
     if 'input' in kwargs and kwargs['input'] is None:
         # Explicitly passing input=None was previously equivalent to passing an
         # empty string. That is maintained here for backwards compatibility.
-        kwargs['input'] = '' if kwargs.get('universal_newlines', False) else b''
+        kwargs['input'] = '' if kwargs.get(
+            'universal_newlines', False) else b''
 
     return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
                **kwargs).stdout
@@ -387,6 +394,7 @@ class CompletedProcess(object):
       stdout: The standard output (None if not captured).
       stderr: The standard error (None if not captured).
     """
+
     def __init__(self, args, returncode, stdout=None, stderr=None):
         self.args = args
         self.returncode = returncode
@@ -573,6 +581,7 @@ def getstatusoutput(cmd):
         data = data[:-1]
     return exitcode, data
 
+
 def getoutput(cmd):
     """Return output (stdout or stderr) of executing cmd in a shell.
 
@@ -684,7 +693,7 @@ class Popen(object):
 
         # Validate the combinations of text and universal_newlines
         if (text is not None and universal_newlines is not None
-            and bool(universal_newlines) != bool(text)):
+                and bool(universal_newlines) != bool(text)):
             raise SubprocessError('Cannot disambiguate when both text '
                                   'and universal_newlines are supplied but '
                                   'different. Pass one or the other.')
@@ -734,18 +743,19 @@ class Popen(object):
                 self.stdin = io.open(p2cwrite, 'wb', bufsize)
                 if self.text_mode:
                     self.stdin = io.TextIOWrapper(self.stdin, write_through=True,
-                            line_buffering=(bufsize == 1),
-                            encoding=encoding, errors=errors)
+                                                  line_buffering=(
+                                                      bufsize == 1),
+                                                  encoding=encoding, errors=errors)
             if c2pread != -1:
                 self.stdout = io.open(c2pread, 'rb', bufsize)
                 if self.text_mode:
                     self.stdout = io.TextIOWrapper(self.stdout,
-                            encoding=encoding, errors=errors)
+                                                   encoding=encoding, errors=errors)
             if errread != -1:
                 self.stderr = io.open(errread, 'rb', bufsize)
                 if self.text_mode:
                     self.stderr = io.TextIOWrapper(self.stderr,
-                            encoding=encoding, errors=errors)
+                                                   encoding=encoding, errors=errors)
 
             self._execute_child(args, executable, preexec_fn, close_fds,
                                 pass_fds, cwd, env,
@@ -898,7 +908,7 @@ class Popen(object):
         # started communicating, and we have one or zero pipes, using select()
         # or threads is unnecessary.
         if (timeout is None and not self._communication_started and
-            [self.stdin, self.stdout, self.stderr].count(None) >= 2):
+                [self.stdin, self.stdout, self.stderr].count(None) >= 2):
             stdout = None
             stderr = None
             if self.stdin:
@@ -940,12 +950,10 @@ class Popen(object):
 
         return (stdout, stderr)
 
-
     def poll(self):
         """Check if child process has terminated. Set and return returncode
         attribute."""
         return self._internal_poll()
-
 
     def _remaining_time(self, endtime):
         """Convenience for _communicate when computing timeouts."""
@@ -954,14 +962,12 @@ class Popen(object):
         else:
             return endtime - _time()
 
-
     def _check_timeout(self, endtime, orig_timeout):
         """Convenience for checking if a timeout has expired."""
         if endtime is None:
             return
         if _time() > endtime:
             raise TimeoutExpired(self.args, orig_timeout)
-
 
     def wait(self, timeout=None):
         """Wait for child process to terminate; returns self.returncode."""
@@ -985,7 +991,6 @@ class Popen(object):
             except TimeoutExpired:
                 pass
             raise  # resume the KeyboardInterrupt
-
 
     if _mswindows:
         #
@@ -1062,7 +1067,6 @@ class Popen(object):
                     c2pread, c2pwrite,
                     errread, errwrite)
 
-
         def _make_inheritable(self, handle):
             """Return a duplicate of handle, which is inheritable"""
             h = _winapi.DuplicateHandle(
@@ -1070,7 +1074,6 @@ class Popen(object):
                 _winapi.GetCurrentProcess(), 0, 1,
                 _winapi.DUPLICATE_SAME_ACCESS)
             return Handle(h)
-
 
         def _filter_handle_list(self, handle_list):
             """Filter out console handles that can't be used
@@ -1082,8 +1085,7 @@ class Popen(object):
             return list({handle for handle in handle_list
                          if handle & 0x3 != 0x3
                          or _winapi.GetFileType(handle) !=
-                            _winapi.FILE_TYPE_CHAR})
-
+                         _winapi.FILE_TYPE_CHAR})
 
         def _execute_child(self, args, executable, preexec_fn, close_fds,
                            pass_fds, cwd, env,
@@ -1141,18 +1143,19 @@ class Popen(object):
                 startupinfo.dwFlags |= _winapi.STARTF_USESHOWWINDOW
                 startupinfo.wShowWindow = _winapi.SW_HIDE
                 comspec = os.environ.get("COMSPEC", "cmd.exe")
-                args = '{} /c "{}"'.format (comspec, args)
+                args = '{} /c "{}"'.format(comspec, args)
 
             # Start the process
             try:
                 hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
-                                         # no special security
-                                         None, None,
-                                         int(not close_fds),
-                                         creationflags,
-                                         env,
-                                         os.fspath(cwd) if cwd is not None else None,
-                                         startupinfo)
+                                                         # no special security
+                                                         None, None,
+                                                         int(not close_fds),
+                                                         creationflags,
+                                                         env,
+                                                         os.fspath(
+                                                             cwd) if cwd is not None else None,
+                                                         startupinfo)
             finally:
                 # Child is launched. Close the parent's copy of those pipe
                 # handles that only the child should have open.  You need
@@ -1179,9 +1182,9 @@ class Popen(object):
             _winapi.CloseHandle(ht)
 
         def _internal_poll(self, _deadstate=None,
-                _WaitForSingleObject=_winapi.WaitForSingleObject,
-                _WAIT_OBJECT_0=_winapi.WAIT_OBJECT_0,
-                _GetExitCodeProcess=_winapi.GetExitCodeProcess):
+                           _WaitForSingleObject=_winapi.WaitForSingleObject,
+                           _WAIT_OBJECT_0=_winapi.WAIT_OBJECT_0,
+                           _GetExitCodeProcess=_winapi.GetExitCodeProcess):
             """Check if child process has terminated.  Returns returncode
             attribute.
 
@@ -1193,7 +1196,6 @@ class Popen(object):
                 if _WaitForSingleObject(self._handle, 0) == _WAIT_OBJECT_0:
                     self.returncode = _GetExitCodeProcess(self._handle)
             return self.returncode
-
 
         def _wait(self, timeout):
             """Internal implementation of wait() on Windows."""
@@ -1210,11 +1212,9 @@ class Popen(object):
                 self.returncode = _winapi.GetExitCodeProcess(self._handle)
             return self.returncode
 
-
         def _readerthread(self, fh, buffer):
             buffer.append(fh.read())
             fh.close()
-
 
         def _communicate(self, input, endtime, orig_timeout):
             # Start reader threads feeding into a list hanging off of this
@@ -1222,15 +1222,15 @@ class Popen(object):
             if self.stdout and not hasattr(self, "_stdout_buff"):
                 self._stdout_buff = []
                 self.stdout_thread = \
-                        threading.Thread(target=self._readerthread,
-                                         args=(self.stdout, self._stdout_buff))
+                    threading.Thread(target=self._readerthread,
+                                     args=(self.stdout, self._stdout_buff))
                 self.stdout_thread.daemon = True
                 self.stdout_thread.start()
             if self.stderr and not hasattr(self, "_stderr_buff"):
                 self._stderr_buff = []
                 self.stderr_thread = \
-                        threading.Thread(target=self._readerthread,
-                                         args=(self.stderr, self._stderr_buff))
+                    threading.Thread(target=self._readerthread,
+                                     args=(self.stderr, self._stderr_buff))
                 self.stderr_thread.daemon = True
                 self.stderr_thread.start()
 
@@ -1342,7 +1342,7 @@ class Popen(object):
             elif stderr == STDOUT:
                 if c2pwrite != -1:
                     errwrite = c2pwrite
-                else: # child's stdout is not set, use parent's stdout
+                else:  # child's stdout is not set, use parent's stdout
                     errwrite = sys.__stdout__.fileno()
             elif stderr == DEVNULL:
                 errwrite = self._get_devnull()
@@ -1355,7 +1355,6 @@ class Popen(object):
             return (p2cread, p2cwrite,
                     c2pread, c2pwrite,
                     errread, errwrite)
-
 
         def _execute_child(self, args, executable, preexec_fn, close_fds,
                            pass_fds, cwd, env,
@@ -1374,7 +1373,7 @@ class Popen(object):
             if shell:
                 # On Android the default shell is at '/system/bin/sh'.
                 unix_shell = ('/system/bin/sh' if
-                          hasattr(sys, 'getandroidapilevel') else '/bin/sh')
+                              hasattr(sys, 'getandroidapilevel') else '/bin/sh')
                 args = [unix_shell, "-c"] + args
                 if executable:
                     args[0] = executable
@@ -1406,7 +1405,8 @@ class Popen(object):
                         for k, v in env.items():
                             k = os.fsencode(k)
                             if b'=' in k:
-                                raise ValueError("illegal environment variable name")
+                                raise ValueError(
+                                    "illegal environment variable name")
                             env_list.append(k + b'=' + os.fsencode(v))
                     else:
                         env_list = None  # Use execv instead of execve.
@@ -1421,13 +1421,13 @@ class Popen(object):
                     fds_to_keep = set(pass_fds)
                     fds_to_keep.add(errpipe_write)
                     self.pid = _posixsubprocess.fork_exec(
-                            args, executable_list,
-                            close_fds, tuple(sorted(map(int, fds_to_keep))),
-                            cwd, env_list,
-                            p2cread, p2cwrite, c2pread, c2pwrite,
-                            errread, errwrite,
-                            errpipe_read, errpipe_write,
-                            restore_signals, start_new_session, preexec_fn)
+                        args, executable_list,
+                        close_fds, tuple(sorted(map(int, fds_to_keep))),
+                        cwd, env_list,
+                        p2cread, p2cwrite, c2pread, c2pwrite,
+                        errread, errwrite,
+                        errpipe_read, errpipe_write,
+                        restore_signals, start_new_session, preexec_fn)
                     self._child_created = True
                 finally:
                     # be sure the FD is closed no matter what
@@ -1470,7 +1470,7 @@ class Popen(object):
 
                 try:
                     exception_name, hex_errno, err_msg = (
-                            errpipe_data.split(b':', 2))
+                        errpipe_data.split(b':', 2))
                     # The encoding here should match the encoding
                     # written in by the subprocess implementations
                     # like _posixsubprocess
@@ -1479,10 +1479,10 @@ class Popen(object):
                     exception_name = b'SubprocessError'
                     hex_errno = b'0'
                     err_msg = 'Bad exception data from child: {!r}'.format(
-                                  bytes(errpipe_data))
+                        bytes(errpipe_data))
                 child_exception_type = getattr(
-                        builtins, exception_name.decode('ascii'),
-                        SubprocessError)
+                    builtins, exception_name.decode('ascii'),
+                    SubprocessError)
                 if issubclass(child_exception_type, OSError) and hex_errno:
                     errno_num = int(hex_errno, 16)
                     child_exec_never_called = (err_msg == "noexec")
@@ -1496,14 +1496,14 @@ class Popen(object):
                         err_msg = os.strerror(errno_num)
                         if errno_num == errno.ENOENT:
                             err_msg += ': ' + repr(err_filename)
-                    raise child_exception_type(errno_num, err_msg, err_filename)
+                    raise child_exception_type(
+                        errno_num, err_msg, err_filename)
                 raise child_exception_type(err_msg)
 
-
         def _handle_exitstatus(self, sts, _WIFSIGNALED=os.WIFSIGNALED,
-                _WTERMSIG=os.WTERMSIG, _WIFEXITED=os.WIFEXITED,
-                _WEXITSTATUS=os.WEXITSTATUS, _WIFSTOPPED=os.WIFSTOPPED,
-                _WSTOPSIG=os.WSTOPSIG):
+                               _WTERMSIG=os.WTERMSIG, _WIFEXITED=os.WIFEXITED,
+                               _WEXITSTATUS=os.WEXITSTATUS, _WIFSTOPPED=os.WIFSTOPPED,
+                               _WSTOPSIG=os.WSTOPSIG):
             """All callers to this function MUST hold self._waitpid_lock."""
             # This method is called (indirectly) by __del__, so it cannot
             # refer to anything outside of its local scope.
@@ -1517,9 +1517,8 @@ class Popen(object):
                 # Should never happen
                 raise SubprocessError("Unknown child exit status!")
 
-
         def _internal_poll(self, _deadstate=None, _waitpid=os.waitpid,
-                _WNOHANG=os.WNOHANG, _ECHILD=errno.ECHILD):
+                           _WNOHANG=os.WNOHANG, _ECHILD=errno.ECHILD):
             """Check if child process has terminated.  Returns returncode
             attribute.
 
@@ -1552,7 +1551,6 @@ class Popen(object):
                     self._waitpid_lock.release()
             return self.returncode
 
-
         def _try_wait(self, wait_flags):
             """All callers to this function MUST hold self._waitpid_lock."""
             try:
@@ -1565,7 +1563,6 @@ class Popen(object):
                 sts = 0
             return (pid, sts)
 
-
         def _wait(self, timeout):
             """Internal implementation of wait() on POSIX."""
             if self.returncode is not None:
@@ -1575,7 +1572,7 @@ class Popen(object):
                 endtime = _time() + timeout
                 # Enter a busy loop if we have a timeout.  This busy loop was
                 # cribbed from Lib/threading.py in Thread.wait() at r71065.
-                delay = 0.0005 # 500 us -> initial delay of 1 ms
+                delay = 0.0005  # 500 us -> initial delay of 1 ms
                 while True:
                     if self._waitpid_lock.acquire(False):
                         try:
@@ -1605,7 +1602,6 @@ class Popen(object):
                         if pid == self.pid:
                             self._handle_exitstatus(sts)
             return self.returncode
-
 
         def _communicate(self, input, endtime, orig_timeout):
             if self.stdin and not self._communication_started:
@@ -1663,7 +1659,7 @@ class Popen(object):
 
                     for key, events in ready:
                         if key.fileobj is self.stdin:
-                            chunk = input_view[self._input_offset :
+                            chunk = input_view[self._input_offset:
                                                self._input_offset + _PIPE_BUF]
                             try:
                                 self._input_offset += os.write(key.fd, chunk)
@@ -1703,7 +1699,6 @@ class Popen(object):
 
             return (stdout, stderr)
 
-
         def _save_input(self, input):
             # This method is called from the _communicate_with_*() methods
             # so that if we time out while communicating, we can continue
@@ -1714,7 +1709,6 @@ class Popen(object):
                 if input is not None and self.text_mode:
                     self._input = self._input.encode(self.stdin.encoding,
                                                      self.stdin.errors)
-
 
         def send_signal(self, sig):
             """Send a signal to the process."""

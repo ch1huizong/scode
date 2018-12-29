@@ -5,6 +5,7 @@ for urllib.requests, thus do not use directly.
 """
 # Testing is done through test_urllib.
 
+
 def url2pathname(url):
     """OS-specific conversion from a relative URL of the 'file' scheme
     to a file system path; not recommended for general use."""
@@ -14,7 +15,8 @@ def url2pathname(url):
     #   ///C:/foo/bar/spam.foo
     # become
     #   C:\foo\bar\spam.foo
-    import string, urllib.parse
+    import string
+    import urllib.parse
     # Windows itself uses ":" even in URLs.
     url = url.replace(':', '|')
     if not '|' in url:
@@ -42,6 +44,7 @@ def url2pathname(url):
         path += '\\'
     return path
 
+
 def pathname2url(p):
     """OS-specific conversion from a file system path to a relative URL
     of the 'file' scheme; not recommended for general use."""
@@ -53,9 +56,9 @@ def pathname2url(p):
     if not ':' in p:
         # No drive specifier, just convert slashes and quote the name
         if p[:2] == '\\\\':
-        # path is something like \\host\path\on\remote\host
-        # convert this to ////host/path/on/remote/host
-        # (notice doubling of slashes at the start of the path)
+            # path is something like \\host\path\on\remote\host
+            # convert this to ////host/path/on/remote/host
+            # (notice doubling of slashes at the start of the path)
             p = '\\\\' + p
         components = p.split('\\')
         return urllib.parse.quote('/'.join(components))

@@ -290,10 +290,13 @@ class closing(AbstractContextManager):
             f.close()
 
     """
+
     def __init__(self, thing):
         self.thing = thing
+
     def __enter__(self):
         return self.thing
+
     def __exit__(self, *exc_info):
         self.thing.close()
 
@@ -471,6 +474,7 @@ class ExitStack(_BaseExitStack, AbstractContextManager):
         # We manipulate the exception state so it behaves as though
         # we were actually nesting multiple with statements
         frame_exc = sys.exc_info()[1]
+
         def _fix_exception_context(new_exc, old_exc):
             # Context may not be correct, so find the end of the chain
             while 1:
@@ -608,6 +612,7 @@ class AsyncExitStack(_BaseExitStack, AbstractAsyncContextManager):
         # We manipulate the exception state so it behaves as though
         # we were actually nesting multiple with statements
         frame_exc = sys.exc_info()[1]
+
         def _fix_exception_context(new_exc, old_exc):
             # Context may not be correct, so find the end of the chain
             while 1:

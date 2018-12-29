@@ -33,12 +33,12 @@ def needsquoting(c, quotetabs, header):
         return header
     return c == ESCAPE or not (b' ' <= c <= b'~')
 
+
 def quote(c):
     """Quote a single character."""
-    assert isinstance(c, bytes) and len(c)==1
+    assert isinstance(c, bytes) and len(c) == 1
     c = ord(c)
-    return ESCAPE + bytes((HEX[c//16], HEX[c%16]))
-
+    return ESCAPE + bytes((HEX[c//16], HEX[c % 16]))
 
 
 def encode(input, output, quotetabs, header=False):
@@ -103,6 +103,7 @@ def encode(input, output, quotetabs, header=False):
     if prevline is not None:
         write(prevline, lineEnd=stripped)
 
+
 def encodestring(s, quotetabs=False, header=False):
     if b2a_qp is not None:
         return b2a_qp(s, quotetabs=quotetabs, header=header)
@@ -111,7 +112,6 @@ def encodestring(s, quotetabs=False, header=False):
     outfp = BytesIO()
     encode(infp, outfp, quotetabs, header)
     return outfp.getvalue()
-
 
 
 def decode(input, output, header=False):
@@ -128,10 +128,12 @@ def decode(input, output, header=False):
     new = b''
     while 1:
         line = input.readline()
-        if not line: break
+        if not line:
+            break
         i, n = 0, len(line)
         if n > 0 and line[n-1:n] == b'\n':
-            partial = 0; n = n-1
+            partial = 0
+            n = n-1
             # Strip trailing whitespace
             while n > 0 and line[n-1:n] in b" \t\r":
                 n = n-1
@@ -140,22 +142,29 @@ def decode(input, output, header=False):
         while i < n:
             c = line[i:i+1]
             if c == b'_' and header:
-                new = new + b' '; i = i+1
+                new = new + b' '
+                i = i+1
             elif c != ESCAPE:
-                new = new + c; i = i+1
+                new = new + c
+                i = i+1
             elif i+1 == n and not partial:
-                partial = 1; break
+                partial = 1
+                break
             elif i+1 < n and line[i+1:i+2] == ESCAPE:
-                new = new + ESCAPE; i = i+2
+                new = new + ESCAPE
+                i = i+2
             elif i+2 < n and ishex(line[i+1:i+2]) and ishex(line[i+2:i+3]):
-                new = new + bytes((unhex(line[i+1:i+3]),)); i = i+3
-            else: # Bad escape sequence -- leave it in
-                new = new + c; i = i+1
+                new = new + bytes((unhex(line[i+1:i+3]),))
+                i = i+3
+            else:  # Bad escape sequence -- leave it in
+                new = new + c
+                i = i+1
         if not partial:
             output.write(new + b'\n')
             new = b''
     if new:
         output.write(new)
+
 
 def decodestring(s, header=False):
     if a2b_qp is not None:
@@ -167,12 +176,12 @@ def decodestring(s, header=False):
     return outfp.getvalue()
 
 
-
 # Other helper functions
 def ishex(c):
     """Return true if the byte ordinal 'c' is a hexadecimal digit in ASCII."""
     assert isinstance(c, bytes)
     return b'0' <= c <= b'9' or b'a' <= c <= b'f' or b'A' <= c <= b'F'
+
 
 def unhex(s):
     """Get the integer value of a hexadecimal number."""
@@ -191,7 +200,6 @@ def unhex(s):
     return bits
 
 
-
 def main():
     import sys
     import getopt
@@ -207,13 +215,16 @@ def main():
     deco = 0
     tabs = 0
     for o, a in opts:
-        if o == '-t': tabs = 1
-        if o == '-d': deco = 1
+        if o == '-t':
+            tabs = 1
+        if o == '-d':
+            deco = 1
     if tabs and deco:
         sys.stdout = sys.stderr
         print("-t and -d are mutually exclusive")
         sys.exit(2)
-    if not args: args = ['-']
+    if not args:
+        args = ['-']
     sts = 0
     for file in args:
         if file == '-':
@@ -235,7 +246,6 @@ def main():
                 fp.close()
     if sts:
         sys.exit(sts)
-
 
 
 if __name__ == '__main__':

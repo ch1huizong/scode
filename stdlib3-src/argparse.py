@@ -102,6 +102,7 @@ _UNRECOGNIZED_ARGS_ATTR = '_unrecognized_args'
 # Utility functions and classes
 # =============================
 
+
 class _AttributeHolder(object):
     """Abstract base class that provides __repr__.
 
@@ -701,7 +702,6 @@ class MetavarTypeHelpFormatter(HelpFormatter):
         return action.type.__name__
 
 
-
 # =====================
 # Options and Arguments
 # =====================
@@ -710,7 +710,7 @@ def _get_action_name(argument):
     if argument is None:
         return None
     elif argument.option_strings:
-        return  '/'.join(argument.option_strings)
+        return '/'.join(argument.option_strings)
     elif argument.metavar not in (None, SUPPRESS):
         return argument.metavar
     elif argument.dest not in (None, SUPPRESS):
@@ -1216,6 +1216,7 @@ class FileType(object):
 # Optional and Positional Parsing
 # ===========================
 
+
 class Namespace(_AttributeHolder):
     """Simple object for storing attributes.
 
@@ -1315,10 +1316,10 @@ class _ActionsContainer(object):
                 return action.default
         return self._defaults.get(dest, None)
 
-
     # =======================
     # Adding argument actions
     # =======================
+
     def add_argument(self, *args, **kwargs):
         """
         add_argument(dest, ..., name=value, ...)
@@ -1362,7 +1363,8 @@ class _ActionsContainer(object):
             try:
                 self._get_formatter()._format_args(action, None)
             except TypeError:
-                raise ValueError("length of metavar tuple does not match nargs")
+                raise ValueError(
+                    "length of metavar tuple does not match nargs")
 
         return self._add_action(action)
 
@@ -2007,7 +2009,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
                     if (action.default is not None and
                         isinstance(action.default, str) and
                         hasattr(namespace, action.dest) and
-                        action.default is getattr(namespace, action.dest)):
+                            action.default is getattr(namespace, action.dest)):
                         setattr(namespace, action.dest,
                                 self._get_value(action, action.default))
 
@@ -2132,7 +2134,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
             # if multiple actions match, the option string was ambiguous
             if len(option_tuples) > 1:
                 options = ', '.join([option_string
-                    for action, option_string, explicit_arg in option_tuples])
+                                     for action, option_string, explicit_arg in option_tuples])
                 args = {'option': arg_string, 'matches': options}
                 msg = _('ambiguous option: %(option)s could match %(matches)s')
                 self.error(msg % args)
@@ -2276,10 +2278,10 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
              if action.nargs in [PARSER, REMAINDER]]
         if a:
             raise TypeError('parse_intermixed_args: positional arg'
-                            ' with nargs=%s'%a[0].nargs)
+                            ' with nargs=%s' % a[0].nargs)
 
         if [action.dest for group in self._mutually_exclusive_groups
-            for action in group._group_actions if action in positionals]:
+                for action in group._group_actions if action in positionals]:
             raise TypeError('parse_intermixed_args: positional in'
                             ' mutuallyExclusiveGroup')
 
@@ -2301,9 +2303,10 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
                 for action in positionals:
                     # remove the empty positional values from namespace
                     if (hasattr(namespace, action.dest)
-                            and getattr(namespace, action.dest)==[]):
+                            and getattr(namespace, action.dest) == []):
                         from warnings import warn
-                        warn('Do not expect %s in %s' % (action.dest, namespace))
+                        warn('Do not expect %s in %s' %
+                             (action.dest, namespace))
                         delattr(namespace, action.dest)
             finally:
                 # restore nargs and usage before exiting

@@ -1,3 +1,9 @@
+import warnings
+from collections import namedtuple
+from chunk import Chunk
+import sys
+import struct
+import audioop
 """Stuff to parse WAVE files.
 
 Usage.
@@ -75,22 +81,19 @@ import builtins
 
 __all__ = ["open", "openfp", "Error", "Wave_read", "Wave_write"]
 
+
 class Error(Exception):
     pass
+
 
 WAVE_FORMAT_PCM = 0x0001
 
 _array_fmts = None, 'b', 'h', None, 'i'
 
-import audioop
-import struct
-import sys
-from chunk import Chunk
-from collections import namedtuple
-import warnings
 
 _wave_params = namedtuple('_wave_params',
-                     'nchannels sampwidth framerate nframes comptype compname')
+                          'nchannels sampwidth framerate nframes comptype compname')
+
 
 class Wave_read:
     """Variables used in this class:
@@ -126,7 +129,7 @@ class Wave_read:
     def initfp(self, file):
         self._convert = None
         self._soundpos = 0
-        self._file = Chunk(file, bigendian = 0)
+        self._file = Chunk(file, bigendian=0)
         if self._file.getname() != b'RIFF':
             raise Error('file does not start with RIFF id')
         if self._file.read(4) != b'WAVE':
@@ -136,7 +139,7 @@ class Wave_read:
         while 1:
             self._data_seek_needed = 1
             try:
-                chunk = Chunk(self._file, bigendian = 0)
+                chunk = Chunk(self._file, bigendian=0)
             except EOFError:
                 break
             chunkname = chunk.getname()
@@ -216,8 +219,8 @@ class Wave_read:
 
     def getparams(self):
         return _wave_params(self.getnchannels(), self.getsampwidth(),
-                       self.getframerate(), self.getnframes(),
-                       self.getcomptype(), self.getcompname())
+                            self.getframerate(), self.getnframes(),
+                            self.getcomptype(), self.getcompname())
 
     def getmarkers(self):
         return None
@@ -245,7 +248,8 @@ class Wave_read:
             data = audioop.byteswap(data, self._sampwidth)
         if self._convert and data:
             data = self._convert(data)
-        self._soundpos = self._soundpos + len(data) // (self._nchannels * self._sampwidth)
+        self._soundpos = self._soundpos + \
+            len(data) // (self._nchannels * self._sampwidth)
         return data
 
     #
@@ -254,7 +258,8 @@ class Wave_read:
 
     def _read_fmt_chunk(self, chunk):
         try:
-            wFormatTag, self._nchannels, self._framerate, dwAvgBytesPerSec, wBlockAlign = struct.unpack_from('<HHLLH', chunk.read(14))
+            wFormatTag, self._nchannels, self._framerate, dwAvgBytesPerSec, wBlockAlign = struct.unpack_from(
+                '<HHLLH', chunk.read(14))
         except struct.error:
             raise EOFError from None
         if wFormatTag == WAVE_FORMAT_PCM:
@@ -272,6 +277,7 @@ class Wave_read:
         self._framesize = self._nchannels * self._sampwidth
         self._comptype = 'NONE'
         self._compname = 'not compressed'
+
 
 class Wave_write:
     """Variables used in this class:
@@ -407,7 +413,7 @@ class Wave_write:
         if not self._nchannels or not self._sampwidth or not self._framerate:
             raise Error('not all parameters set')
         return _wave_params(self._nchannels, self._sampwidth, self._framerate,
-              self._nframes, self._comptype, self._compname)
+                            self._nframes, self._comptype, self._compname)
 
     def setmark(self, id, pos, name):
         raise Error('setmark() not supported')
@@ -478,11 +484,11 @@ class Wave_write:
         except (AttributeError, OSError):
             self._form_length_pos = None
         self._file.write(struct.pack('<L4s4sLHHLLHH4s',
-            36 + self._datalength, b'WAVE', b'fmt ', 16,
-            WAVE_FORMAT_PCM, self._nchannels, self._framerate,
-            self._nchannels * self._framerate * self._sampwidth,
-            self._nchannels * self._sampwidth,
-            self._sampwidth * 8, b'data'))
+                                     36 + self._datalength, b'WAVE', b'fmt ', 16,
+                                     WAVE_FORMAT_PCM, self._nchannels, self._framerate,
+                                     self._nchannels * self._framerate * self._sampwidth,
+                                     self._nchannels * self._sampwidth,
+                                     self._sampwidth * 8, b'data'))
         if self._form_length_pos is not None:
             self._data_length_pos = self._file.tell()
         self._file.write(struct.pack('<L', self._datalength))
@@ -500,6 +506,7 @@ class Wave_write:
         self._file.seek(curpos, 0)
         self._datalength = self._datawritten
 
+
 def open(f, mode=None):
     if mode is None:
         if hasattr(f, 'mode'):
@@ -512,6 +519,7 @@ def open(f, mode=None):
         return Wave_write(f)
     else:
         raise Error("mode must be 'r', 'rb', 'w', or 'wb'")
+
 
 def openfp(f, mode=None):
     warnings.warn("wave.openfp is deprecated since Python 3.7. "

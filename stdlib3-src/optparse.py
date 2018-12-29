@@ -73,8 +73,10 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import sys, os
+import sys
+import os
 import textwrap
+
 
 def _repr(self):
     return "<%s at 0x%x: %s>" % (self.__class__.__name__, id(self), self)
@@ -124,10 +126,12 @@ class OptionError (OptParseError):
         else:
             return self.msg
 
+
 class OptionConflictError (OptionError):
     """
     Raised if conflicting options are added to an OptionParser.
     """
+
 
 class OptionValueError (OptParseError):
     """
@@ -135,20 +139,24 @@ class OptionValueError (OptParseError):
     line.
     """
 
+
 class BadOptionError (OptParseError):
     """
     Raised if an invalid option is seen on the command line.
     """
+
     def __init__(self, opt_str):
         self.opt_str = opt_str
 
     def __str__(self):
         return _("no such option: %s") % self.opt_str
 
+
 class AmbiguousOptionError (BadOptionError):
     """
     Raised if an ambiguous option is seen on the command line.
     """
+
     def __init__(self, opt_str, possibilities):
         BadOptionError.__init__(self, opt_str)
         self.possibilities = possibilities
@@ -218,7 +226,7 @@ class HelpFormatter:
             width -= 2
         self.width = width
         self.help_position = self.max_help_position = \
-                min(max_help_position, max(width - 20, indent_increment * 2))
+            min(max_help_position, max(width - 20, indent_increment * 2))
         self.current_indent = 0
         self.level = 0
         self.help_width = None          # computed later
@@ -281,7 +289,6 @@ class HelpFormatter:
             return "\n" + self._format_text(epilog) + "\n"
         else:
             return ""
-
 
     def expand_default(self, option):
         if self.parser is None or not self.default_tag:
@@ -365,6 +372,7 @@ class HelpFormatter:
 
         return ", ".join(opts)
 
+
 class IndentedHelpFormatter (HelpFormatter):
     """Format help with indented section bodies.
     """
@@ -393,7 +401,7 @@ class TitledHelpFormatter (HelpFormatter):
                  max_help_position=24,
                  width=None,
                  short_first=0):
-        HelpFormatter.__init__ (
+        HelpFormatter.__init__(
             self, indent_increment, max_help_position, width, short_first)
 
     def format_usage(self, usage):
@@ -416,13 +424,16 @@ def _parse_num(val, type):
 
     return type(val, radix)
 
+
 def _parse_int(val):
     return _parse_num(val, int)
 
-_builtin_cvt = { "int" : (_parse_int, _("integer")),
-                 "long" : (_parse_int, _("integer")),
-                 "float" : (float, _("floating-point")),
-                 "complex" : (complex, _("complex")) }
+
+_builtin_cvt = {"int": (_parse_int, _("integer")),
+                "long": (_parse_int, _("integer")),
+                "float": (float, _("floating-point")),
+                "complex": (complex, _("complex"))}
+
 
 def check_builtin(option, opt, value):
     (cvt, what) = _builtin_cvt[option.type]
@@ -432,6 +443,7 @@ def check_builtin(option, opt, value):
         raise OptionValueError(
             _("option %s: invalid %s value: %r") % (opt, what, value))
 
+
 def check_choice(option, opt, value):
     if value in option.choices:
         return value
@@ -440,6 +452,7 @@ def check_choice(option, opt, value):
         raise OptionValueError(
             _("option %s: invalid choice: %r (choose from %s)")
             % (opt, value, choices))
+
 
 # Not supplying a default is different from a default of None,
 # so we need an explicit "not supplied" value.
@@ -540,13 +553,12 @@ class Option:
     #
     # If no checker is defined for a type, arguments will be
     # unchecked and remain strings.
-    TYPE_CHECKER = { "int"    : check_builtin,
-                     "long"   : check_builtin,
-                     "float"  : check_builtin,
-                     "complex": check_builtin,
-                     "choice" : check_choice,
-                   }
-
+    TYPE_CHECKER = {"int": check_builtin,
+                    "long": check_builtin,
+                    "float": check_builtin,
+                    "complex": check_builtin,
+                    "choice": check_choice,
+                    }
 
     # CHECK_METHODS is a list of unbound method objects; they are called
     # by the constructor, in order, after all attributes are
@@ -557,7 +569,6 @@ class Option:
     # define their own CHECK_METHODS list that adds their check method
     # to those from this class.
     CHECK_METHODS = None
-
 
     # -- Constructor/initialization methods ----------------------------
 
@@ -625,7 +636,6 @@ class Option:
             raise OptionError(
                 "invalid keyword arguments: %s" % ", ".join(attrs),
                 self)
-
 
     # -- Constructor validation methods --------------------------------
 
@@ -708,12 +718,12 @@ class Option:
                 raise OptionError(
                     "callback not callable: %r" % self.callback, self)
             if (self.callback_args is not None and
-                not isinstance(self.callback_args, tuple)):
+                    not isinstance(self.callback_args, tuple)):
                 raise OptionError(
                     "callback_args, if supplied, must be a tuple: not %r"
                     % self.callback_args, self)
             if (self.callback_kwargs is not None and
-                not isinstance(self.callback_kwargs, dict)):
+                    not isinstance(self.callback_kwargs, dict)):
                 raise OptionError(
                     "callback_kwargs, if supplied, must be a dict: not %r"
                     % self.callback_kwargs, self)
@@ -729,7 +739,6 @@ class Option:
                 raise OptionError(
                     "callback_kwargs supplied for non-callback option", self)
 
-
     CHECK_METHODS = [_check_action,
                      _check_type,
                      _check_choice,
@@ -737,7 +746,6 @@ class Option:
                      _check_const,
                      _check_nargs,
                      _check_callback]
-
 
     # -- Miscellaneous methods -----------------------------------------
 
@@ -754,7 +762,6 @@ class Option:
             return self._long_opts[0]
         else:
             return self._short_opts[0]
-
 
     # -- Processing methods --------------------------------------------
 
@@ -819,6 +826,7 @@ class Option:
 
 SUPPRESS_HELP = "SUPPRESS"+"HELP"
 SUPPRESS_USAGE = "SUPPRESS"+"USAGE"
+
 
 class Values:
 
@@ -936,7 +944,6 @@ class OptionContainer:
         self._long_opt = {}             # long option -> Option instance
         self.defaults = {}              # maps option dest -> default value
 
-
     def _share_option_mappings(self, parser):
         # For use by OptionGroup constructor -- use shared option
         # mappings from the OptionParser that owns this OptionGroup.
@@ -955,13 +962,11 @@ class OptionContainer:
     def get_description(self):
         return self.description
 
-
     def destroy(self):
         """see OptionParser.destroy()."""
         del self._short_opt
         del self._long_opt
         del self.defaults
-
 
     # -- Option-adding methods -----------------------------------------
 
@@ -1049,7 +1054,6 @@ class OptionContainer:
             del self._long_opt[opt]
         option.container.option_list.remove(option)
 
-
     # -- Help-formatting methods ---------------------------------------
 
     def format_option_help(self, formatter):
@@ -1057,7 +1061,7 @@ class OptionContainer:
             return ""
         result = []
         for option in self.option_list:
-            if not option.help is SUPPRESS_HELP:
+            if option.help is not SUPPRESS_HELP:
                 result.append(formatter.format_option(option))
         return "".join(result)
 
@@ -1208,7 +1212,6 @@ class OptionParser (OptionContainer):
 
         self._init_parsing_state()
 
-
     def destroy(self):
         """
         Declare that you are done with this OptionParser.  This cleans up
@@ -1222,7 +1225,6 @@ class OptionParser (OptionContainer):
         del self.option_list
         del self.option_groups
         del self.formatter
-
 
     # -- Private methods -----------------------------------------------
     # (used by our or OptionContainer's constructor)
@@ -1257,7 +1259,6 @@ class OptionParser (OptionContainer):
         self.rargs = None
         self.largs = None
         self.values = None
-
 
     # -- Simple modifier methods ---------------------------------------
 
@@ -1317,7 +1318,6 @@ class OptionParser (OptionContainer):
 
         return Values(defaults)
 
-
     # -- OptionGroup methods -------------------------------------------
 
     def add_option_group(self, *args, **kwargs):
@@ -1342,7 +1342,6 @@ class OptionParser (OptionContainer):
         if option and option.container is not self:
             return option.container
         return None
-
 
     # -- Option-parsing methods ----------------------------------------
 
@@ -1537,7 +1536,6 @@ class OptionParser (OptionContainer):
 
             if stop:
                 break
-
 
     # -- Feedback methods ----------------------------------------------
 

@@ -9,7 +9,7 @@ __all__ = ['tok_name', 'ISTERMINAL', 'ISNONTERMINAL', 'ISEOF']
 #
 #    ./python Lib/token.py
 
-#--start constants--
+# --start constants--
 ENDMARKER = 0
 NAME = 1
 NUMBER = 2
@@ -73,18 +73,21 @@ ENCODING = 57
 N_TOKENS = 58
 # Special definitions for cooperation with parser
 NT_OFFSET = 256
-#--end constants--
+# --end constants--
 
 tok_name = {value: name
             for name, value in globals().items()
             if isinstance(value, int) and not name.startswith('_')}
 __all__.extend(tok_name.values())
 
+
 def ISTERMINAL(x):
     return x < NT_OFFSET
 
+
 def ISNONTERMINAL(x):
     return x >= NT_OFFSET
+
 
 def ISEOF(x):
     return x == ENDMARKER
@@ -119,7 +122,8 @@ def _main():
         if match:
             name, val = match.group(1, 2)
             val = int(val)
-            tokens[val] = {'token': name}          # reverse so we can sort them...
+            # reverse so we can sort them...
+            tokens[val] = {'token': name}
             prev_val = val
         else:
             comment_match = comment_regex.match(line)

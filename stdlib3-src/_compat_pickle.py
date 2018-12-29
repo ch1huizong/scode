@@ -6,7 +6,7 @@
 # lib2to3 and use the mapping defined there, because lib2to3 uses pickle.
 # Thus, this could cause the module to be imported recursively.
 IMPORT_MAPPING = {
-    '__builtin__' : 'builtins',
+    '__builtin__': 'builtins',
     'copy_reg': 'copyreg',
     'Queue': 'queue',
     'SocketServer': 'socketserver',
@@ -36,18 +36,18 @@ IMPORT_MAPPING = {
     'xmlrpclib': 'xmlrpc.client',
     'SimpleXMLRPCServer': 'xmlrpc.server',
     'httplib': 'http.client',
-    'htmlentitydefs' : 'html.entities',
-    'HTMLParser' : 'html.parser',
+    'htmlentitydefs': 'html.entities',
+    'HTMLParser': 'html.parser',
     'Cookie': 'http.cookies',
     'cookielib': 'http.cookiejar',
     'BaseHTTPServer': 'http.server',
     'test.test_support': 'test.support',
     'commands': 'subprocess',
-    'urlparse' : 'urllib.parse',
-    'robotparser' : 'urllib.robotparser',
+    'urlparse': 'urllib.parse',
+    'robotparser': 'urllib.robotparser',
     'urllib2': 'urllib.request',
     'anydbm': 'dbm',
-    '_abcoll' : 'collections.abc',
+    '_abcoll': 'collections.abc',
 }
 
 
@@ -159,7 +159,8 @@ MULTIPROCESSING_EXCEPTIONS = (
 )
 
 for excname in MULTIPROCESSING_EXCEPTIONS:
-    NAME_MAPPING[("multiprocessing", excname)] = ("multiprocessing.context", excname)
+    NAME_MAPPING[("multiprocessing", excname)] = (
+        "multiprocessing.context", excname)
 
 # Same, but for 3.x to 2.x
 REVERSE_IMPORT_MAPPING = dict((v, k) for (k, v) in IMPORT_MAPPING.items())

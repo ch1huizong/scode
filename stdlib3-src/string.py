@@ -1,3 +1,5 @@
+from collections import ChainMap as _ChainMap
+import re as _re
 """A collection of string constants.
 
 Public module variables:
@@ -34,6 +36,8 @@ printable = digits + ascii_letters + punctuation + whitespace
 # Functions which aren't available as string methods.
 
 # Capitalize the words in a string, e.g. " aBc  dEf " -> "Abc Def".
+
+
 def capwords(s, sep=None):
     """capwords(s [,sep]) -> string
 
@@ -49,8 +53,7 @@ def capwords(s, sep=None):
 
 
 ####################################################################
-import re as _re
-from collections import ChainMap as _ChainMap
+
 
 class _TemplateMetaclass(type):
     pattern = r"""
@@ -68,10 +71,10 @@ class _TemplateMetaclass(type):
             pattern = cls.pattern
         else:
             pattern = _TemplateMetaclass.pattern % {
-                'delim' : _re.escape(cls.delimiter),
-                'id'    : cls.idpattern,
-                'bid'   : cls.braceidpattern or cls.idpattern,
-                }
+                'delim': _re.escape(cls.delimiter),
+                'id': cls.idpattern,
+                'bid': cls.braceidpattern or cls.idpattern,
+            }
         cls.pattern = _re.compile(pattern, cls.flags | _re.VERBOSE)
 
 
@@ -118,6 +121,7 @@ class Template(metaclass=_TemplateMetaclass):
         else:
             mapping = args[0]
         # Helper function for .sub()
+
         def convert(mo):
             # Check the most common path first.
             named = mo.group('named') or mo.group('braced')
@@ -145,6 +149,7 @@ class Template(metaclass=_TemplateMetaclass):
         else:
             mapping = args[0]
         # Helper function for .sub()
+
         def convert(mo):
             named = mo.group('named') or mo.group('braced')
             if named is not None:
@@ -159,7 +164,6 @@ class Template(metaclass=_TemplateMetaclass):
             raise ValueError('Unrecognized named group in pattern',
                              self.pattern)
         return self.pattern.sub(convert, self.template)
-
 
 
 ########################################################################
@@ -179,7 +183,7 @@ class Formatter:
                             "needs an argument")
         self, *args = args  # allow the "self" keyword be passed
         try:
-            format_string, *args = args # allow the "format_string" keyword be passed
+            format_string, *args = args  # allow the "format_string" keyword be passed
         except ValueError:
             raise TypeError("format() missing 1 required positional "
                             "argument: 'format_string'") from None
@@ -244,21 +248,17 @@ class Formatter:
 
         return ''.join(result), auto_arg_index
 
-
     def get_value(self, key, args, kwargs):
         if isinstance(key, int):
             return args[key]
         else:
             return kwargs[key]
 
-
     def check_unused_args(self, used_args, args, kwargs):
         pass
 
-
     def format_field(self, value, format_spec):
         return format(value, format_spec)
-
 
     def convert_field(self, value, conversion):
         # do any conversion on the resulting object
@@ -270,8 +270,8 @@ class Formatter:
             return repr(value)
         elif conversion == 'a':
             return ascii(value)
-        raise ValueError("Unknown conversion specifier {0!s}".format(conversion))
-
+        raise ValueError(
+            "Unknown conversion specifier {0!s}".format(conversion))
 
     # returns an iterable that contains tuples of the form:
     # (literal_text, field_name, format_spec, conversion)
@@ -280,15 +280,16 @@ class Formatter:
     #  object to format and output
     # if field_name is not None, it is looked up, formatted
     #  with format_spec and conversion and then used
+
     def parse(self, format_string):
         return _string.formatter_parser(format_string)
-
 
     # given a field_name, find the object it references.
     #  field_name:   the field being looked up, e.g. "0.name"
     #                 or "lookup[3]"
     #  used_args:    a set of which args have been used
     #  args, kwargs: as passed in to vformat
+
     def get_field(self, field_name, args, kwargs):
         first, rest = _string.formatter_field_name_split(field_name)
 

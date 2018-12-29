@@ -42,22 +42,39 @@ class NullFormatter:
         if writer is None:
             writer = NullWriter()
         self.writer = writer
+
     def end_paragraph(self, blankline): pass
+
     def add_line_break(self): pass
+
     def add_hor_rule(self, *args, **kw): pass
+
     def add_label_data(self, format, counter, blankline=None): pass
+
     def add_flowing_data(self, data): pass
+
     def add_literal_data(self, data): pass
+
     def flush_softspace(self): pass
+
     def push_alignment(self, align): pass
+
     def pop_alignment(self): pass
+
     def push_font(self, x): pass
+
     def pop_font(self): pass
+
     def push_margin(self, margin): pass
+
     def pop_margin(self): pass
+
     def set_spacing(self, spacing): pass
+
     def push_style(self, *styles): pass
+
     def pop_style(self, n=1): pass
+
     def assert_line_data(self, flag=1): pass
 
 
@@ -115,7 +132,7 @@ class AbstractFormatter:
         self.hard_break = self.nospace = 1
         self.have_label = self.para_end = self.softspace = self.parskip = 0
 
-    def add_label_data(self, format, counter, blankline = None):
+    def add_label_data(self, format, counter, blankline=None):
         if self.have_label or not self.hard_break:
             self.writer.send_line_break()
         if not self.para_end:
@@ -178,7 +195,8 @@ class AbstractFormatter:
         return label
 
     def add_flowing_data(self, data):
-        if not data: return
+        if not data:
+            return
         prespace = data[:1].isspace()
         postspace = data[-1:].isspace()
         data = " ".join(data.split())
@@ -193,23 +211,24 @@ class AbstractFormatter:
             if not self.nospace:
                 data = ' ' + data
         self.hard_break = self.nospace = self.para_end = \
-                          self.parskip = self.have_label = 0
+            self.parskip = self.have_label = 0
         self.softspace = postspace
         self.writer.send_flowing_data(data)
 
     def add_literal_data(self, data):
-        if not data: return
+        if not data:
+            return
         if self.softspace:
             self.writer.send_flowing_data(" ")
         self.hard_break = data[-1:] == '\n'
         self.nospace = self.para_end = self.softspace = \
-                       self.parskip = self.have_label = 0
+            self.parskip = self.have_label = 0
         self.writer.send_literal_data(data)
 
     def flush_softspace(self):
         if self.softspace:
             self.hard_break = self.para_end = self.parskip = \
-                              self.have_label = self.softspace = 0
+                self.have_label = self.softspace = 0
             self.nospace = 1
             self.writer.send_flowing_data(' ')
 
@@ -239,10 +258,14 @@ class AbstractFormatter:
             self.writer.send_flowing_data(' ')
         if self.font_stack:
             csize, ci, cb, ctt = self.font_stack[-1]
-            if size is AS_IS: size = csize
-            if i is AS_IS: i = ci
-            if b is AS_IS: b = cb
-            if tt is AS_IS: tt = ctt
+            if size is AS_IS:
+                size = csize
+            if i is AS_IS:
+                i = ci
+            if b is AS_IS:
+                b = cb
+            if tt is AS_IS:
+                tt = ctt
         font = (size, i, b, tt)
         self.font_stack.append(font)
         self.writer.new_font(font)
@@ -303,18 +326,31 @@ class NullWriter:
     which do not need to inherit any implementation methods.
 
     """
+
     def __init__(self): pass
+
     def flush(self): pass
+
     def new_alignment(self, align): pass
+
     def new_font(self, font): pass
+
     def new_margin(self, margin, level): pass
+
     def new_spacing(self, spacing): pass
+
     def new_styles(self, styles): pass
+
     def send_paragraph(self, blankline): pass
+
     def send_line_break(self): pass
+
     def send_hor_rule(self, *args, **kw): pass
+
     def send_label_data(self, data): pass
+
     def send_flowing_data(self, data): pass
+
     def send_literal_data(self, data): pass
 
 
@@ -407,7 +443,8 @@ class DumbWriter(NullWriter):
         self.atbreak = 0
 
     def send_flowing_data(self, data):
-        if not data: return
+        if not data:
+            return
         atbreak = self.atbreak or data[0].isspace()
         col = self.col
         maxcol = self.maxcol
@@ -427,7 +464,7 @@ class DumbWriter(NullWriter):
         self.atbreak = data[-1].isspace()
 
 
-def test(file = None):
+def test(file=None):
     w = DumbWriter()
     f = AbstractFormatter(w)
     if file is not None:

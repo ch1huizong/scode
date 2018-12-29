@@ -24,14 +24,14 @@ This module also provides some data items to the user:
 """
 
 __all__ = [
-    "NamedTemporaryFile", "TemporaryFile", # high level safe interfaces
+    "NamedTemporaryFile", "TemporaryFile",  # high level safe interfaces
     "SpooledTemporaryFile", "TemporaryDirectory",
     "mkstemp", "mkdtemp",                  # low level safe interfaces
     "mktemp",                              # deprecated unsafe interface
     "TMP_MAX", "gettempprefix",            # constants
     "tempdir", "gettempdir",
     "gettempprefixb", "gettempdirb",
-   ]
+]
 
 
 # Imports.
@@ -80,6 +80,7 @@ else:
     def _stat(fn):
         fd = _os.open(fn, _os.O_RDONLY)
         _os.close(fd)
+
 
 def _exists(fn):
     try:
@@ -156,6 +157,7 @@ class _RandomNameSequence:
         letters = [choose(c) for dummy in range(8)]
         return ''.join(letters)
 
+
 def _candidate_tempdir_list():
     """Generate a list of candidate temporary directories which
     _get_default_tempdir will try."""
@@ -165,15 +167,16 @@ def _candidate_tempdir_list():
     # First, try the environment.
     for envname in 'TMPDIR', 'TEMP', 'TMP':
         dirname = _os.getenv(envname)
-        if dirname: dirlist.append(dirname)
+        if dirname:
+            dirlist.append(dirname)
 
     # Failing that, try OS-specific locations.
     if _os.name == 'nt':
-        dirlist.extend([ _os.path.expanduser(r'~\AppData\Local\Temp'),
-                         _os.path.expandvars(r'%SYSTEMROOT%\Temp'),
-                         r'c:\temp', r'c:\tmp', r'\temp', r'\tmp' ])
+        dirlist.extend([_os.path.expanduser(r'~\AppData\Local\Temp'),
+                        _os.path.expandvars(r'%SYSTEMROOT%\Temp'),
+                        r'c:\temp', r'c:\tmp', r'\temp', r'\tmp'])
     else:
-        dirlist.extend([ '/tmp', '/var/tmp', '/usr/tmp' ])
+        dirlist.extend(['/tmp', '/var/tmp', '/usr/tmp'])
 
     # As a last resort, the current directory.
     try:
@@ -182,6 +185,7 @@ def _candidate_tempdir_list():
         dirlist.append(_os.curdir)
 
     return dirlist
+
 
 def _get_default_tempdir():
     """Calculate the default directory to use for temporary files.
@@ -219,7 +223,7 @@ def _get_default_tempdir():
                 # This exception is thrown when a directory with the chosen name
                 # already exists on windows.
                 if (_os.name == 'nt' and _os.path.isdir(dir) and
-                    _os.access(dir, _os.W_OK)):
+                        _os.access(dir, _os.W_OK)):
                     continue
                 break   # no point trying more names in this directory
             except OSError:
@@ -228,7 +232,9 @@ def _get_default_tempdir():
                             "No usable temporary directory found in %s" %
                             dirlist)
 
+
 _name_sequence = None
+
 
 def _get_candidate_names():
     """Common setup sequence for all user-callable interfaces."""
@@ -262,7 +268,7 @@ def _mkstemp_inner(dir, pre, suf, flags, output_type):
             # This exception is thrown when a directory with the chosen name
             # already exists on windows.
             if (_os.name == 'nt' and _os.path.isdir(dir) and
-                _os.access(dir, _os.W_OK)):
+                    _os.access(dir, _os.W_OK)):
                 continue
             else:
                 raise
@@ -278,11 +284,14 @@ def gettempprefix():
     """The default prefix for temporary directories."""
     return template
 
+
 def gettempprefixb():
     """The default prefix for temporary directories as bytes."""
     return _os.fsencode(gettempprefix())
 
+
 tempdir = None
+
 
 def gettempdir():
     """Accessor for tempfile.tempdir."""
@@ -296,9 +305,11 @@ def gettempdir():
             _once_lock.release()
     return tempdir
 
+
 def gettempdirb():
     """A bytes version of tempfile.gettempdir()."""
     return _os.fsencode(gettempdir())
+
 
 def mkstemp(suffix=None, prefix=None, dir=None, text=False):
     """User-callable function to create and return a unique temporary
@@ -370,7 +381,7 @@ def mkdtemp(suffix=None, prefix=None, dir=None):
             # This exception is thrown when a directory with the chosen name
             # already exists on windows.
             if (_os.name == 'nt' and _os.path.isdir(dir) and
-                _os.access(dir, _os.W_OK)):
+                    _os.access(dir, _os.W_OK)):
                 continue
             else:
                 raise
@@ -378,6 +389,7 @@ def mkdtemp(suffix=None, prefix=None, dir=None):
 
     raise FileExistsError(_errno.EEXIST,
                           "No usable temporary directory name found")
+
 
 def mktemp(suffix="", prefix=template, dir=None):
     """User-callable function to return a unique temporary file name.  The
@@ -394,8 +406,8 @@ def mktemp(suffix="", prefix=template, dir=None):
     """
 
 ##    from warnings import warn as _warn
-##    _warn("mktemp is a potential security risk to your program",
-##          RuntimeWarning, stacklevel=2)
+# _warn("mktemp is a potential security risk to your program",
+# RuntimeWarning, stacklevel=2)
 
     if dir is None:
         dir = gettempdir()
@@ -476,6 +488,7 @@ class _TemporaryFileWrapper:
         a = getattr(file, name)
         if hasattr(a, '__call__'):
             func = a
+
             @_functools.wraps(func)
             def func_wrapper(*args, **kwargs):
                 return func(*args, **kwargs)
@@ -555,6 +568,7 @@ def NamedTemporaryFile(mode='w+b', buffering=-1, encoding=None,
         _os.close(fd)
         raise
 
+
 if _os.name != 'posix' or _os.sys.platform == 'cygwin':
     # On non-POSIX and Cygwin systems, assume that we cannot unlink a file
     # while it is open.
@@ -583,7 +597,8 @@ else:
         """
         global _O_TMPFILE_WORKS
 
-        prefix, suffix, dir, output_type = _sanitize_params(prefix, suffix, dir)
+        prefix, suffix, dir, output_type = _sanitize_params(
+            prefix, suffix, dir)
 
         flags = _bin_openflags
         if _O_TMPFILE_WORKS:
@@ -624,6 +639,7 @@ else:
             _os.close(fd)
             raise
 
+
 class SpooledTemporaryFile:
     """Temporary file wrapper, specialized to switch from BytesIO
     or StringIO to a real file when it exceeds a certain size or
@@ -649,13 +665,15 @@ class SpooledTemporaryFile:
                                    'dir': dir}
 
     def _check(self, file):
-        if self._rolled: return
+        if self._rolled:
+            return
         max_size = self._max_size
         if max_size and file.tell() > max_size:
             self.rollover()
 
     def rollover(self):
-        if self._rolled: return
+        if self._rolled:
+            return
         file = self._file
         newfile = self._file = TemporaryFile(**self._TemporaryFileArgs)
         del self._TemporaryFileArgs

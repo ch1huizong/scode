@@ -1,3 +1,4 @@
+import token
 """Tokenization help for Python programs.
 
 tokenize(readline) is a generator that breaks a stream of bytes into
@@ -37,7 +38,6 @@ from token import *
 cookie_re = re.compile(r'^[ \t\f]*#.*?coding[:=][ \t]*([-\w.]+)', re.ASCII)
 blank_re = re.compile(br'^[ \t\f]*(?:[#\r\n]|$)', re.ASCII)
 
-import token
 __all__ = token.__all__ + ["tokenize", "detect_encoding",
                            "untokenize", "TokenInfo"]
 del token
@@ -91,6 +91,7 @@ EXACT_TOKEN_TYPES = {
     '@=':  ATEQUAL,
 }
 
+
 class TokenInfo(collections.namedtuple('TokenInfo', 'type string start end line')):
     def __repr__(self):
         annotated_type = '%d (%s)' % (self.type, tok_name[self.type])
@@ -104,9 +105,15 @@ class TokenInfo(collections.namedtuple('TokenInfo', 'type string start end line'
         else:
             return self.type
 
+
 def group(*choices): return '(' + '|'.join(choices) + ')'
+
+
 def any(*choices): return group(*choices) + '*'
+
+
 def maybe(*choices): return group(*choices) + '?'
+
 
 # Note: we use unicode matching for names ("\w") but ascii matching for
 # number literals.
@@ -129,6 +136,8 @@ Imagnumber = group(r'[0-9](?:_?[0-9])*[jJ]', Floatnumber + r'[jJ]')
 Number = group(Imagnumber, Floatnumber, Intnumber)
 
 # Return the empty string, plus all of the valid string prefixes.
+
+
 def _all_string_prefixes():
     # The valid string prefixes. Only contain the lower case versions,
     #  and don't contain any permuations (include 'fr', but not
@@ -144,8 +153,10 @@ def _all_string_prefixes():
                 result.add(''.join(u))
     return result
 
+
 def _compile(expr):
     return re.compile(expr, re.UNICODE)
+
 
 # Note that since _all_string_prefixes includes the empty string,
 #  StringPrefix can be the empty string (making it optional).
@@ -209,9 +220,13 @@ for t in _all_string_prefixes():
 
 tabsize = 8
 
-class TokenError(Exception): pass
 
-class StopTokenizing(Exception): pass
+class TokenError(Exception):
+    pass
+
+
+class StopTokenizing(Exception):
+    pass
 
 
 class Untokenizer:
@@ -347,6 +362,7 @@ def _get_normal_name(orig_enc):
         return "iso-8859-1"
     return orig_enc
 
+
 def detect_encoding(readline):
     """
     The detect_encoding() function is used to detect the encoding that should
@@ -371,6 +387,7 @@ def detect_encoding(readline):
     bom_found = False
     encoding = None
     default = 'utf-8'
+
     def read_or_stop():
         try:
             return readline()
@@ -401,7 +418,7 @@ def detect_encoding(readline):
                 msg = "unknown encoding: " + encoding
             else:
                 msg = "unknown encoding for {!r}: {}".format(filename,
-                        encoding)
+                                                             encoding)
             raise SyntaxError(msg)
 
         if bom_found:
@@ -514,12 +531,12 @@ def _tokenize(readline, encoding):
             if endmatch:
                 pos = end = endmatch.end(0)
                 yield TokenInfo(STRING, contstr + line[:end],
-                       strstart, (lnum, end), contline + line)
+                                strstart, (lnum, end), contline + line)
                 contstr, needcont = '', 0
                 contline = None
             elif needcont and line[-2:] != '\\\n' and line[-3:] != '\\\r\n':
                 yield TokenInfo(ERRORTOKEN, contstr + line,
-                           strstart, (lnum, len(line)), contline)
+                                strstart, (lnum, len(line)), contline)
                 contstr = ''
                 contline = None
                 continue
@@ -529,7 +546,8 @@ def _tokenize(readline, encoding):
                 continue
 
         elif parenlev == 0 and not continued:  # new statement
-            if not line: break
+            if not line:
+                break
             column = 0
             while pos < max:                   # measure leading whitespace
                 if line[pos] == ' ':
@@ -548,11 +566,11 @@ def _tokenize(readline, encoding):
                 if line[pos] == '#':
                     comment_token = line[pos:].rstrip('\r\n')
                     yield TokenInfo(COMMENT, comment_token,
-                           (lnum, pos), (lnum, pos + len(comment_token)), line)
+                                    (lnum, pos), (lnum, pos + len(comment_token)), line)
                     pos += len(comment_token)
 
                 yield TokenInfo(NL, line[pos:],
-                           (lnum, pos), (lnum, len(line)), line)
+                                (lnum, pos), (lnum, len(line)), line)
                 continue
 
             if column > indents[-1]:           # count indents or dedents
@@ -582,7 +600,7 @@ def _tokenize(readline, encoding):
                 token, initial = line[start:end], line[start]
 
                 if (initial in numchars or                  # ordinary number
-                    (initial == '.' and token != '.' and token != '...')):
+                        (initial == '.' and token != '.' and token != '...')):
                     yield TokenInfo(NUMBER, token, spos, epos, line)
                 elif initial in '\r\n':
                     if parenlev > 0:
@@ -649,7 +667,7 @@ def _tokenize(readline, encoding):
                     yield TokenInfo(OP, token, spos, epos, line)
             else:
                 yield TokenInfo(ERRORTOKEN, line[pos],
-                           (lnum, pos), (lnum, pos+1), line)
+                                (lnum, pos), (lnum, pos+1), line)
                 pos += 1
 
     for indent in indents[1:]:                 # pop remaining indent levels
@@ -661,6 +679,7 @@ def _tokenize(readline, encoding):
 # library that expect to be able to use tokenize with strings
 def generate_tokens(readline):
     return _tokenize(readline, None)
+
 
 def main():
     import argparse
@@ -721,6 +740,7 @@ def main():
     except Exception as err:
         perror("unexpected error: %s" % err)
         raise
+
 
 if __name__ == "__main__":
     main()

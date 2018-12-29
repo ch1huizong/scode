@@ -17,7 +17,7 @@ class Scheduler(object):
     def __init__(self, dupefilter, jobdir=None, dqclass=None, mqclass=None,
                  logunser=False, stats=None, pqclass=None):
         self.df = dupefilter
-        self.dqdir = self._dqdir(jobdir)  # 可能有可能无
+        self.dqdir = self._dqdir(jobdir)
         self.pqclass = pqclass
         self.dqclass = dqclass
         self.mqclass = mqclass
@@ -39,26 +39,29 @@ class Scheduler(object):
     def has_pending_requests(self):
         return len(self) > 0
 
-    def open(self, spider):
+    def open(self, spider): # 初始化，设定会使用的队列
         self.spider = spider
         self.mqs = self.pqclass(self._newmq) # lifo
         self.dqs = self._dq() if self.dqdir else None
-        return self.df.open()
+        return self.df.open() # filter打开
 
     def close(self, reason):
         if self.dqs:
             prios = self.dqs.close()
             with open(join(self.dqdir, 'active.json'), 'w') as f:
                 json.dump(prios, f)
-        return self.df.close(reason)
+        return self.df.close(reason) # filter关闭
 
 
-    # 入队
+    ############################################################ 
+    #
+    #               Scheduler-API
+    # 
     def enqueue_request(self, request):
         if not request.dont_filter and self.df.request_seen(request):
             self.df.log(request, self.spider)
             return False
-        dqok = self._dqpush(request)  # 何时入磁盘?
+        dqok = self._dqpush(request)
         if dqok:
             self.stats.inc_value('scheduler/enqueued/disk', spider=self.spider)
         else:
@@ -67,7 +70,6 @@ class Scheduler(object):
         self.stats.inc_value('scheduler/enqueued', spider=self.spider)
         return True
     
-    # 出队
     def next_request(self):
         request = self.mqs.pop()
         if request:
@@ -79,8 +81,6 @@ class Scheduler(object):
         if request:
             self.stats.inc_value('scheduler/dequeued', spider=self.spider)
         return request
-
-    ############################################################ 
 
     def __len__(self):
         return len(self.dqs) + len(self.mqs) if self.dqs else len(self.mqs)
@@ -127,8 +127,8 @@ class Scheduler(object):
                 prios = json.load(f) 
         else:
             prios = ()
-        q = self.pqclass(self._newdq, startprios=prios) # 这里获得所有优先级pq
-        if q:
+        q = self.pqclass(self._newdq, startprios=prios)
+        if q: # exists 
             logger.info("Resuming crawl (%(queuesize)d requests scheduled)",
                         {'queuesize': len(q)}, extra={'spider': self.spider})
         return q

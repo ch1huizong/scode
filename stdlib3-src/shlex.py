@@ -16,8 +16,10 @@ from io import StringIO
 
 __all__ = ["shlex", "split", "quote"]
 
+
 class shlex:
     "A lexical analyzer class for simple shell-like syntaxes."
+
     def __init__(self, instream=None, infile=None, posix=False,
                  punctuation_chars=False):
         if isinstance(instream, str):
@@ -61,7 +63,7 @@ class shlex:
             self._pushback_chars = deque()
             # these chars added because allowed in file names, args, wildcards
             self.wordchars += '~-./*?='
-            #remove any punctuation chars from wordchars
+            # remove any punctuation chars from wordchars
             t = self.wordchars.maketrans(dict.fromkeys(punctuation_chars))
             self.wordchars = self.wordchars.translate(t)
 
@@ -90,7 +92,7 @@ class shlex:
         self.instream.close()
         (self.infile, self.instream, self.lineno) = self.filestack.popleft()
         if self.debug:
-            print('shlex: popping to %s, line %d' \
+            print('shlex: popping to %s, line %d'
                   % (self.instream, self.lineno))
         self.state = ' '
 
@@ -297,6 +299,7 @@ class shlex:
             raise StopIteration
         return token
 
+
 def split(s, comments=False, posix=True):
     lex = shlex(s, posix=posix)
     lex.whitespace_split = True
@@ -306,6 +309,7 @@ def split(s, comments=False, posix=True):
 
 
 _find_unsafe = re.compile(r'[^\w@%+=:,./-]', re.ASCII).search
+
 
 def quote(s):
     """Return a shell-escaped version of the string *s*."""
@@ -325,6 +329,7 @@ def _print_tokens(lexer):
         if not tt:
             break
         print("Token: " + repr(tt))
+
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:

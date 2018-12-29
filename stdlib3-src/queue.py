@@ -9,7 +9,8 @@ try:
 except ImportError:
     SimpleQueue = None
 
-__all__ = ['Empty', 'Full', 'Queue', 'PriorityQueue', 'LifoQueue', 'SimpleQueue']
+__all__ = ['Empty', 'Full', 'Queue',
+           'PriorityQueue', 'LifoQueue', 'SimpleQueue']
 
 
 try:
@@ -18,6 +19,7 @@ except AttributeError:
     class Empty(Exception):
         'Exception raised by Queue.get(block=0)/get_nowait().'
         pass
+
 
 class Full(Exception):
     'Exception raised by Queue.put(block=0)/put_nowait().'

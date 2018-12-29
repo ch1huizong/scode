@@ -29,10 +29,10 @@ from _lzma import _encode_filter_properties, _decode_filter_properties
 import _compression
 
 
-_MODE_CLOSED   = 0
-_MODE_READ     = 1
+_MODE_CLOSED = 0
+_MODE_READ = 1
 # Value 2 no longer used
-_MODE_WRITE    = 3
+_MODE_WRITE = 3
 
 
 class LZMAFile(_compression.BaseStream):
@@ -124,11 +124,12 @@ class LZMAFile(_compression.BaseStream):
             self._fp = filename
             self._mode = mode_code
         else:
-            raise TypeError("filename must be a str, bytes, file or PathLike object")
+            raise TypeError(
+                "filename must be a str, bytes, file or PathLike object")
 
         if self._mode == _MODE_READ:
             raw = _compression.DecompressReader(self._fp, LZMADecompressor,
-                trailing_error=LZMAError, format=format, filters=filters)
+                                                trailing_error=LZMAError, format=format, filters=filters)
             self._buffer = io.BufferedReader(raw)
 
     def close(self):
@@ -291,7 +292,8 @@ def open(filename, mode="rb", *,
             raise ValueError("Invalid mode: %r" % (mode,))
     else:
         if encoding is not None:
-            raise ValueError("Argument 'encoding' not supported in binary mode")
+            raise ValueError(
+                "Argument 'encoding' not supported in binary mode")
         if errors is not None:
             raise ValueError("Argument 'errors' not supported in binary mode")
         if newline is not None:
@@ -334,7 +336,8 @@ def decompress(data, format=FORMAT_AUTO, memlimit=None, filters=None):
             res = decomp.decompress(data)
         except LZMAError:
             if results:
-                break  # Leftover data is not a valid LZMA/XZ stream; ignore it.
+                # Leftover data is not a valid LZMA/XZ stream; ignore it.
+                break
             else:
                 raise  # Error on the first iteration; bail out.
         results.append(res)

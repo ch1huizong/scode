@@ -95,6 +95,7 @@ _MAXLINE = 2048
 # Exceptions raised when an error or invalid response is received
 class NNTPError(Exception):
     """Base class for all nntplib exceptions"""
+
     def __init__(self, *args):
         Exception.__init__(self, *args)
         try:
@@ -102,21 +103,26 @@ class NNTPError(Exception):
         except IndexError:
             self.response = 'No response given'
 
+
 class NNTPReplyError(NNTPError):
     """Unexpected [123]xx reply"""
     pass
+
 
 class NNTPTemporaryError(NNTPError):
     """4xx errors"""
     pass
 
+
 class NNTPPermanentError(NNTPError):
     """5xx errors"""
     pass
 
+
 class NNTPProtocolError(NNTPError):
     """Response does not begin with [1-5]"""
     pass
+
 
 class NNTPDataError(NNTPError):
     """Error in response data"""
@@ -175,6 +181,7 @@ def decode_header(header_str):
             parts.append(v)
     return ''.join(parts)
 
+
 def _parse_overview_fmt(lines):
     """Parse a list of string representing the response to LIST OVERVIEW.FMT
     and return a list of header/metadata names.
@@ -199,6 +206,7 @@ def _parse_overview_fmt(lines):
     if fmt[:len(defaults)] != defaults:
         raise NNTPDataError("LIST OVERVIEW.FMT redefines default fields")
     return fmt
+
 
 def _parse_overview(lines, fmt, data_process_func=None):
     """Parse the response to an OVER or XOVER command according to the
@@ -229,6 +237,7 @@ def _parse_overview(lines, fmt, data_process_func=None):
         overview.append((article_number, fields))
     return overview
 
+
 def _parse_datetime(date_str, time_str=None):
     """Parse a pair of (date, time) strings, and return a datetime object.
     If only the date is given, it is assumed to be date and time
@@ -250,6 +259,7 @@ def _parse_datetime(date_str, time_str=None):
     elif year < 100:
         year += 1900
     return datetime.datetime(year, month, day, hours, minutes, seconds)
+
 
 def _unparse_datetime(dt, legacy=False):
     """Format a date or datetime object as a pair of (date, time) strings
@@ -360,7 +370,7 @@ class _NNTPBase:
         return self
 
     def __exit__(self, *args):
-        is_connected = lambda: hasattr(self, "file")
+        def is_connected(): return hasattr(self, "file")
         if is_connected():
             try:
                 self.quit()
@@ -376,7 +386,8 @@ class _NNTPBase:
         If the response code is 200, posting is allowed;
         if it 201, posting is not allowed."""
 
-        if self.debugging: print('*welcome*', repr(self.welcome))
+        if self.debugging:
+            print('*welcome*', repr(self.welcome))
         return self.welcome
 
     def getcapabilities(self):
@@ -414,14 +425,16 @@ class _NNTPBase:
         """Internal: send one line to the server, appending CRLF.
         The `line` must be a bytes-like object."""
         line = line + _CRLF
-        if self.debugging > 1: print('*put*', repr(line))
+        if self.debugging > 1:
+            print('*put*', repr(line))
         self.file.write(line)
         self.file.flush()
 
     def _putcmd(self, line):
         """Internal: send one command to the server (through _putline()).
         The `line` must be a unicode string."""
-        if self.debugging: print('*cmd*', repr(line))
+        if self.debugging:
+            print('*cmd*', repr(line))
         line = line.encode(self.encoding, self.errors)
         self._putline(line)
 
@@ -429,12 +442,13 @@ class _NNTPBase:
         """Internal: return one line from the server, stripping _CRLF.
         Raise EOFError if the connection is closed.
         Returns a bytes object."""
-        line = self.file.readline(_MAXLINE +1)
+        line = self.file.readline(_MAXLINE + 1)
         if len(line) > _MAXLINE:
             raise NNTPDataError('line too long')
         if self.debugging > 1:
             print('*get*', repr(line))
-        if not line: raise EOFError
+        if not line:
+            raise EOFError
         if strip_crlf:
             if line[-2:] == _CRLF:
                 line = line[:-2]
@@ -447,7 +461,8 @@ class _NNTPBase:
         Raise various errors if the response indicates an error.
         Returns a unicode string."""
         resp = self._getline()
-        if self.debugging: print('*resp*', repr(resp))
+        if self.debugging:
+            print('*resp*', repr(resp))
         resp = resp.decode(self.encoding, self.errors)
         c = resp[:1]
         if c == '4':
@@ -785,7 +800,9 @@ class _NNTPBase:
         - list: list of (nr, value) strings
         """
         pat = re.compile('^([0-9]+) ?(.*)\n?')
-        resp, lines = self._longcmdstring('XHDR {0} {1}'.format(hdr, str), file)
+        resp, lines = self._longcmdstring(
+            'XHDR {0} {1}'.format(hdr, str), file)
+
         def remove_number(line):
             m = pat.match(line)
             return m.group(1, 2) if m else line
@@ -1065,9 +1082,9 @@ if _have_ssl:
     class NNTP_SSL(_NNTPBase):
 
         def __init__(self, host, port=NNTP_SSL_PORT,
-                    user=None, password=None, ssl_context=None,
-                    readermode=None, usenetrc=False,
-                    timeout=_GLOBAL_DEFAULT_TIMEOUT):
+                     user=None, password=None, ssl_context=None,
+                     readermode=None, usenetrc=False,
+                     timeout=_GLOBAL_DEFAULT_TIMEOUT):
             """This works identically to NNTP.__init__, except for the change
             in default port and the `ssl_context` argument for SSL connections.
             """

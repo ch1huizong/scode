@@ -50,9 +50,9 @@ class PyCompileError(Exception):
                 exc_type, exc_value))
             errmsg = tbtext.replace('File "<string>"', 'File "%s"' % file)
         else:
-            errmsg = "Sorry: %s: %s" % (exc_type_name,exc_value)
+            errmsg = "Sorry: %s: %s" % (exc_type_name, exc_value)
 
-        Exception.__init__(self,msg or errmsg,exc_type_name,exc_value,file)
+        Exception.__init__(self, msg or errmsg, exc_type_name, exc_value, file)
 
         self.exc_type_name = exc_type_name
         self.exc_value = exc_value
@@ -200,6 +200,7 @@ def main(args=None):
                 rv = 1
                 sys.stderr.write("%s\n" % error.msg)
     return rv
+
 
 if __name__ == "__main__":
     sys.exit(main())

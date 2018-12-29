@@ -22,7 +22,8 @@ except ImportError:
     ProcessPoolExecutor = None
 from functools import partial
 
-__all__ = ["compile_dir","compile_file","compile_path"]
+__all__ = ["compile_dir", "compile_file", "compile_path"]
+
 
 def _walk_dir(dir, ddir=None, maxlevels=10, quiet=0):
     if quiet < 2 and isinstance(dir, os.PathLike):
@@ -50,6 +51,7 @@ def _walk_dir(dir, ddir=None, maxlevels=10, quiet=0):
               os.path.isdir(fullname) and not os.path.islink(fullname)):
             yield from _walk_dir(fullname, ddir=dfile,
                                  maxlevels=maxlevels - 1, quiet=quiet)
+
 
 def compile_dir(dir, maxlevels=10, ddir=None, force=False, rx=None,
                 quiet=0, legacy=False, optimize=-1, workers=1,
@@ -94,6 +96,7 @@ def compile_dir(dir, maxlevels=10, ddir=None, force=False, rx=None,
                 success = False
     return success
 
+
 def compile_file(fullname, ddir=None, force=False, rx=None, quiet=0,
                  legacy=False, optimize=-1,
                  invalidation_mode=py_compile.PycInvalidationMode.TIMESTAMP):
@@ -130,7 +133,7 @@ def compile_file(fullname, ddir=None, force=False, rx=None, quiet=0,
             if optimize >= 0:
                 opt = optimize if optimize >= 1 else ''
                 cfile = importlib.util.cache_from_source(
-                                fullname, optimization=opt)
+                    fullname, optimization=opt)
             else:
                 cfile = importlib.util.cache_from_source(fullname)
             cache_dir = os.path.dirname(cfile)
@@ -179,6 +182,7 @@ def compile_file(fullname, ddir=None, force=False, rx=None, quiet=0,
                 if ok == 0:
                     success = False
     return success
+
 
 def compile_path(skip_curdir=1, maxlevels=0, force=False, quiet=0,
                  legacy=False, optimize=-1,
@@ -266,7 +270,6 @@ def main():
         import re
         args.rx = re.compile(args.rx)
 
-
     if args.recursion is not None:
         maxlevels = args.recursion
     else:
@@ -275,7 +278,7 @@ def main():
     # if flist is provided then load it
     if args.flist:
         try:
-            with (sys.stdin if args.flist=='-' else open(args.flist)) as f:
+            with (sys.stdin if args.flist == '-' else open(args.flist)) as f:
                 for line in f:
                     compile_dests.append(line.strip())
         except OSError:

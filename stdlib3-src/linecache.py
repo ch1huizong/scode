@@ -12,6 +12,7 @@ import tokenize
 
 __all__ = ["getline", "clearcache", "checkcache"]
 
+
 def getline(filename, lineno, module_globals=None):
     lines = getlines(filename, module_globals)
     if 1 <= lineno <= len(lines):

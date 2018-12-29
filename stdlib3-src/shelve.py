@@ -63,6 +63,7 @@ import collections.abc
 
 __all__ = ["Shelf", "BsdDbShelf", "DbfilenameShelf", "open"]
 
+
 class _ClosedDict(collections.abc.MutableMapping):
     'Marker for a closed dict.  Access attempts raise a ValueError.'
 

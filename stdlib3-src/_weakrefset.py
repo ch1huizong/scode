@@ -35,6 +35,7 @@ class _IterationGuard:
 class WeakSet:
     def __init__(self, data=None):
         self.data = set()
+
         def _remove(item, selfref=ref(self)):
             self = selfref()
             if self is not None:
@@ -131,6 +132,7 @@ class WeakSet:
 
     def difference_update(self, other):
         self.__isub__(other)
+
     def __isub__(self, other):
         if self._pending_removals:
             self._commit_removals()
@@ -146,6 +148,7 @@ class WeakSet:
 
     def intersection_update(self, other):
         self.__iand__(other)
+
     def __iand__(self, other):
         if self._pending_removals:
             self._commit_removals()
@@ -179,13 +182,15 @@ class WeakSet:
 
     def symmetric_difference_update(self, other):
         self.__ixor__(other)
+
     def __ixor__(self, other):
         if self._pending_removals:
             self._commit_removals()
         if self is other:
             self.data.clear()
         else:
-            self.data.symmetric_difference_update(ref(item, self._remove) for item in other)
+            self.data.symmetric_difference_update(
+                ref(item, self._remove) for item in other)
         return self
 
     def union(self, other):

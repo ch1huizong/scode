@@ -99,7 +99,7 @@ class ABCMeta(type):
         if subtype is subclass:
             if (cls._abc_negative_cache_version ==
                 ABCMeta._abc_invalidation_counter and
-                subclass in cls._abc_negative_cache):
+                    subclass in cls._abc_negative_cache):
                 return False
             # Fall back to the subclass check.
             return cls.__subclasscheck__(subclass)

@@ -21,8 +21,8 @@ HSV: Hue, Saturation, Value
 # http://en.wikipedia.org/wiki/HLS_color_space
 # http://en.wikipedia.org/wiki/HSV_color_space
 
-__all__ = ["rgb_to_yiq","yiq_to_rgb","rgb_to_hls","hls_to_rgb",
-           "rgb_to_hsv","hsv_to_rgb"]
+__all__ = ["rgb_to_yiq", "yiq_to_rgb", "rgb_to_hls", "hls_to_rgb",
+           "rgb_to_hsv", "hsv_to_rgb"]
 
 # Some floating point constants
 
@@ -37,11 +37,13 @@ TWO_THIRD = 2.0/3.0
 # There are a great many versions of the constants used in these formulae.
 # The ones in this library uses constants from the FCC version of NTSC.
 
+
 def rgb_to_yiq(r, g, b):
     y = 0.30*r + 0.59*g + 0.11*b
     i = 0.74*(r-y) - 0.27*(b-y)
     q = 0.48*(r-y) + 0.41*(b-y)
     return (y, i, q)
+
 
 def yiq_to_rgb(y, i, q):
     # r = y + (0.27*q + 0.41*i) / (0.74*0.41 + 0.27*0.48)
@@ -95,6 +97,7 @@ def rgb_to_hls(r, g, b):
     h = (h/6.0) % 1.0
     return h, l, s
 
+
 def hls_to_rgb(h, l, s):
     if s == 0.0:
         return l, l, l
@@ -104,6 +107,7 @@ def hls_to_rgb(h, l, s):
         m2 = l+s-(l*s)
     m1 = 2.0*l - m2
     return (_v(m1, m2, h+ONE_THIRD), _v(m1, m2, h), _v(m1, m2, h-ONE_THIRD))
+
 
 def _v(m1, m2, hue):
     hue = hue % 1.0
@@ -140,15 +144,16 @@ def rgb_to_hsv(r, g, b):
     h = (h/6.0) % 1.0
     return h, s, v
 
+
 def hsv_to_rgb(h, s, v):
     if s == 0.0:
         return v, v, v
-    i = int(h*6.0) # XXX assume int() truncates!
+    i = int(h*6.0)  # XXX assume int() truncates!
     f = (h*6.0) - i
     p = v*(1.0 - s)
     q = v*(1.0 - s*f)
     t = v*(1.0 - s*(1.0-f))
-    i = i%6
+    i = i % 6
     if i == 0:
         return v, t, p
     if i == 1:

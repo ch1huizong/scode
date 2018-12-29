@@ -1,1 +1,0 @@
-../../../../share/pyshared/xdg/Config.py

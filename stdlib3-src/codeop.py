@@ -65,6 +65,7 @@ __all__ = ["compile_command", "Compile", "CommandCompiler"]
 
 PyCF_DONT_IMPLY_DEDENT = 0x200          # Matches pythonrun.h
 
+
 def _maybe_compile(compiler, source, filename, symbol):
     # Check for source consisting of only blank lines and comments
     for line in source.split("\n"):
@@ -98,8 +99,10 @@ def _maybe_compile(compiler, source, filename, symbol):
     if not code1 and repr(err1) == repr(err2):
         raise err1
 
+
 def _compile(source, filename, symbol):
     return compile(source, filename, symbol, PyCF_DONT_IMPLY_DEDENT)
+
 
 def compile_command(source, filename="<input>", symbol="single"):
     r"""Compile a command and determine whether it is incomplete.
@@ -121,11 +124,13 @@ def compile_command(source, filename="<input>", symbol="single"):
     """
     return _maybe_compile(_compile, source, filename, symbol)
 
+
 class Compile:
     """Instances of this class behave much like the built-in compile
     function, but if one is used to compile text containing a future
     statement, it "remembers" and compiles all subsequent program texts
     with the statement in force."""
+
     def __init__(self):
         self.flags = PyCF_DONT_IMPLY_DEDENT
 
@@ -135,6 +140,7 @@ class Compile:
             if codeob.co_flags & feature.compiler_flag:
                 self.flags |= feature.compiler_flag
         return codeob
+
 
 class CommandCompiler:
     """Instances of this class have __call__ methods identical in

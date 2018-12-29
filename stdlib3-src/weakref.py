@@ -10,14 +10,14 @@ http://www.python.org/dev/peps/pep-0205/
 # the module-global ref() function imported from _weakref.
 
 from _weakref import (
-     getweakrefcount,
-     getweakrefs,
-     ref,
-     proxy,
-     CallableProxyType,
-     ProxyType,
-     ReferenceType,
-     _remove_dead_weakref)
+    getweakrefcount,
+    getweakrefs,
+    ref,
+    proxy,
+    CallableProxyType,
+    ProxyType,
+    ReferenceType,
+    _remove_dead_weakref)
 
 from _weakrefset import WeakSet, _IterationGuard
 
@@ -48,6 +48,7 @@ class WeakMethod(ref):
         except AttributeError:
             raise TypeError("argument should be a bound method, not {}"
                             .format(type(meth))) from None
+
         def _cb(arg):
             # The self-weakref trick is needed to avoid creating a reference
             # cycle.
@@ -106,6 +107,7 @@ class WeakValueDictionary(_collections_abc.MutableMapping):
         self, *args = args
         if len(args) > 1:
             raise TypeError('expected at most 1 arguments, got %d' % len(args))
+
         def remove(wr, selfref=ref(self), _atomic_removal=_remove_dead_weakref):
             self = selfref()
             if self is not None:
@@ -353,6 +355,7 @@ class WeakKeyDictionary(_collections_abc.MutableMapping):
 
     def __init__(self, dict=None):
         self.data = {}
+
         def remove(k, selfref=ref(self)):
             self = selfref()
             if self is not None:
@@ -426,7 +429,7 @@ class WeakKeyDictionary(_collections_abc.MutableMapping):
         return new
 
     def get(self, key, default=None):
-        return self.data.get(ref(key),default)
+        return self.data.get(ref(key), default)
 
     def __contains__(self, key):
         try:
@@ -482,7 +485,7 @@ class WeakKeyDictionary(_collections_abc.MutableMapping):
         return self.data.pop(ref(key), *args)
 
     def setdefault(self, key, default=None):
-        return self.data.setdefault(ref(key, self._remove),default)
+        return self.data.setdefault(ref(key, self._remove), default)
 
     def update(self, dict=None, **kwargs):
         d = self.data
@@ -592,9 +595,9 @@ class finalize:
     @classmethod
     def _select_for_exit(cls):
         # Return live finalizers marked for exit, oldest first
-        L = [(f,i) for (f,i) in cls._registry.items() if i.atexit]
-        L.sort(key=lambda item:item[1].index)
-        return [f for (f,i) in L]
+        L = [(f, i) for (f, i) in cls._registry.items() if i.atexit]
+        L.sort(key=lambda item: item[1].index)
+        return [f for (f, i) in L]
 
     @classmethod
     def _exitfunc(cls):

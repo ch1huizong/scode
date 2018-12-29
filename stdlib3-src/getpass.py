@@ -20,10 +20,11 @@ import os
 import sys
 import warnings
 
-__all__ = ["getpass","getuser","GetPassWarning"]
+__all__ = ["getpass", "getuser", "GetPassWarning"]
 
 
-class GetPassWarning(UserWarning): pass
+class GetPassWarning(UserWarning):
+    pass
 
 
 def unix_getpass(prompt='Password: ', stream=None):
@@ -45,7 +46,7 @@ def unix_getpass(prompt='Password: ', stream=None):
     with contextlib.ExitStack() as stack:
         try:
             # Always try reading and writing directly on the tty first.
-            fd = os.open('/dev/tty', os.O_RDWR|os.O_NOCTTY)
+            fd = os.open('/dev/tty', os.O_RDWR | os.O_NOCTTY)
             tty = io.FileIO(fd, 'w+')
             stack.enter_context(tty)
             input = io.TextIOWrapper(tty)
@@ -167,6 +168,7 @@ def getuser():
     # If this fails, the exception will "explain" why
     import pwd
     return pwd.getpwuid(os.getuid())[0]
+
 
 # Bind the name getpass to the appropriate function
 try:

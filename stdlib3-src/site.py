@@ -294,12 +294,13 @@ def getusersitepackages():
     function will also set it.
     """
     global USER_SITE
-    userbase = getuserbase() # this will also set USER_BASE
+    userbase = getuserbase()  # this will also set USER_BASE
 
     if USER_SITE is None:
         USER_SITE = _get_path(userbase)
 
     return USER_SITE
+
 
 def addusersitepackages(known_paths):
     """Add a per user site-package to sys.path
@@ -314,6 +315,7 @@ def addusersitepackages(known_paths):
     if ENABLE_USER_SITE and os.path.isdir(user_site):
         addsitedir(user_site, known_paths)
     return known_paths
+
 
 def getsitepackages(prefixes=None):
     """Returns a list containing all global site-packages directories.
@@ -335,12 +337,13 @@ def getsitepackages(prefixes=None):
 
         if os.sep == '/':
             sitepackages.append(os.path.join(prefix, "lib",
-                                        "python%d.%d" % sys.version_info[:2],
-                                        "site-packages"))
+                                             "python%d.%d" % sys.version_info[:2],
+                                             "site-packages"))
         else:
             sitepackages.append(prefix)
             sitepackages.append(os.path.join(prefix, "lib", "site-packages"))
     return sitepackages
+
 
 def addsitepackages(known_paths, prefixes=None):
     """Add site-packages to sys.path"""
@@ -349,6 +352,7 @@ def addsitepackages(known_paths, prefixes=None):
             addsitedir(sitedir, known_paths)
 
     return known_paths
+
 
 def setquit():
     """Define new builtins 'quit' and 'exit'.
@@ -392,6 +396,7 @@ def setcopyright():
 
 def sethelper():
     builtins.help = _sitebuiltins._Helper()
+
 
 def enablerlcompleter():
     """Enable default readline configuration on interactive prompts, by
@@ -443,6 +448,7 @@ def enablerlcompleter():
 
     sys.__interactivehook__ = register_readline
 
+
 def venv(known_paths):
     global PREFIXES, ENABLE_USER_SITE
 
@@ -459,9 +465,9 @@ def venv(known_paths):
         conffile for conffile in (
             os.path.join(exe_dir, conf_basename),
             os.path.join(site_prefix, conf_basename)
-            )
+        )
         if os.path.isfile(conffile)
-        ]
+    ]
 
     if candidate_confs:
         virtual_conf = candidate_confs[0]
@@ -564,10 +570,12 @@ def main():
     if ENABLE_USER_SITE:
         execusercustomize()
 
+
 # Prevent extending of sys.path when python was started with -S and
 # site is imported later.
 if not sys.flags.no_site:
     main()
+
 
 def _script():
     help = """\
@@ -593,10 +601,10 @@ def _script():
             print("    %r," % (dir,))
         print("]")
         print("USER_BASE: %r (%s)" % (user_base,
-            "exists" if os.path.isdir(user_base) else "doesn't exist"))
+                                      "exists" if os.path.isdir(user_base) else "doesn't exist"))
         print("USER_SITE: %r (%s)" % (user_site,
-            "exists" if os.path.isdir(user_site) else "doesn't exist"))
-        print("ENABLE_USER_SITE: %r" %  ENABLE_USER_SITE)
+                                      "exists" if os.path.isdir(user_site) else "doesn't exist"))
+        print("ENABLE_USER_SITE: %r" % ENABLE_USER_SITE)
         sys.exit(0)
 
     buffer = []
@@ -619,6 +627,7 @@ def _script():
         import textwrap
         print(textwrap.dedent(help % (sys.argv[0], os.pathsep)))
         sys.exit(10)
+
 
 if __name__ == '__main__':
     _script()

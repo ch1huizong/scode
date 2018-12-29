@@ -9,6 +9,7 @@ __all__ = ["pickle", "constructor",
 
 dispatch_table = {}
 
+
 def pickle(ob_type, pickle_function, constructor_ob=None):
     if not callable(pickle_function):
         raise TypeError("reduction functions must be callable")
@@ -19,11 +20,13 @@ def pickle(ob_type, pickle_function, constructor_ob=None):
     if constructor_ob is not None:
         constructor(constructor_ob)
 
+
 def constructor(object):
     if not callable(object):
         raise TypeError("constructors must be callable")
 
 # Example: provide pickling support for complex numbers.
+
 
 try:
     complex
@@ -38,6 +41,7 @@ else:
 
 # Support for pickling new-style objects
 
+
 def _reconstructor(cls, base, state):
     if base is object:
         obj = object.__new__(cls)
@@ -47,9 +51,11 @@ def _reconstructor(cls, base, state):
             base.__init__(obj, state)
     return obj
 
-_HEAPTYPE = 1<<9
+
+_HEAPTYPE = 1 << 9
 
 # Python code for object.__reduce_ex__ for protocols 0 and 1
+
 
 def _reduce_ex(self, proto):
     assert proto < 2
@@ -57,7 +63,7 @@ def _reduce_ex(self, proto):
         if hasattr(base, '__flags__') and not base.__flags__ & _HEAPTYPE:
             break
     else:
-        base = object # not really reachable
+        base = object  # not really reachable
     if base is object:
         state = None
     else:
@@ -84,14 +90,17 @@ def _reduce_ex(self, proto):
 
 # Helper for __reduce_ex__ protocol 2
 
+
 def __newobj__(cls, *args):
     return cls.__new__(cls, *args)
+
 
 def __newobj_ex__(cls, args, kwargs):
     """Used by pickle protocol 4, instead of __newobj__ to allow classes with
     keyword-only arguments to be pickled correctly.
     """
     return cls.__new__(cls, *args, **kwargs)
+
 
 def _slotnames(cls):
     """Return a list of slot names for a given class.
@@ -140,7 +149,7 @@ def _slotnames(cls):
     try:
         cls.__slotnames__ = names
     except:
-        pass # But don't die if we can't
+        pass  # But don't die if we can't
 
     return names
 
@@ -153,11 +162,13 @@ def _slotnames(cls):
 # don't have this restriction.)  Codes are positive ints; 0 is
 # reserved.
 
+
 _extension_registry = {}                # key -> code
 _inverted_registry = {}                 # code -> key
 _extension_cache = {}                   # code -> object
 # Don't ever rebind those names:  pickling grabs a reference to them when
 # it's initialized, and won't see a rebinding.
+
 
 def add_extension(module, name, code):
     """Register an extension code."""
@@ -166,8 +177,8 @@ def add_extension(module, name, code):
         raise ValueError("code out of range")
     key = (module, name)
     if (_extension_registry.get(key) == code and
-        _inverted_registry.get(code) == key):
-        return # Redundant registrations are benign
+            _inverted_registry.get(code) == key):
+        return  # Redundant registrations are benign
     if key in _extension_registry:
         raise ValueError("key %s is already registered with code %s" %
                          (key, _extension_registry[key]))
@@ -177,17 +188,19 @@ def add_extension(module, name, code):
     _extension_registry[key] = code
     _inverted_registry[code] = key
 
+
 def remove_extension(module, name, code):
     """Unregister an extension code.  For testing only."""
     key = (module, name)
     if (_extension_registry.get(key) != code or
-        _inverted_registry.get(code) != key):
+            _inverted_registry.get(code) != key):
         raise ValueError("key %s is not registered with code %s" %
                          (key, code))
     del _extension_registry[key]
     del _inverted_registry[code]
     if code in _extension_cache:
         del _extension_cache[code]
+
 
 def clear_extension_cache():
     _extension_cache.clear()

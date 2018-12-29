@@ -165,7 +165,8 @@ class async_chat(asyncore.dispatcher):
                         # don't bother reporting the empty string
                         # (source of subtle bugs)
                         self.collect_incoming_data(self.ac_in_buffer[:index])
-                    self.ac_in_buffer = self.ac_in_buffer[index+terminator_len:]
+                    self.ac_in_buffer = self.ac_in_buffer[index +
+                                                          terminator_len:]
                     # This does the Right Thing if the terminator
                     # is changed here.
                     self.found_terminator()
@@ -175,7 +176,8 @@ class async_chat(asyncore.dispatcher):
                     if index:
                         if index != lb:
                             # we found a prefix, collect up to the prefix
-                            self.collect_incoming_data(self.ac_in_buffer[:-index])
+                            self.collect_incoming_data(
+                                self.ac_in_buffer[:-index])
                             self.ac_in_buffer = self.ac_in_buffer[-index:]
                         break
                     else:

@@ -75,6 +75,7 @@ def crypt(word, salt=None):
 #  available salting/crypto methods
 methods = []
 
+
 def _add_method(name, *args, rounds=None):
     method = _Method(name, *args)
     globals()['METHOD_' + name] = method
@@ -85,6 +86,7 @@ def _add_method(name, *args, rounds=None):
         return True
     return False
 
+
 _add_method('SHA512', '6', 16, 106)
 _add_method('SHA256', '5', 16, 63)
 
@@ -94,7 +96,7 @@ _add_method('SHA256', '5', 16, 63)
 # 'y' is the same as 'b', for compatibility
 # with openwall crypt_blowfish.
 for _v in 'b', 'y', 'a', '':
-    if _add_method('BLOWFISH', '2' + _v, 22, 59 + len(_v), rounds=1<<4):
+    if _add_method('BLOWFISH', '2' + _v, 22, 59 + len(_v), rounds=1 << 4):
         break
 
 _add_method('MD5', '1', 8, 34)

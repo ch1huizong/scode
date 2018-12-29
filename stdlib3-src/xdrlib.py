@@ -11,6 +11,8 @@ from functools import wraps
 __all__ = ["Error", "Packer", "Unpacker", "ConversionError"]
 
 # exceptions
+
+
 class Error(Exception):
     """Exception class for this module. Use:
 
@@ -21,16 +23,20 @@ class Error(Exception):
         msg -- contains the message
 
     """
+
     def __init__(self, msg):
         self.msg = msg
+
     def __repr__(self):
         return repr(self.msg)
+
     def __str__(self):
         return str(self.msg)
 
 
 class ConversionError(Error):
     pass
+
 
 def raise_conversion_error(function):
     """ Wrap any raised struct.errors in a ConversionError. """
@@ -69,12 +75,14 @@ class Packer:
     pack_enum = pack_int
 
     def pack_bool(self, x):
-        if x: self.__buf.write(b'\0\0\0\1')
-        else: self.__buf.write(b'\0\0\0\0')
+        if x:
+            self.__buf.write(b'\0\0\0\1')
+        else:
+            self.__buf.write(b'\0\0\0\0')
 
     def pack_uhyper(self, x):
         try:
-            self.pack_uint(x>>32 & 0xffffffff)
+            self.pack_uint(x >> 32 & 0xffffffff)
         except (TypeError, struct.error) as e:
             raise ConversionError(e.args[0]) from None
         try:
@@ -128,7 +136,6 @@ class Packer:
         self.pack_farray(n, list, pack_item)
 
 
-
 class Unpacker:
     """Unpacks various data representations from the given buffer."""
 
@@ -176,7 +183,7 @@ class Unpacker:
     def unpack_uhyper(self):
         hi = self.unpack_uint()
         lo = self.unpack_uint()
-        return int(hi)<<32 | lo
+        return int(hi) << 32 | lo
 
     def unpack_hyper(self):
         x = self.unpack_uhyper()
@@ -223,7 +230,8 @@ class Unpacker:
         list = []
         while 1:
             x = self.unpack_uint()
-            if x == 0: break
+            if x == 0:
+                break
             if x != 1:
                 raise ConversionError('0 or 1 expected, got %r' % (x,))
             item = unpack_item()

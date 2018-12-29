@@ -1,3 +1,4 @@
+import _random
 """Random variable generators.
 
     integers
@@ -48,11 +49,11 @@ import itertools as _itertools
 import bisect as _bisect
 import os as _os
 
-__all__ = ["Random","seed","random","uniform","randint","choice","sample",
-           "randrange","shuffle","normalvariate","lognormvariate",
-           "expovariate","vonmisesvariate","gammavariate","triangular",
-           "gauss","betavariate","paretovariate","weibullvariate",
-           "getstate","setstate", "getrandbits", "choices",
+__all__ = ["Random", "seed", "random", "uniform", "randint", "choice", "sample",
+           "randrange", "shuffle", "normalvariate", "lognormvariate",
+           "expovariate", "vonmisesvariate", "gammavariate", "triangular",
+           "gauss", "betavariate", "paretovariate", "weibullvariate",
+           "getstate", "setstate", "getrandbits", "choices",
            "SystemRandom"]
 
 NV_MAGICCONST = 4 * _exp(-0.5)/_sqrt(2.0)
@@ -67,7 +68,6 @@ RECIP_BPF = 2**-BPF
 # Adrian Baddeley.  Adapted by Raymond Hettinger for use with
 # the Mersenne Twister  and os.urandom() core generators.
 
-import _random
 
 class Random(_random.Random):
     """Random number generator base class used by bound module functions.
@@ -152,15 +152,15 @@ class Random(_random.Random):
                              "Random.setstate() of version %s" %
                              (version, self.VERSION))
 
-## ---- Methods below this point do not need to be overridden when
-## ---- subclassing for the purpose of using a different core generator.
+# ---- Methods below this point do not need to be overridden when
+# ---- subclassing for the purpose of using a different core generator.
 
-## -------------------- pickle support  -------------------
+# -------------------- pickle support  -------------------
 
     # Issue 17489: Since __reduce__ was defined to fix #759889 this is no
     # longer called; we leave it here because it has been here since random was
     # rewritten back in 2001 and why risk breaking something.
-    def __getstate__(self): # for pickle
+    def __getstate__(self):  # for pickle
         return self.getstate()
 
     def __setstate__(self, state):  # for pickle
@@ -169,7 +169,7 @@ class Random(_random.Random):
     def __reduce__(self):
         return self.__class__, (), self.getstate()
 
-## -------------------- integer methods  -------------------
+# -------------------- integer methods  -------------------
 
     def randrange(self, start, stop=None, step=1, _int=int):
         """Choose a random item from range(start, stop[, step]).
@@ -197,7 +197,8 @@ class Random(_random.Random):
         if step == 1 and width > 0:
             return istart + self._randbelow(width)
         if step == 1:
-            raise ValueError("empty range for randrange() (%d,%d, %d)" % (istart, istop, width))
+            raise ValueError(
+                "empty range for randrange() (%d,%d, %d)" % (istart, istop, width))
 
         # Non-unit step argument supplied.
         istep = _int(step)
@@ -221,7 +222,7 @@ class Random(_random.Random):
 
         return self.randrange(a, b+1)
 
-    def _randbelow(self, n, int=int, maxsize=1<<BPF, type=type,
+    def _randbelow(self, n, int=int, maxsize=1 << BPF, type=type,
                    Method=_MethodType, BuiltinMethod=_BuiltinMethodType):
         "Return a random int in the range [0,n).  Raises ValueError if n==0."
 
@@ -239,8 +240,8 @@ class Random(_random.Random):
         # so we can only use random() from here.
         if n >= maxsize:
             _warn("Underlying random() generator does not supply \n"
-                "enough bits to choose from a population range this large.\n"
-                "To remove the range limitation, add a getrandbits() method.")
+                  "enough bits to choose from a population range this large.\n"
+                  "To remove the range limitation, add a getrandbits() method.")
             return int(random() * n)
         if n == 0:
             raise ValueError("Boundary cannot be zero")
@@ -251,7 +252,7 @@ class Random(_random.Random):
             r = random()
         return int(r*maxsize) % n
 
-## -------------------- sequence methods  -------------------
+# -------------------- sequence methods  -------------------
 
     def choice(self, seq):
         """Choose a random element from a non-empty sequence."""
@@ -314,7 +315,8 @@ class Random(_random.Random):
         if isinstance(population, _Set):
             population = tuple(population)
         if not isinstance(population, _Sequence):
-            raise TypeError("Population must be a sequence or set.  For dicts, use list(d).")
+            raise TypeError(
+                "Population must be a sequence or set.  For dicts, use list(d).")
         randbelow = self._randbelow
         n = len(population)
         if not 0 <= k <= n:
@@ -322,7 +324,7 @@ class Random(_random.Random):
         result = [None] * k
         setsize = 21        # size of a small set minus size of an empty list
         if k > 5:
-            setsize += 4 ** _ceil(_log(k * 3, 4)) # table size for big sets
+            setsize += 4 ** _ceil(_log(k * 3, 4))  # table size for big sets
         if n <= setsize:
             # An n-length list is smaller than a k-length set
             pool = list(population)
@@ -356,22 +358,24 @@ class Random(_random.Random):
                 return [population[_int(random() * total)] for i in range(k)]
             cum_weights = list(_itertools.accumulate(weights))
         elif weights is not None:
-            raise TypeError('Cannot specify both weights and cumulative weights')
+            raise TypeError(
+                'Cannot specify both weights and cumulative weights')
         if len(cum_weights) != len(population):
-            raise ValueError('The number of weights does not match the population')
+            raise ValueError(
+                'The number of weights does not match the population')
         bisect = _bisect.bisect
         total = cum_weights[-1]
         return [population[bisect(cum_weights, random() * total)] for i in range(k)]
 
-## -------------------- real-valued distributions  -------------------
+# -------------------- real-valued distributions  -------------------
 
-## -------------------- uniform distribution -------------------
+# -------------------- uniform distribution -------------------
 
     def uniform(self, a, b):
         "Get a random number in the range [a, b) or [a, b] depending on rounding."
         return a + (b-a) * self.random()
 
-## -------------------- triangular --------------------
+# -------------------- triangular --------------------
 
     def triangular(self, low=0.0, high=1.0, mode=None):
         """Triangular distribution.
@@ -393,7 +397,7 @@ class Random(_random.Random):
             low, high = high, low
         return low + (high - low) * _sqrt(u * c)
 
-## -------------------- normal distribution --------------------
+# -------------------- normal distribution --------------------
 
     def normalvariate(self, mu, sigma):
         """Normal distribution.
@@ -418,7 +422,7 @@ class Random(_random.Random):
                 break
         return mu + z*sigma
 
-## -------------------- lognormal distribution --------------------
+# -------------------- lognormal distribution --------------------
 
     def lognormvariate(self, mu, sigma):
         """Log normal distribution.
@@ -430,7 +434,7 @@ class Random(_random.Random):
         """
         return _exp(self.normalvariate(mu, sigma))
 
-## -------------------- exponential distribution --------------------
+# -------------------- exponential distribution --------------------
 
     def expovariate(self, lambd):
         """Exponential distribution.
@@ -449,7 +453,7 @@ class Random(_random.Random):
         # possibility of taking the log of zero.
         return -_log(1.0 - self.random())/lambd
 
-## -------------------- von Mises distribution --------------------
+# -------------------- von Mises distribution --------------------
 
     def vonmisesvariate(self, mu, kappa):
         """Circular data distribution.
@@ -497,7 +501,7 @@ class Random(_random.Random):
 
         return theta
 
-## -------------------- gamma distribution --------------------
+# -------------------- gamma distribution --------------------
 
     def gammavariate(self, alpha, beta):
         """Gamma distribution.  Not the gamma function!
@@ -569,7 +573,7 @@ class Random(_random.Random):
                     break
             return x * beta
 
-## -------------------- Gauss (faster alternative) --------------------
+# -------------------- Gauss (faster alternative) --------------------
 
     def gauss(self, mu, sigma):
         """Gaussian distribution.
@@ -610,19 +614,19 @@ class Random(_random.Random):
 
         return mu + z*sigma
 
-## -------------------- beta --------------------
-## See
-## http://mail.python.org/pipermail/python-bugs-list/2001-January/003752.html
-## for Ivan Frohne's insightful analysis of why the original implementation:
+# -------------------- beta --------------------
+# See
+# http://mail.python.org/pipermail/python-bugs-list/2001-January/003752.html
+# for Ivan Frohne's insightful analysis of why the original implementation:
 ##
-##    def betavariate(self, alpha, beta):
-##        # Discrete Event Simulation in C, pp 87-88.
+# def betavariate(self, alpha, beta):
+# Discrete Event Simulation in C, pp 87-88.
 ##
 ##        y = self.expovariate(alpha)
 ##        z = self.expovariate(1.0/beta)
-##        return z/(y+z)
+# return z/(y+z)
 ##
-## was dead wrong, and how it probably got that way.
+# was dead wrong, and how it probably got that way.
 
     def betavariate(self, alpha, beta):
         """Beta distribution.
@@ -640,7 +644,7 @@ class Random(_random.Random):
         else:
             return y / (y + self.gammavariate(beta, 1.0))
 
-## -------------------- Pareto --------------------
+# -------------------- Pareto --------------------
 
     def paretovariate(self, alpha):
         """Pareto distribution.  alpha is the shape parameter."""
@@ -649,7 +653,7 @@ class Random(_random.Random):
         u = 1.0 - self.random()
         return 1.0 / u ** (1.0/alpha)
 
-## -------------------- Weibull --------------------
+# -------------------- Weibull --------------------
 
     def weibullvariate(self, alpha, beta):
         """Weibull distribution.
@@ -662,7 +666,8 @@ class Random(_random.Random):
         u = 1.0 - self.random()
         return alpha * (-_log(u)) ** (1.0/beta)
 
-## --------------- Operating System Random Source  ------------------
+# --------------- Operating System Random Source  ------------------
+
 
 class SystemRandom(Random):
     """Alternate random number generator using sources provided
@@ -695,7 +700,8 @@ class SystemRandom(Random):
         raise NotImplementedError('System entropy source does not have state.')
     getstate = setstate = _notimplemented
 
-## -------------------- test program --------------------
+# -------------------- test program --------------------
+
 
 def _test_generator(n, func, args):
     import time
@@ -715,8 +721,8 @@ def _test_generator(n, func, args):
     print(round(t1-t0, 3), 'sec,', end=' ')
     avg = total/n
     stddev = _sqrt(sqsum/n - avg*avg)
-    print('avg %g, stddev %g, min %g, max %g\n' % \
-              (avg, stddev, smallest, largest))
+    print('avg %g, stddev %g, min %g, max %g\n' %
+          (avg, stddev, smallest, largest))
 
 
 def _test(N=2000):
@@ -739,9 +745,10 @@ def _test(N=2000):
 
 # Create one instance, seeded from current time, and export its methods
 # as module-level functions.  The functions share state across all uses
-#(both in the user's code and in the Python libraries), but that's fine
+# (both in the user's code and in the Python libraries), but that's fine
 # for most programs and is easier for the casual user than making them
 # instantiate their own Random() instance.
+
 
 _inst = Random()
 seed = _inst.seed

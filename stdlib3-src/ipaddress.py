@@ -16,6 +16,7 @@ import functools
 IPV4LENGTH = 32
 IPV6LENGTH = 128
 
+
 class AddressValueError(ValueError):
     """A Value Error related to the address."""
 
@@ -230,7 +231,7 @@ def summarize_address_range(first, last):
         raise TypeError('first and last must be IP addresses, not networks')
     if first.version != last.version:
         raise TypeError("%s and %s are not of the same version" % (
-                         first, last))
+            first, last))
     if first > last:
         raise ValueError('last IP address must be greater than first')
 
@@ -330,12 +331,12 @@ def collapse_addresses(addresses):
         if isinstance(ip, _BaseAddress):
             if ips and ips[-1]._version != ip._version:
                 raise TypeError("%s and %s are not of the same version" % (
-                                 ip, ips[-1]))
+                    ip, ips[-1]))
             ips.append(ip)
         elif ip._prefixlen == ip._max_prefixlen:
             if ips and ips[-1]._version != ip._version:
                 raise TypeError("%s and %s are not of the same version" % (
-                                 ip, ips[-1]))
+                    ip, ips[-1]))
             try:
                 ips.append(ip.ip)
             except AttributeError:
@@ -343,7 +344,7 @@ def collapse_addresses(addresses):
         else:
             if nets and nets[-1]._version != ip._version:
                 raise TypeError("%s and %s are not of the same version" % (
-                                 ip, nets[-1]))
+                    ip, nets[-1]))
             nets.append(ip)
 
     # sort and dedup
@@ -562,7 +563,7 @@ class _BaseAddress(_IPAddressBase):
             return NotImplemented
         if self._version != other._version:
             raise TypeError('%s and %s are not of the same version' % (
-                             self, other))
+                self, other))
         if self._ip != other._ip:
             return self._ip < other._ip
         return False
@@ -604,6 +605,7 @@ class _BaseNetwork(_IPAddressBase):
     used by networks.
 
     """
+
     def __init__(self, address):
         self._cache = {}
 
@@ -649,7 +651,7 @@ class _BaseNetwork(_IPAddressBase):
             return NotImplemented
         if self._version != other._version:
             raise TypeError('%s and %s are not of the same version' % (
-                             self, other))
+                self, other))
         if self.network_address != other.network_address:
             return self.network_address < other.network_address
         if self.netmask != other.netmask:
@@ -771,7 +773,7 @@ class _BaseNetwork(_IPAddressBase):
         """
         if not self._version == other._version:
             raise TypeError("%s and %s are not of the same version" % (
-                             self, other))
+                self, other))
 
         if not isinstance(other, _BaseNetwork):
             raise TypeError("%s is not a network object" % other)
@@ -843,7 +845,7 @@ class _BaseNetwork(_IPAddressBase):
         # does this need to raise a ValueError?
         if self._version != other._version:
             raise TypeError('%s and %s are not of the same type' % (
-                             self, other))
+                self, other))
         # self._version == other._version below here:
         if self.network_address < other.network_address:
             return -1
@@ -958,7 +960,7 @@ class _BaseNetwork(_IPAddressBase):
         return self.__class__((
             int(self.network_address) & (int(self.netmask) << prefixlen_diff),
             new_prefixlen
-            ))
+        ))
 
     @property
     def is_multicast(self):
@@ -1266,7 +1268,6 @@ class IPv4Address(_BaseV4, _BaseAddress):
     __slots__ = ('_ip', '__weakref__')
 
     def __init__(self, address):
-
         """
         Args:
             address: A string or integer representing the IP
@@ -1475,7 +1476,6 @@ class IPv4Network(_BaseV4, _BaseNetwork):
     _address_class = IPv4Address
 
     def __init__(self, address, strict=True):
-
         """Instantiate a new IPv4 network object.
 
         Args:
@@ -1552,7 +1552,7 @@ class IPv4Network(_BaseV4, _BaseNetwork):
 
         """
         return (not (self.network_address in IPv4Network('100.64.0.0/10') and
-                    self.broadcast_address in IPv4Network('100.64.0.0/10')) and
+                     self.broadcast_address in IPv4Network('100.64.0.0/10')) and
                 not self.is_private)
 
 
@@ -1580,7 +1580,7 @@ class _IPv4Constants:
         IPv4Network('203.0.113.0/24'),
         IPv4Network('240.0.0.0/4'),
         IPv4Network('255.255.255.255/32'),
-        ]
+    ]
 
     _reserved_network = IPv4Network('240.0.0.0/4')
 
@@ -2264,7 +2264,7 @@ class _IPv6Constants:
         IPv6Network('2001:10::/28'),
         IPv6Network('fc00::/7'),
         IPv6Network('fe80::/10'),
-        ]
+    ]
 
     _reserved_networks = [
         IPv6Network('::/8'), IPv6Network('100::/8'),

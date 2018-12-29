@@ -119,8 +119,8 @@ class UUID:
     """
 
     def __init__(self, hex=None, bytes=None, bytes_le=None, fields=None,
-                       int=None, version=None,
-                       *, is_safe=SafeUUID.unknown):
+                 int=None, version=None,
+                 *, is_safe=SafeUUID.unknown):
         r"""Create a UUID from either a string of 32 hexadecimal digits,
         a string of 16 bytes as the 'bytes' argument, a string of 16 bytes
         in little-endian order as the 'bytes_le' argument, a tuple of six
@@ -174,23 +174,23 @@ class UUID:
                 raise ValueError('fields is not a 6-tuple')
             (time_low, time_mid, time_hi_version,
              clock_seq_hi_variant, clock_seq_low, node) = fields
-            if not 0 <= time_low < 1<<32:
+            if not 0 <= time_low < 1 << 32:
                 raise ValueError('field 1 out of range (need a 32-bit value)')
-            if not 0 <= time_mid < 1<<16:
+            if not 0 <= time_mid < 1 << 16:
                 raise ValueError('field 2 out of range (need a 16-bit value)')
-            if not 0 <= time_hi_version < 1<<16:
+            if not 0 <= time_hi_version < 1 << 16:
                 raise ValueError('field 3 out of range (need a 16-bit value)')
-            if not 0 <= clock_seq_hi_variant < 1<<8:
+            if not 0 <= clock_seq_hi_variant < 1 << 8:
                 raise ValueError('field 4 out of range (need an 8-bit value)')
-            if not 0 <= clock_seq_low < 1<<8:
+            if not 0 <= clock_seq_low < 1 << 8:
                 raise ValueError('field 5 out of range (need an 8-bit value)')
-            if not 0 <= node < 1<<48:
+            if not 0 <= node < 1 << 48:
                 raise ValueError('field 6 out of range (need a 48-bit value)')
             clock_seq = (clock_seq_hi_variant << 8) | clock_seq_low
             int = ((time_low << 96) | (time_mid << 80) |
                    (time_hi_version << 64) | (clock_seq << 48) | node)
         if int is not None:
-            if not 0 <= int < 1<<128:
+            if not 0 <= int < 1 << 128:
                 raise ValueError('int is out of range (need a 128-bit value)')
         if version is not None:
             if not 1 <= version <= 5:
@@ -323,8 +323,11 @@ class UUID:
         if self.variant == RFC_4122:
             return int((self.int >> 76) & 0xf)
 
+
 def _popen(command, *args):
-    import os, shutil, subprocess
+    import os
+    import shutil
+    import subprocess
     executable = shutil.which(command)
     if executable is None:
         path = os.pathsep.join(('/sbin', '/usr/sbin'))
@@ -357,8 +360,10 @@ def _popen(command, *args):
 #
 # See https://en.wikipedia.org/wiki/MAC_address#Universal_vs._local
 
+
 def _is_universal(mac):
     return not (mac & (1 << 41))
+
 
 def _find_mac(command, args, hw_identifiers, get_index):
     first_local_mac = None
@@ -388,6 +393,7 @@ def _find_mac(command, args, hw_identifiers, get_index):
         pass
     return first_local_mac or None
 
+
 def _ifconfig_getnode():
     """Get the hardware address on Unix by running ifconfig."""
     # This works on Linux ('' or '-a'), Tru64 ('-av'), but not all Unixes.
@@ -398,6 +404,7 @@ def _ifconfig_getnode():
             return mac
         return None
 
+
 def _ip_getnode():
     """Get the hardware address on Unix by running ip."""
     # This works on Linux with iproute2.
@@ -406,9 +413,11 @@ def _ip_getnode():
         return mac
     return None
 
+
 def _arp_getnode():
     """Get the hardware address on Unix by running arp."""
-    import os, socket
+    import os
+    import socket
     try:
         ip_addr = socket.gethostbyname(socket.gethostname())
     except OSError:
@@ -432,10 +441,12 @@ def _arp_getnode():
         return mac
     return None
 
+
 def _lanscan_getnode():
     """Get the hardware address on Unix by running lanscan."""
     # This might work on HP-UX.
     return _find_mac('lanscan', '-ai', [b'lan0'], lambda i: 0)
+
 
 def _netstat_getnode():
     """Get the hardware address on Unix by running netstat."""
@@ -466,9 +477,12 @@ def _netstat_getnode():
         pass
     return first_local_mac or None
 
+
 def _ipconfig_getnode():
     """Get the hardware address on Windows by running ipconfig.exe."""
-    import os, re, subprocess
+    import os
+    import re
+    import subprocess
     first_local_mac = None
     dirs = ['', r'c:\windows\system32', r'c:\winnt\system32']
     try:
@@ -495,10 +509,12 @@ def _ipconfig_getnode():
                     first_local_mac = first_local_mac or mac
     return first_local_mac or None
 
+
 def _netbios_getnode():
     """Get the hardware address on Windows using NetBIOS calls.
     See http://support.microsoft.com/kb/118623 for details."""
-    import win32wnet, netbios
+    import win32wnet
+    import netbios
     first_local_mac = None
     ncb = netbios.NCB()
     ncb.Command = netbios.NCBENUM
@@ -587,6 +603,7 @@ def _load_system_functions():
             if hasattr(lib, 'uuid_generate_time_safe'):
                 _uuid_generate_time_safe = lib.uuid_generate_time_safe
                 # int uuid_generate_time_safe(uuid_t out);
+
                 def _generate_time_safe():
                     _buffer = ctypes.create_string_buffer(16)
                     res = _uuid_generate_time_safe(_buffer)
@@ -598,6 +615,7 @@ def _load_system_functions():
                 _uuid_generate_time = lib.uuid_generate_time
                 # void uuid_generate_time(uuid_t out);
                 _uuid_generate_time.restype = None
+
                 def _generate_time_safe():
                     _buffer = ctypes.create_string_buffer(16)
                     _uuid_generate_time(_buffer)
@@ -632,6 +650,7 @@ def _unix_getnode():
     uuid_time, _ = _generate_time_safe()
     return UUID(bytes=uuid_time).node
 
+
 def _windll_getnode():
     """Get the hardware address on Windows using ctypes."""
     import ctypes
@@ -639,6 +658,7 @@ def _windll_getnode():
     _buffer = ctypes.create_string_buffer(16)
     if _UuidCreate(_buffer) == 0:
         return UUID(bytes=bytes_(_buffer.raw)).node
+
 
 def _random_getnode():
     """Get a random node ID."""
@@ -662,6 +682,7 @@ _NODE_GETTERS_WIN32 = [_windll_getnode, _netbios_getnode, _ipconfig_getnode]
 
 _NODE_GETTERS_UNIX = [_unix_getnode, _ifconfig_getnode, _ip_getnode,
                       _arp_getnode, _lanscan_getnode, _netstat_getnode]
+
 
 def getnode(*, getters=None):
     """Get the hardware address as a 48-bit positive integer.
@@ -692,6 +713,7 @@ def getnode(*, getters=None):
 
 _last_timestamp = None
 
+
 def uuid1(node=None, clock_seq=None):
     """Generate a UUID from a host ID, sequence number, and the current time.
     If 'node' is not given, getnode() is used to obtain the hardware
@@ -720,7 +742,7 @@ def uuid1(node=None, clock_seq=None):
     _last_timestamp = timestamp
     if clock_seq is None:
         import random
-        clock_seq = random.getrandbits(14) # instead of stable storage
+        clock_seq = random.getrandbits(14)  # instead of stable storage
     time_low = timestamp & 0xffffffff
     time_mid = (timestamp >> 32) & 0xffff
     time_hi_version = (timestamp >> 48) & 0x0fff
@@ -731,15 +753,18 @@ def uuid1(node=None, clock_seq=None):
     return UUID(fields=(time_low, time_mid, time_hi_version,
                         clock_seq_hi_variant, clock_seq_low, node), version=1)
 
+
 def uuid3(namespace, name):
     """Generate a UUID from the MD5 hash of a namespace UUID and a name."""
     from hashlib import md5
     hash = md5(namespace.bytes + bytes(name, "utf-8")).digest()
     return UUID(bytes=hash[:16], version=3)
 
+
 def uuid4():
     """Generate a random UUID."""
     return UUID(bytes=os.urandom(16), version=4)
+
 
 def uuid5(namespace, name):
     """Generate a UUID from the SHA-1 hash of a namespace UUID and a name."""
@@ -748,6 +773,7 @@ def uuid5(namespace, name):
     return UUID(bytes=hash[:16], version=5)
 
 # The following standard UUIDs are for use with uuid3() or uuid5().
+
 
 NAMESPACE_DNS = UUID('6ba7b810-9dad-11d1-80b4-00c04fd430c8')
 NAMESPACE_URL = UUID('6ba7b811-9dad-11d1-80b4-00c04fd430c8')

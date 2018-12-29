@@ -49,7 +49,7 @@ class Statistic:
 
     def __str__(self):
         text = ("%s: size=%s, count=%i"
-                 % (self.traceback,
+                % (self.traceback,
                     _format_size(self.size, False),
                     self.count))
         if self.count:
@@ -467,7 +467,7 @@ class Snapshot:
                         frames = trace_traceback
                     elif key_type == 'lineno':
                         frames = trace_traceback[:1]
-                    else: # key_type == 'filename':
+                    else:  # key_type == 'filename':
                         frames = ((trace_traceback[0][0], 0),)
                     traceback = Traceback(frames)
                     tracebacks[trace_traceback] = traceback
@@ -487,7 +487,7 @@ class Snapshot:
                     except KeyError:
                         if key_type == 'lineno':
                             frames = (frame,)
-                        else: # key_type == 'filename':
+                        else:  # key_type == 'filename':
                             frames = ((frame[0], 0),)
                         traceback = Traceback(frames)
                         tracebacks[frame] = traceback

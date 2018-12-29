@@ -277,6 +277,7 @@ class _Final:
         if '_root' not in kwds:
             raise TypeError("Cannot subclass special typing classes")
 
+
 class _Immutable:
     """Mixin to indicate that object should not be copied."""
 
@@ -337,7 +338,8 @@ class _SpecialForm(_Final, _Immutable, _root=True):
     @_tp_cache
     def __getitem__(self, parameters):
         if self._name == 'ClassVar':
-            item = _type_check(parameters, 'ClassVar accepts only single type.')
+            item = _type_check(
+                parameters, 'ClassVar accepts only single type.')
             return _GenericAlias(self, (item,))
         if self._name == 'Union':
             if parameters == ():
@@ -351,13 +353,13 @@ class _SpecialForm(_Final, _Immutable, _root=True):
                 return parameters[0]
             return _GenericAlias(self, parameters)
         if self._name == 'Optional':
-            arg = _type_check(parameters, "Optional[t] requires a single type.")
+            arg = _type_check(
+                parameters, "Optional[t] requires a single type.")
             return Union[arg, type(None)]
         raise TypeError(f"{self} is not subscriptable")
 
 
-Any = _SpecialForm('Any', doc=
-    """Special type indicating an unconstrained type.
+Any = _SpecialForm('Any', doc="""Special type indicating an unconstrained type.
 
     - Any is compatible with every type.
     - Any assumed to have all methods.
@@ -368,8 +370,7 @@ Any = _SpecialForm('Any', doc=
     or class checks.
     """)
 
-NoReturn = _SpecialForm('NoReturn', doc=
-    """Special type indicating functions that never return.
+NoReturn = _SpecialForm('NoReturn', doc="""Special type indicating functions that never return.
     Example::
 
       from typing import NoReturn
@@ -381,8 +382,7 @@ NoReturn = _SpecialForm('NoReturn', doc=
     will fail in static type checkers.
     """)
 
-ClassVar = _SpecialForm('ClassVar', doc=
-    """Special type construct to mark class variables.
+ClassVar = _SpecialForm('ClassVar', doc="""Special type construct to mark class variables.
 
     An annotation wrapped in ClassVar indicates that a given
     attribute is intended to be used as a class variable and
@@ -398,8 +398,7 @@ ClassVar = _SpecialForm('ClassVar', doc=
     be used with isinstance() or issubclass().
     """)
 
-Union = _SpecialForm('Union', doc=
-    """Union type; Union[X, Y] means either X or Y.
+Union = _SpecialForm('Union', doc="""Union type; Union[X, Y] means either X or Y.
 
     To define a union, use e.g. Union[int, str].  Details:
     - The arguments must be types and there must be at least one.
@@ -425,8 +424,7 @@ Union = _SpecialForm('Union', doc=
     - You can use Optional[X] as a shorthand for Union[X, None].
     """)
 
-Optional = _SpecialForm('Optional', doc=
-    """Optional type.
+Optional = _SpecialForm('Optional', doc="""Optional type.
 
     Optional[X] is equivalent to Union[X, None].
     """)
@@ -584,6 +582,7 @@ _normalize_alias = {'list': 'List',
                     'type': 'Type',
                     'Set': 'AbstractSet'}
 
+
 def _is_dunder(attr):
     return attr.startswith('__') and attr.endswith('__')
 
@@ -597,6 +596,7 @@ class _GenericAlias(_Final, _root=True):
     have 'name' always set. If 'inst' is False, then the alias can't be instantiated,
     this is used by e.g. typing.List and typing.Dict.
     """
+
     def __init__(self, origin, params, *, inst=True, special=False, name=None):
         self._inst = inst
         self._special = special
@@ -725,7 +725,7 @@ class _GenericAlias(_Final, _root=True):
         else:
             origin = self.__origin__
         if (origin is Callable and
-            not (len(self.__args__) == 2 and self.__args__[0] is Ellipsis)):
+                not (len(self.__args__) == 2 and self.__args__[0] is Ellipsis)):
             args = list(self.__args__[:-1]), self.__args__[-1]
         else:
             args = tuple(self.__args__)
@@ -738,6 +738,7 @@ class _VariadicGenericAlias(_GenericAlias, _root=True):
     """Same as _GenericAlias above but for variadic aliases. Currently,
     this is used only by special internal aliases: Tuple and Callable.
     """
+
     def __getitem__(self, params):
         if self._name != 'Callable' or not self._special:
             return self.__getitem_inner__(params)
@@ -868,7 +869,8 @@ class Generic:
                 tvarset = set(tvars)
                 gvarset = set(gvars)
                 if not tvarset <= gvarset:
-                    s_vars = ', '.join(str(t) for t in tvars if t not in gvarset)
+                    s_vars = ', '.join(str(t)
+                                       for t in tvars if t not in gvarset)
                     s_args = ', '.join(str(g) for g in gvars)
                     raise TypeError(f"Some type variables ({s_vars}) are"
                                     f" not listed in Generic[{s_args}]")
@@ -1190,6 +1192,7 @@ AnyStr = TypeVar('AnyStr', bytes, str)
 def _alias(origin, params, inst=True):
     return _GenericAlias(origin, params, special=True, inst=inst)
 
+
 Hashable = _alias(collections.abc.Hashable, ())  # Not generic.
 Awaitable = _alias(collections.abc.Awaitable, T_co)
 Coroutine = _alias(collections.abc.Coroutine, (T_co, T_contra, V_co))
@@ -1326,9 +1329,11 @@ def _make_nmtuple(name, types):
     nm_tpl = collections.namedtuple(name, [n for n, t in types])
     # Prior to PEP 526, only _field_types attribute was assigned.
     # Now, both __annotations__ and _field_types are used to maintain compatibility.
-    nm_tpl.__annotations__ = nm_tpl._field_types = collections.OrderedDict(types)
+    nm_tpl.__annotations__ = nm_tpl._field_types = collections.OrderedDict(
+        types)
     try:
-        nm_tpl.__module__ = sys._getframe(2).f_globals.get('__name__', '__main__')
+        nm_tpl.__module__ = sys._getframe(
+            2).f_globals.get('__name__', '__main__')
     except (AttributeError, ValueError):
         pass
     return nm_tpl
@@ -1367,7 +1372,8 @@ class NamedTupleMeta(type):
         # update from user namespace without overriding special namedtuple attributes
         for key in ns:
             if key in _prohibited:
-                raise AttributeError("Cannot overwrite NamedTuple attribute " + key)
+                raise AttributeError(
+                    "Cannot overwrite NamedTuple attribute " + key)
             elif key not in _special and key not in nm_tpl._fields:
                 setattr(nm_tpl, key, ns[key])
         return nm_tpl
@@ -1599,6 +1605,7 @@ sys.modules[io.__name__] = io
 
 Pattern = _alias(stdlib_re.Pattern, AnyStr)
 Match = _alias(stdlib_re.Match, AnyStr)
+
 
 class re:
     """Wrapper namespace for re type aliases."""

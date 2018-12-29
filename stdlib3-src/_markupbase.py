@@ -52,7 +52,7 @@ class ParserBase:
         nlines = rawdata.count("\n", i, j)
         if nlines:
             self.lineno = self.lineno + nlines
-            pos = rawdata.rindex("\n", i, j) # Should not fail
+            pos = rawdata.rindex("\n", i, j)  # Should not fail
             self.offset = j-(pos+1)
         else:
             self.offset = self.offset + j-i
@@ -84,16 +84,16 @@ class ParserBase:
             return -1
         # A simple, practical version could look like: ((name|stringlit) S*) + '>'
         n = len(rawdata)
-        if rawdata[j:j+2] == '--': #comment
+        if rawdata[j:j+2] == '--':  # comment
             # Locate --.*-- as the body of the comment
             return self.parse_comment(i)
-        elif rawdata[j] == '[': #marked section
+        elif rawdata[j] == '[':  # marked section
             # Locate [statusWord [...arbitrary SGML...]] as the body of the marked section
             # Where statusWord is one of TEMP, CDATA, IGNORE, INCLUDE, RCDATA
             # Note that this is extended by Microsoft Office "Save as Web" function
             # to include [if...] and [endif].
             return self.parse_marked_section(i)
-        else: #all other declaration elements
+        else:  # all other declaration elements
             decltype, j = self._scan_name(j, i)
         if j < 0:
             return j
@@ -116,7 +116,7 @@ class ParserBase:
             if c in "\"'":
                 m = _declstringlit_match(rawdata, j)
                 if not m:
-                    return -1 # incomplete
+                    return -1  # incomplete
                 j = m.end()
             elif c in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":
                 name, j = self._scan_name(j, i)
@@ -131,7 +131,8 @@ class ParserBase:
                     # also in data attribute specifications of attlist declaration
                     # also link type declaration subsets in linktype declarations
                     # also link attribute specification lists in link declarations
-                    self.error("unsupported '[' char in %s declaration" % decltype)
+                    self.error(
+                        "unsupported '[' char in %s declaration" % decltype)
                 else:
                     self.error("unexpected '[' char in declaration")
             else:
@@ -139,24 +140,26 @@ class ParserBase:
                     "unexpected %r char in declaration" % rawdata[j])
             if j < 0:
                 return j
-        return -1 # incomplete
+        return -1  # incomplete
 
     # Internal -- parse a marked section
     # Override this to handle MS-word extension syntax <![if word]>content<![endif]>
     def parse_marked_section(self, i, report=1):
-        rawdata= self.rawdata
-        assert rawdata[i:i+3] == '<![', "unexpected call to parse_marked_section()"
-        sectName, j = self._scan_name( i+3, i )
+        rawdata = self.rawdata
+        assert rawdata[i:i +
+                       3] == '<![', "unexpected call to parse_marked_section()"
+        sectName, j = self._scan_name(i+3, i)
         if j < 0:
             return j
         if sectName in {"temp", "cdata", "ignore", "include", "rcdata"}:
             # look for standard ]]> ending
-            match= _markedsectionclose.search(rawdata, i+3)
+            match = _markedsectionclose.search(rawdata, i+3)
         elif sectName in {"if", "else", "endif"}:
             # look for MS Office ]> ending
-            match= _msmarkedsectionclose.search(rawdata, i+3)
+            match = _msmarkedsectionclose.search(rawdata, i+3)
         else:
-            self.error('unknown status keyword %r in marked section' % rawdata[i+3:j])
+            self.error('unknown status keyword %r in marked section' %
+                       rawdata[i+3:j])
         if not match:
             return -1
         if report:
@@ -192,7 +195,8 @@ class ParserBase:
                     return -1
                 if s != "<!":
                     self.updatepos(declstartpos, j + 1)
-                    self.error("unexpected char in internal subset (in %r)" % s)
+                    self.error(
+                        "unexpected char in internal subset (in %r)" % s)
                 if (j + 2) == n:
                     # end of buffer; incomplete
                     return -1

@@ -16,6 +16,7 @@ import functools
 
 __all__ = ["filter", "fnmatch", "fnmatchcase", "translate"]
 
+
 def fnmatch(name, pat):
     """Test whether FILENAME matches PATTERN.
 
@@ -35,6 +36,7 @@ def fnmatch(name, pat):
     pat = os.path.normcase(pat)
     return fnmatchcase(name, pat)
 
+
 @functools.lru_cache(maxsize=256, typed=True)
 def _compile_pattern(pat):
     if isinstance(pat, bytes):
@@ -44,6 +46,7 @@ def _compile_pattern(pat):
     else:
         res = translate(pat)
     return re.compile(res).match
+
 
 def filter(names, pat):
     """Return the subset of the list NAMES that match PAT."""
@@ -60,6 +63,7 @@ def filter(names, pat):
             if match(os.path.normcase(name)):
                 result.append(name)
     return result
+
 
 def fnmatchcase(name, pat):
     """Test whether FILENAME matches PATTERN, including case.
