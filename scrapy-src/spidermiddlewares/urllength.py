@@ -26,7 +26,7 @@ class UrlLengthMiddleware(object):
             raise NotConfigured
         return cls(maxlength)
 
-    def process_spider_output(self, response, result, spider):      # 过滤输出request
+    def process_spider_output(self, response, result, spider):
         def _filter(request):
             if isinstance(request, Request) and len(request.url) > self.maxlength:
                 logger.debug("Ignoring link (url length > %(maxlength)d): %(url)s ",
@@ -36,4 +36,4 @@ class UrlLengthMiddleware(object):
             else:
                 return True
 
-        return (r for r in result or () if _filter(r))  # result回退默认值
+        return (r for r in result or () if _filter(r))

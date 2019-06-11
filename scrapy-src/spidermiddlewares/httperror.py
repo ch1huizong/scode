@@ -30,9 +30,10 @@ class HttpErrorMiddleware(object):
         self.handle_httpstatus_all = settings.getbool('HTTPERROR_ALLOW_ALL')
         self.handle_httpstatus_list = settings.getlist('HTTPERROR_ALLOWED_CODES')  #
 
-    def process_spider_input(self, response, spider): 
+    def process_spider_input(self, response, spider):
         if 200 <= response.status < 300:  # common case
             return  # 放行
+
         meta = response.meta
         if 'handle_httpstatus_all' in meta:
             return

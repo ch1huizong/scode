@@ -43,7 +43,7 @@ class DepthMiddleware(object):
                         extra={'spider': spider}
                     )
                     return False
-                elif self.stats:  # 这里？ bug?
+                elif self.stats:
                     if self.verbose_stats:
                         self.stats.inc_value('request_depth_count/%s' % depth,
                                              spider=spider)
@@ -52,7 +52,7 @@ class DepthMiddleware(object):
             return True
 
         # base case (depth=0)
-        if self.stats and 'depth' not in response.meta: # 初始response depth=0
+        if self.stats and 'depth' not in response.meta:
             response.meta['depth'] = 0
             if self.verbose_stats:
                 self.stats.inc_value('request_depth_count/0', spider=spider)

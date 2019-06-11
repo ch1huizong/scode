@@ -31,9 +31,9 @@ class OffsiteMiddleware(object):
     def process_spider_output(self, response, result, spider): # 过滤request
         for x in result:
             if isinstance(x, Request):
-                if x.dont_filter or self.should_follow(x, spider): 
+                if x.dont_filter or self.should_follow(x, spider):
                     yield x
-                else: 
+                else:
                     domain = urlparse_cached(x).hostname  # 不跟踪了，但是记录
                     if domain and domain not in self.domains_seen:
                         self.domains_seen.add(domain)
@@ -59,9 +59,8 @@ class OffsiteMiddleware(object):
         for domain in allowed_domains:
             if url_pattern.match(domain):   # 只是发出警告
                 warnings.warn("allowed_domains accepts only domains, not URLs. Ignoring URL entry %s in allowed_domains." % domain, URLWarning)
-               
         # 允许子域名
-        regex = r'^(.*\.)?(%s)$' % '|'.join(re.escape(d) for d in allowed_domains if d is not None) 
+        regex = r'^(.*\.)?(%s)$' % '|'.join(re.escape(d) for d in allowed_domains if d is not None)
         return re.compile(regex)    # 被编译的综合re
 
     def spider_opened(self, spider): # 进行一些实例的初始设置
