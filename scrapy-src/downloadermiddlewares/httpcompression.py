@@ -1,5 +1,5 @@
 # -*- coding:UTF-8 -*-
-# 阅
+# 阅, 加密/解密, snack
 import zlib
 
 from scrapy.utils.gz import gunzip

@@ -15,13 +15,13 @@ class DownloadTimeoutMiddleware(object):
         self._timeout = timeout
 
     @classmethod
-    def from_crawler(cls, crawler):
+    def from_crawler(cls, crawler): # 注意timeout优先级
         o = cls(crawler.settings.getfloat('DOWNLOAD_TIMEOUT'))
         crawler.signals.connect(o.spider_opened, signal=signals.spider_opened)
         return o
 
     def spider_opened(self, spider):
-        self._timeout = getattr(spider, 'download_timeout', self._timeout) # 爬虫本身获取?
+        self._timeout = getattr(spider, 'download_timeout', self._timeout)
 
     def process_request(self, request, spider):
         if self._timeout:
