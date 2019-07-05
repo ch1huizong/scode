@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 # -*- test-case-name: twisted.test.test_factories,twisted.internet.test.test_protocol -*-
 # Copyright (c) Twisted Matrix Laboratories.
 # See LICENSE for details.

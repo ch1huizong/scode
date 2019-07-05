@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 # Copyright (c) Twisted Matrix Laboratories.
 # See LICENSE for details.
 
@@ -725,7 +726,7 @@ class IResolver(IResolverSimple):
         """
 
 
-
+# 监听或创建TCP
 class IReactorTCP(Interface):
 
     def listenTCP(port, factory, backlog=50, interface=''):
@@ -1951,7 +1952,7 @@ class IPullProducer(IProducer):
         """
 
 
-
+# 代表具体的协议解析 
 class IProtocol(Interface):
 
     def dataReceived(data):
@@ -2148,7 +2149,7 @@ class IFileDescriptorReceiver(Interface):
         """
 
 
-
+# 绑定链接和协议
 class IProtocolFactory(Interface):
     """
     Interface for protocol factories.
@@ -2178,7 +2179,7 @@ class IProtocolFactory(Interface):
         Called every time this is unconnected from a Port or Connector.
         """
 
-
+# 代表tcp或其他链接
 class ITransport(Interface):
     """
     I am a transport for bytes.
